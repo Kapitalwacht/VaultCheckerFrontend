@@ -1,0 +1,51 @@
+{
+    "app": {
+        "name": "VaultChecker",
+        "tagline": "Store credit control for your business"
+    },
+    "nav": {
+        "home": "Home",
+        "stores": "Stores",
+        "customers": "Customers",
+        "catalog": "Products",
+        "credit": "Credits",
+        "audit": "Audit log",
+        "logout": "Log out",
+        "login": "Sign in",
+        "menu": "Menu",
+        "theme": "Toggle theme",
+        "light": "Light mode",
+        "dark": "Dark mode"
+    },
+    "home": {
+        "title": "Home",
+        "subtitle": "Overview of your store credit ledger.",
+        "quickStart": "Quick actions",
+        "kpi": {
+            "outstanding": "Outstanding debt",
+            "customers": "Active customers",
+            "dueSoon": "Installments due soon",
+            "overdue": "Overdue"
+        }
+    },
+    "comingSoon": {
+        "title": "Coming soon",
+        "text": "This section is under construction. You'll be able to manage it here soon."
+    },
+    "notFound": {
+        "title": "Page not found",
+        "text": "The page you are looking for doesn't exist or was moved.",
+        "back": "Back to home"
+    },
+    "login": {
+        "title": "Welcome back",
+        "subtitle": "Sign in to your VaultChecker account.",
+        "email": "Email",
+        "emailPlaceholder": "you{'@'}example.com",
+        "password": "Password",
+        "passwordPlaceholder": "Your password",
+        "togglePassword": "Show or hide password",
+        "submit": "Sign in",
+        "hint": "Protect your business and customer information."
+    }
+}

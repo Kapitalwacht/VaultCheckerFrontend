@@ -1,0 +1,52 @@
+{
+    "app": {
+        "name": "VaultChecker",
+        "tagline": "Control de fiado para tu negocio"
+    },
+    "nav": {
+        "home": "Inicio",
+        "stores": "Tiendas",
+        "customers": "Clientes",
+        "catalog": "Productos",
+        "credit": "Créditos",
+        "audit": "Auditoría",
+        "logout": "Cerrar sesión",
+        "login": "Iniciar sesión",
+        "menu": "Menú",
+        "theme": "Cambiar tema",
+        "light": "Modo claro",
+        "dark": "Modo oscuro"
+    },
+    "home": {
+        "title": "Inicio",
+        "subtitle": "Resumen de tu cuaderno de fiado.",
+        "quickStart": "Accesos rápidos",
+        "kpi": {
+            "outstanding": "Deuda por cobrar",
+            "customers": "Clientes activos",
+            "dueSoon": "Cuotas por vencer",
+            "overdue": "En mora"
+        }
+    },
+    "comingSoon": {
+        "title": "Próximamente",
+        "text": "Esta sección está en construcción. Muy pronto podrás gestionarla desde aquí."
+    },
+    "notFound": {
+        "title": "Página no encontrada",
+        "text": "La página que buscas no existe o fue movida.",
+        "back": "Volver al inicio"
+    },
+    "login": {
+        "title": "Bienvenido de nuevo",
+        "subtitle": "Ingresa a tu cuenta de VaultChecker.",
+        "email": "Correo",
+        "emailPlaceholder": "tucorreo{'@'}ejemplo.com",
+        "password": "Contraseña",
+        "passwordPlaceholder": "Tu contraseña",
+        "togglePassword": "Mostrar u ocultar contraseña",
+        "submit": "Iniciar sesión",
+        "togglePasswordAria": "Mostrar contraseña",
+        "hint": "Protege la información de tu negocio y tus clientes."
+    }
+}
