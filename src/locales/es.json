@@ -9,6 +9,8 @@
         "customers": "Clientes",
         "catalog": "Productos",
         "credit": "Créditos",
+        "plan": "Plan de pagos",
+        "report": "Reporte de corte",
         "audit": "Auditoría",
         "logout": "Cerrar sesión",
         "login": "Iniciar sesión",
@@ -26,6 +28,213 @@
             "customers": "Clientes activos",
             "dueSoon": "Cuotas por vencer",
             "overdue": "En mora"
+        }
+    },
+    "common": {
+        "search": "Buscar…",
+        "new": "Nuevo",
+        "edit": "Editar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "activate": "Activar",
+        "deactivate": "Desactivar",
+        "actions": "Acciones",
+        "state": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "loading": "Cargando…",
+        "error": "Ocurrió un error",
+        "retry": "Reintentar"
+    },
+    "stores": {
+        "subtitle": "Gestiona las tiendas registradas en la plataforma.",
+        "new": "Nueva tienda",
+        "edit": "Editar tienda",
+        "categoryHint": "bodega, frutería, botica…",
+        "emptyTitle": "Aún no hay tiendas",
+        "emptyText": "Registra tu primera tienda para empezar a gestionar sus créditos.",
+        "field": {
+            "businessName": "Razón social",
+            "ruc": "RUC",
+            "category": "Rubro",
+            "address": "Dirección",
+            "phone": "Teléfono",
+            "email": "Correo",
+            "description": "Descripción"
+        }
+    },
+    "customers": {
+        "subtitle": "Administra los clientes y su límite de crédito.",
+        "new": "Nuevo cliente",
+        "edit": "Editar cliente",
+        "confirmDelete": "¿Eliminar al cliente {name}?",
+        "emptyTitle": "Aún no hay clientes",
+        "emptyText": "Registra a tus vecinos para poder otorgarles crédito.",
+        "section": {
+            "credit": "Condiciones de crédito",
+            "rates": "Tasas de interés"
+        },
+        "rateType": {
+            "effective": "efectiva",
+            "nominal": "nominal"
+        },
+        "capitalization": {
+            "daily": "Diaria",
+            "monthly": "Mensual",
+            "quarterly": "Trimestral",
+            "biannual": "Semestral",
+            "annual": "Anual"
+        },
+        "field": {
+            "name": "Nombre",
+            "firstName": "Nombres",
+            "lastName": "Apellidos",
+            "dni": "DNI",
+            "phone": "Teléfono",
+            "address": "Dirección",
+            "creditLimit": "Límite de crédito",
+            "currency": "Moneda",
+            "rate": "Tasa",
+            "rateType": "Tipo de tasa",
+            "rateValue": "Tasa compensatoria (%)",
+            "capitalization": "Capitalización",
+            "moratoriumRateType": "Tipo de tasa moratoria",
+            "moratoriumRateValue": "Tasa moratoria (%)",
+            "maxMonths": "Máx. meses",
+            "cutoffDay": "Día de corte",
+            "paymentDay": "Día de pago"
+        }
+    },
+    "catalog": {
+        "subtitle": "Administra los productos y servicios que ofreces.",
+        "new": "Nuevo producto",
+        "edit": "Editar producto",
+        "confirmDelete": "¿Eliminar el producto {name}?",
+        "emptyTitle": "Aún no hay productos",
+        "emptyText": "Agrega los productos o servicios que vendes a crédito.",
+        "field": {
+            "name": "Nombre",
+            "category": "Categoría",
+            "brand": "Marca",
+            "unit": "Unidad",
+            "cashPrice": "Precio contado",
+            "listPrice": "Precio de lista (crédito)",
+            "paymentMode": "Modalidad de pago",
+            "imageUrl": "URL de imagen"
+        },
+        "paymentMode": {
+            "both": "Contado o en meses",
+            "single": "Pago único fin de mes",
+            "installments": "En meses"
+        },
+        "unit": {
+            "unit": "Unidad",
+            "kg": "Kilogramo",
+            "g": "Gramo",
+            "l": "Litro",
+            "ml": "Mililitro",
+            "pack": "Paquete",
+            "box": "Caja",
+            "dozen": "Docena"
+        }
+    },
+    "credit": {
+        "subtitle": "Cuentas corrientes de crédito y pagos.",
+        "new": "Nueva cuenta",
+        "totalOutstanding": "Deuda total",
+        "activeAccounts": "Cuentas activas",
+        "overdue": "En mora",
+        "registerPayment": "Registrar pago",
+        "selectCustomer": "Selecciona un cliente",
+        "emptyTitle": "Aún no hay cuentas de crédito",
+        "emptyText": "Abre una cuenta de crédito para un cliente registrado.",
+        "field": {
+            "customer": "Cliente",
+            "balance": "Saldo",
+            "available": "Disponible",
+            "creditLimit": "Límite de crédito",
+            "dueDate": "Fecha de pago",
+            "amount": "Monto",
+            "date": "Fecha"
+        },
+        "state": {
+            "current": "Al día",
+            "overdue": "En mora",
+            "paid": "Pagado"
+        },
+        "plan": {
+            "subtitle": "Registra compras y calcula el plan de pagos (método francés).",
+            "newPurchase": "Nueva compra",
+            "available": "Crédito disponible",
+            "calendar": "Calendario",
+            "pickTitle": "Selecciona un cliente",
+            "pickText": "Elige un cliente para ver y registrar sus compras a crédito.",
+            "emptyTitle": "Sin compras registradas",
+            "emptyText": "Registra la primera compra a crédito de este cliente.",
+            "purchase": "Compra",
+            "principal": "Capital",
+            "months": "meses",
+            "single": "Pago único fin de mes",
+            "totalToPay": "Total a pagar",
+            "graceInfo": "Período de gracia: {days} días hasta el {date}",
+            "capitalized": "Deuda capitalizada",
+            "installment": "Cuota",
+            "interest": "Interés",
+            "principalCol": "Amortización",
+            "balance": "Saldo",
+            "product": "Producto",
+            "freeItem": "Ítem libre",
+            "description": "Descripción",
+            "quantity": "Cantidad",
+            "unitPrice": "Precio unitario",
+            "purchaseDate": "Fecha de compra",
+            "amount": "Monto",
+            "paid": "Pagada",
+            "pending": "Pendiente",
+            "pay": "Pagar",
+            "payInstallment": "Registrar pago de cuota",
+            "dueOn": "vence el",
+            "paidDate": "Fecha de pago",
+            "overdueInfo": "Pago con {days} días de mora",
+            "lateFee": "Mora",
+            "allocationHint": "Imputación: primero mora, luego interés, y al final capital.",
+            "confirmPay": "Confirmar pago",
+            "error": {
+                "credit-limit-exceeded": "El monto supera el crédito disponible del cliente.",
+                "max-months-exceeded": "Los meses superan el máximo pactado con el cliente.",
+                "installment-already-paid": "Esta cuota ya fue pagada.",
+                "previous-installment-pending": "Debes pagar primero la cuota anterior."
+            }
+        },
+        "report": {
+            "subtitle": "Estado de cuenta que el cliente debe pagar en su fecha de pago.",
+            "cutoffDate": "Fecha de corte",
+            "pickTitle": "Selecciona un cliente",
+            "pickText": "Elige un cliente para generar su reporte de pago.",
+            "emptyTitle": "Sin deudas pendientes",
+            "emptyText": "Este cliente no tiene cuotas por pagar a la fecha indicada.",
+            "docTitle": "Reporte de pago",
+            "dueDate": "Vencimiento",
+            "concept": "Concepto",
+            "lateFee": "Mora",
+            "lineTotal": "Total",
+            "overdue": "En mora",
+            "total": "Total a pagar"
+        }
+    },
+    "audit": {
+        "subtitle": "Registro de acciones realizadas en la plataforma.",
+        "filterByDate": "Filtrar por fecha",
+        "clearFilter": "Limpiar filtro",
+        "emptyTitle": "Sin registros",
+        "emptyText": "Todavía no hay acciones registradas para mostrar.",
+        "field": {
+            "date": "Fecha",
+            "time": "Hora",
+            "role": "Rol",
+            "action": "Acción",
+            "details": "Detalle"
         }
     },
     "comingSoon": {
@@ -47,6 +256,65 @@
         "togglePassword": "Mostrar u ocultar contraseña",
         "submit": "Iniciar sesión",
         "togglePasswordAria": "Mostrar contraseña",
-        "hint": "Protege la información de tu negocio y tus clientes."
+        "hint": "Protege la información de tu negocio y tus clientes.",
+        "forgot": "¿Olvidaste tu contraseña?",
+        "or": "o",
+        "google": "Continuar con Google",
+        "googleNote": "Configura tu Client ID de Google (gratuito) para habilitar el ingreso con Google.",
+        "recoveredOk": "Contraseña actualizada. Ya puedes iniciar sesión.",
+        "error": {
+            "invalid-credentials": "Correo o contraseña incorrectos.",
+            "google-no-account": "No hay una cuenta con ese correo de Google.",
+            "generic": "No se pudo iniciar sesión. Inténtalo de nuevo."
+        }
+    },
+    "recover": {
+        "title": "Recuperar contraseña",
+        "subtitleEmail": "Ingresa tu correo y te enviaremos un código de recuperación.",
+        "subtitleCode": "Ingresa el código y tu nueva contraseña.",
+        "sendCode": "Enviar código",
+        "sentEmail": "Te enviamos un código a {email}.",
+        "sentDemo": "Modo demo (sin email configurado): usa el código mostrado abajo.",
+        "yourCode": "Tu código",
+        "code": "Código",
+        "codePlaceholder": "6 dígitos",
+        "newPassword": "Nueva contraseña",
+        "newPasswordPlaceholder": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "reset": "Cambiar contraseña",
+        "backToLogin": "Volver a iniciar sesión",
+        "error": {
+            "email-not-found": "No hay una cuenta con ese correo.",
+            "invalid-code": "El código es incorrecto.",
+            "code-expired": "El código expiró, solicita uno nuevo.",
+            "mismatch": "Las contraseñas no coinciden.",
+            "generic": "No se pudo completar la recuperación."
+        }
+    },
+    "roles": {
+        "system-admin": "Administrador del sistema",
+        "store-admin": "Administrador del negocio",
+        "customer": "Cliente"
+    },
+    "profile": {
+        "title": "Mi cuenta",
+        "subtitle": "Edita tus datos y tu contraseña.",
+        "basic": "Datos básicos",
+        "name": "Nombre",
+        "email": "Correo",
+        "savedProfile": "Datos actualizados.",
+        "password": "Contraseña",
+        "passwordHint": "Cambia tu contraseña de acceso.",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "changePassword": "Cambiar contraseña",
+        "savedPassword": "Contraseña actualizada.",
+        "error": {
+            "wrong-current-password": "La contraseña actual es incorrecta.",
+            "mismatch": "Las contraseñas no coinciden.",
+            "not-authenticated": "Tu sesión expiró, vuelve a iniciar sesión.",
+            "generic": "No se pudieron guardar los cambios."
+        }
     }
 }

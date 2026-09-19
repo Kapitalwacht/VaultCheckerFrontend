@@ -9,6 +9,8 @@
         "customers": "Customers",
         "catalog": "Products",
         "credit": "Credits",
+        "plan": "Payment plan",
+        "report": "Cutoff report",
         "audit": "Audit log",
         "logout": "Log out",
         "login": "Sign in",
@@ -26,6 +28,213 @@
             "customers": "Active customers",
             "dueSoon": "Installments due soon",
             "overdue": "Overdue"
+        }
+    },
+    "common": {
+        "search": "Search…",
+        "new": "New",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "actions": "Actions",
+        "state": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "loading": "Loading…",
+        "error": "Something went wrong",
+        "retry": "Retry"
+    },
+    "stores": {
+        "subtitle": "Manage the stores registered on the platform.",
+        "new": "New store",
+        "edit": "Edit store",
+        "categoryHint": "grocery, bakery, pharmacy…",
+        "emptyTitle": "No stores yet",
+        "emptyText": "Register your first store to start managing its credit.",
+        "field": {
+            "businessName": "Business name",
+            "ruc": "Tax ID",
+            "category": "Category",
+            "address": "Address",
+            "phone": "Phone",
+            "email": "Email",
+            "description": "Description"
+        }
+    },
+    "customers": {
+        "subtitle": "Manage customers and their credit limit.",
+        "new": "New customer",
+        "edit": "Edit customer",
+        "confirmDelete": "Delete customer {name}?",
+        "emptyTitle": "No customers yet",
+        "emptyText": "Register your neighbors so you can grant them credit.",
+        "section": {
+            "credit": "Credit terms",
+            "rates": "Interest rates"
+        },
+        "rateType": {
+            "effective": "effective",
+            "nominal": "nominal"
+        },
+        "capitalization": {
+            "daily": "Daily",
+            "monthly": "Monthly",
+            "quarterly": "Quarterly",
+            "biannual": "Biannual",
+            "annual": "Annual"
+        },
+        "field": {
+            "name": "Name",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "dni": "ID number",
+            "phone": "Phone",
+            "address": "Address",
+            "creditLimit": "Credit limit",
+            "currency": "Currency",
+            "rate": "Rate",
+            "rateType": "Rate type",
+            "rateValue": "Compensatory rate (%)",
+            "capitalization": "Capitalization",
+            "moratoriumRateType": "Late rate type",
+            "moratoriumRateValue": "Late rate (%)",
+            "maxMonths": "Max. months",
+            "cutoffDay": "Cutoff day",
+            "paymentDay": "Payment day"
+        }
+    },
+    "catalog": {
+        "subtitle": "Manage the products and services you offer.",
+        "new": "New product",
+        "edit": "Edit product",
+        "confirmDelete": "Delete product {name}?",
+        "emptyTitle": "No products yet",
+        "emptyText": "Add the products or services you sell on credit.",
+        "field": {
+            "name": "Name",
+            "category": "Category",
+            "brand": "Brand",
+            "unit": "Unit",
+            "cashPrice": "Cash price",
+            "listPrice": "List price (credit)",
+            "paymentMode": "Payment mode",
+            "imageUrl": "Image URL"
+        },
+        "paymentMode": {
+            "both": "Cash or installments",
+            "single": "Single end-of-month payment",
+            "installments": "Installments"
+        },
+        "unit": {
+            "unit": "Unit",
+            "kg": "Kilogram",
+            "g": "Gram",
+            "l": "Liter",
+            "ml": "Milliliter",
+            "pack": "Pack",
+            "box": "Box",
+            "dozen": "Dozen"
+        }
+    },
+    "credit": {
+        "subtitle": "Credit current accounts and payments.",
+        "new": "New account",
+        "totalOutstanding": "Total debt",
+        "activeAccounts": "Active accounts",
+        "overdue": "Overdue",
+        "registerPayment": "Register payment",
+        "selectCustomer": "Select a customer",
+        "emptyTitle": "No credit accounts yet",
+        "emptyText": "Open a credit account for a registered customer.",
+        "field": {
+            "customer": "Customer",
+            "balance": "Balance",
+            "available": "Available",
+            "creditLimit": "Credit limit",
+            "dueDate": "Due date",
+            "amount": "Amount",
+            "date": "Date"
+        },
+        "state": {
+            "current": "Current",
+            "overdue": "Overdue",
+            "paid": "Paid"
+        },
+        "plan": {
+            "subtitle": "Register purchases and compute the payment plan (French method).",
+            "newPurchase": "New purchase",
+            "available": "Available credit",
+            "calendar": "Calendar",
+            "pickTitle": "Select a customer",
+            "pickText": "Choose a customer to view and register their credit purchases.",
+            "emptyTitle": "No purchases yet",
+            "emptyText": "Register this customer's first credit purchase.",
+            "purchase": "Purchase",
+            "principal": "Principal",
+            "months": "months",
+            "single": "Single end-of-month payment",
+            "totalToPay": "Total to pay",
+            "graceInfo": "Grace period: {days} days until {date}",
+            "capitalized": "Capitalized debt",
+            "installment": "Installment",
+            "interest": "Interest",
+            "principalCol": "Principal",
+            "balance": "Balance",
+            "product": "Product",
+            "freeItem": "Free item",
+            "description": "Description",
+            "quantity": "Quantity",
+            "unitPrice": "Unit price",
+            "purchaseDate": "Purchase date",
+            "amount": "Amount",
+            "paid": "Paid",
+            "pending": "Pending",
+            "pay": "Pay",
+            "payInstallment": "Register installment payment",
+            "dueOn": "due on",
+            "paidDate": "Payment date",
+            "overdueInfo": "Payment with {days} overdue days",
+            "lateFee": "Late fee",
+            "allocationHint": "Allocation order: late fee first, then interest, principal last.",
+            "confirmPay": "Confirm payment",
+            "error": {
+                "credit-limit-exceeded": "The amount exceeds the customer's available credit.",
+                "max-months-exceeded": "The months exceed the customer's agreed maximum.",
+                "installment-already-paid": "This installment is already paid.",
+                "previous-installment-pending": "You must pay the previous installment first."
+            }
+        },
+        "report": {
+            "subtitle": "Statement the customer must pay on their payment date.",
+            "cutoffDate": "Cutoff date",
+            "pickTitle": "Select a customer",
+            "pickText": "Choose a customer to generate their payment report.",
+            "emptyTitle": "No pending debt",
+            "emptyText": "This customer has no installments due on the given date.",
+            "docTitle": "Payment report",
+            "dueDate": "Due date",
+            "concept": "Concept",
+            "lateFee": "Late fee",
+            "lineTotal": "Total",
+            "overdue": "Overdue",
+            "total": "Total to pay"
+        }
+    },
+    "audit": {
+        "subtitle": "Log of actions performed on the platform.",
+        "filterByDate": "Filter by date",
+        "clearFilter": "Clear filter",
+        "emptyTitle": "No records",
+        "emptyText": "There are no logged actions to show yet.",
+        "field": {
+            "date": "Date",
+            "time": "Time",
+            "role": "Role",
+            "action": "Action",
+            "details": "Details"
         }
     },
     "comingSoon": {
@@ -46,6 +255,65 @@
         "passwordPlaceholder": "Your password",
         "togglePassword": "Show or hide password",
         "submit": "Sign in",
-        "hint": "Protect your business and customer information."
+        "hint": "Protect your business and customer information.",
+        "forgot": "Forgot your password?",
+        "or": "or",
+        "google": "Continue with Google",
+        "googleNote": "Set your Google Client ID (free) to enable Google sign-in.",
+        "recoveredOk": "Password updated. You can sign in now.",
+        "error": {
+            "invalid-credentials": "Wrong email or password.",
+            "google-no-account": "There is no account with that Google email.",
+            "generic": "Could not sign in. Please try again."
+        }
+    },
+    "recover": {
+        "title": "Recover password",
+        "subtitleEmail": "Enter your email and we'll send you a recovery code.",
+        "subtitleCode": "Enter the code and your new password.",
+        "sendCode": "Send code",
+        "sentEmail": "We sent a code to {email}.",
+        "sentDemo": "Demo mode (no email configured): use the code shown below.",
+        "yourCode": "Your code",
+        "code": "Code",
+        "codePlaceholder": "6 digits",
+        "newPassword": "New password",
+        "newPasswordPlaceholder": "New password",
+        "confirmPassword": "Confirm password",
+        "reset": "Change password",
+        "backToLogin": "Back to sign in",
+        "error": {
+            "email-not-found": "There is no account with that email.",
+            "invalid-code": "The code is incorrect.",
+            "code-expired": "The code expired, request a new one.",
+            "mismatch": "Passwords don't match.",
+            "generic": "Could not complete the recovery."
+        }
+    },
+    "roles": {
+        "system-admin": "System administrator",
+        "store-admin": "Business administrator",
+        "customer": "Customer"
+    },
+    "profile": {
+        "title": "My account",
+        "subtitle": "Edit your details and password.",
+        "basic": "Basic details",
+        "name": "Name",
+        "email": "Email",
+        "savedProfile": "Details updated.",
+        "password": "Password",
+        "passwordHint": "Change your sign-in password.",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "changePassword": "Change password",
+        "savedPassword": "Password updated.",
+        "error": {
+            "wrong-current-password": "The current password is incorrect.",
+            "mismatch": "Passwords don't match.",
+            "not-authenticated": "Your session expired, please sign in again.",
+            "generic": "Could not save the changes."
+        }
     }
 }
