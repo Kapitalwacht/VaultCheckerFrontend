@@ -12,6 +12,7 @@
   "dependencies": {
     "@primeuix/themes": "^1.2.5",
     "axios": "^1.16.1",
+    "firebase": "^12.19.0",
     "pinia": "^3.0.4",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
