@@ -66,7 +66,7 @@ function go(to) { router.push(to) }
     width: 46px; height: 46px; border-radius: 12px;
     display: grid; place-items: center; font-size: 1.3rem; flex: none;
 }
-.kpi--brand  .kpi__icon { background: rgba(15, 118, 110, 0.12); color: var(--vc-brand-500); }
+.kpi--brand  .kpi__icon { background: rgba(22, 163, 74, 0.12); color: var(--vc-brand-500); }
 .kpi--info   .kpi__icon { background: rgba(37, 99, 235, 0.12);  color: #2563eb; }
 .kpi--accent .kpi__icon { background: rgba(217, 119, 6, 0.14);  color: var(--vc-accent-500); }
 .kpi--danger .kpi__icon { background: rgba(220, 38, 38, 0.12);  color: var(--vc-danger-500); }

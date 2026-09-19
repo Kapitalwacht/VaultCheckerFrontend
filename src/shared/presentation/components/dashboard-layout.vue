@@ -1,25 +1,34 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import { setLocale } from '@/i18n.js'
+import useIamStore from '@/iam/application/iam.store.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const iamStore = useIamStore()
+const { currentUser, role } = storeToRefs(iamStore)
 
 const mobileMenuOpen = ref(false)
 const isDark = ref(false)
 
-const navItems = [
-    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home' },
-    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores' },
-    { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers' },
-    { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog' },
-    { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit' },
-    { labelKey: 'nav.audit',     icon: 'pi-history',     to: '/audit' }
+const allNavItems = [
+    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: ['system-admin', 'store-admin', 'customer'] },
+    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: ['system-admin'] },
+    { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers',     roles: ['store-admin'] },
+    { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog',       roles: ['store-admin'] },
+    { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit',        roles: ['store-admin'] },
+    { labelKey: 'nav.plan',      icon: 'pi-calculator',  to: '/credit/plan',   roles: ['store-admin'] },
+    { labelKey: 'nav.report',    icon: 'pi-file',        to: '/credit/report', roles: ['store-admin', 'customer'] },
+    { labelKey: 'nav.audit',     icon: 'pi-history',     to: '/audit',         roles: ['system-admin', 'store-admin'] }
 ]
+
+const navItems = computed(() =>
+    allNavItems.filter(item => !role.value || item.roles.includes(role.value)))
 
 function toggleMobileMenu() { mobileMenuOpen.value = !mobileMenuOpen.value }
 function closeMobileMenu() { mobileMenuOpen.value = false }
@@ -35,6 +44,7 @@ function toggleLocale() {
 
 function logout() {
     closeMobileMenu()
+    iamStore.logout()
     router.push('/login')
 }
 
@@ -74,6 +84,13 @@ watch(() => route.fullPath, () => closeMobileMenu())
             </nav>
 
             <div class="sidebar__footer">
+                <RouterLink v-if="currentUser" to="/profile" class="sidebar__user" active-class="sidebar__user--active">
+                    <span class="sidebar__user-info">
+                        <span class="sidebar__user-name">{{ currentUser.name || currentUser.email }}</span>
+                        <span class="sidebar__user-role">{{ t(`roles.${currentUser.role}`, currentUser.role) }}</span>
+                    </span>
+                    <i class="pi pi-pencil sidebar__user-edit" />
+                </RouterLink>
                 <button class="ghost-btn" @click="toggleLocale">
                     <i class="pi pi-globe" />
                     <span>{{ locale === 'es' ? 'ES' : 'EN' }}</span>
@@ -150,6 +167,21 @@ watch(() => route.fullPath, () => closeMobileMenu())
     padding-top: 0.8rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
+.sidebar__user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 10px;
+    margin-bottom: 0.2rem;
+    transition: background 0.15s ease;
+}
+.sidebar__user:hover, .sidebar__user--active { background: var(--vc-sidebar-hover-bg); }
+.sidebar__user-info { display: flex; flex-direction: column; min-width: 0; }
+.sidebar__user-name { color: var(--vc-sidebar-text-strong); font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar__user-role { color: var(--vc-sidebar-text); font-size: 0.78rem; text-transform: capitalize; }
+.sidebar__user-edit { color: var(--vc-sidebar-text); font-size: 0.85rem; flex: none; }
 .ghost-btn {
     display: flex;
     align-items: center;

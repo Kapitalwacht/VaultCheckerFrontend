@@ -9,13 +9,8 @@ defineProps({
 <template>
     <span class="brand" :style="{ color }">
         <svg class="brand__mark" :width="size" :height="size" viewBox="0 0 32 32" aria-hidden="true">
-            <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="currentColor" stroke-width="2" opacity="0.35" />
-            <circle cx="16" cy="16" r="8.5" fill="none" stroke="currentColor" stroke-width="2" />
-            <circle cx="16" cy="16" r="2.6" fill="currentColor" />
-            <line x1="16" y1="7.5" x2="16" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <line x1="16" y1="24.5" x2="16" y2="27" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <line x1="7.5" y1="16" x2="5" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <line x1="24.5" y1="16" x2="27" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <circle cx="16" cy="16" r="12.6" fill="none" stroke="#16a34a" stroke-width="3.4" />
+            <path d="M9.5 11.4 L16 21.6 L22.5 11.4" fill="none" stroke="#16a34a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <span v-if="showText" class="brand__text">
             Vault<span class="brand__text--accent">Checker</span>

@@ -34,7 +34,7 @@ const sectionLabel = computed(() => {
 .coming__icon {
     width: 64px; height: 64px; border-radius: 16px;
     display: grid; place-items: center;
-    background: rgba(15, 118, 110, 0.12);
+    background: rgba(22, 163, 74, 0.12);
     color: var(--vc-brand-500);
     font-size: 1.7rem;
     margin-bottom: 0.25rem;
