@@ -12,6 +12,16 @@ export class CustomerAssembler {
             phone: resource.phone,
             address: resource.address,
             creditLimit: resource.creditLimit,
+            currency: resource.currency,
+            rateType: resource.rateType,
+            rateValue: resource.rateValue,
+            rateCapitalizationDays: resource.rateCapitalizationDays,
+            ratePeriodDays: resource.ratePeriodDays,
+            moratoriumRateType: resource.moratoriumRateType,
+            moratoriumRateValue: resource.moratoriumRateValue,
+            maxMonths: resource.maxMonths,
+            cutoffDay: resource.cutoffDay,
+            paymentDay: resource.paymentDay,
             state: resource.state
         })
     }
@@ -26,6 +36,16 @@ export class CustomerAssembler {
             phone: customer.phone,
             address: customer.address,
             creditLimit: customer.creditLimit,
+            currency: customer.currency,
+            rateType: customer.rateType,
+            rateValue: customer.rateValue,
+            rateCapitalizationDays: customer.rateCapitalizationDays,
+            ratePeriodDays: customer.ratePeriodDays,
+            moratoriumRateType: customer.moratoriumRateType,
+            moratoriumRateValue: customer.moratoriumRateValue,
+            maxMonths: customer.maxMonths,
+            cutoffDay: customer.cutoffDay,
+            paymentDay: customer.paymentDay,
             state: customer.state
         }
     }

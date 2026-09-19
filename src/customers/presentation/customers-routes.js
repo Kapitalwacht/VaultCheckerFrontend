@@ -2,7 +2,7 @@ const customersRoutes = [
     {
         path: 'customers',
         name: 'customers',
-        component: () => import('@/shared/presentation/views/coming-soon.vue'),
+        component: () => import('@/customers/presentation/views/customers-list.vue'),
         meta: { title: 'nav.customers' }
     }
 ]
