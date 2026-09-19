@@ -1,0 +1,298 @@
+{
+  "stores": [
+    {
+      "id": "1",
+      "storeId": "ST-001",
+      "ruc": "20512345678",
+      "businessName": "Bodega Don Pepe",
+      "category": "Bodega",
+      "address": "Av. Los Olivos 123, Lima",
+      "phone": "987654321",
+      "email": "donpepe@bodega.pe",
+      "description": "Bodega de barrio con fiado a vecinos",
+      "state": "active"
+    },
+    {
+      "id": "2",
+      "storeId": "ST-002",
+      "ruc": "20587654321",
+      "businessName": "Frutería La Estrella",
+      "category": "Frutería",
+      "address": "Jr. Puno 456, Lima",
+      "phone": "912345678",
+      "email": "laestrella@fruta.pe",
+      "description": "Frutería con clientes frecuentes a crédito",
+      "state": "active"
+    }
+  ],
+  "customers": [
+    {
+      "id": "1",
+      "customerId": "CU-001",
+      "storeId": "ST-001",
+      "firstName": "María",
+      "lastName": "Quispe",
+      "dni": "45678912",
+      "phone": "999111222",
+      "address": "Calle Las Flores 100",
+      "creditLimit": 500,
+      "currency": "PEN",
+      "rateType": "effective",
+      "rateValue": 0.4,
+      "rateCapitalizationDays": 30,
+      "ratePeriodDays": 360,
+      "moratoriumRateType": "effective",
+      "moratoriumRateValue": 0.6,
+      "maxMonths": 6,
+      "cutoffDay": 20,
+      "paymentDay": 26,
+      "state": "active"
+    },
+    {
+      "id": "2",
+      "customerId": "CU-002",
+      "storeId": "ST-001",
+      "firstName": "José",
+      "lastName": "Ramírez",
+      "dni": "41236789",
+      "phone": "988777666",
+      "address": "Av. Grau 250",
+      "creditLimit": 300,
+      "currency": "PEN",
+      "rateType": "nominal",
+      "rateValue": 0.36,
+      "rateCapitalizationDays": 30,
+      "ratePeriodDays": 360,
+      "moratoriumRateType": "nominal",
+      "moratoriumRateValue": 0.48,
+      "maxMonths": 4,
+      "cutoffDay": 15,
+      "paymentDay": 20,
+      "state": "active"
+    },
+    {
+      "id": "3",
+      "customerId": "CU-003",
+      "storeId": "ST-002",
+      "firstName": "Lucía",
+      "lastName": "Torres",
+      "dni": "47890123",
+      "phone": "955444333",
+      "address": "Jr. Lima 55",
+      "creditLimit": 800,
+      "currency": "PEN",
+      "rateType": "effective",
+      "rateValue": 0.3,
+      "rateCapitalizationDays": 30,
+      "ratePeriodDays": 360,
+      "moratoriumRateType": "effective",
+      "moratoriumRateValue": 0.5,
+      "maxMonths": 12,
+      "cutoffDay": 25,
+      "paymentDay": 5,
+      "state": "active"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "productId": "PR-001",
+      "storeId": "ST-001",
+      "name": "Arroz Costeño 1kg",
+      "category": "Abarrotes",
+      "brand": "Costeño",
+      "unit": "kg",
+      "cashPrice": 4.5,
+      "listPrice": 5,
+      "paymentMode": "both",
+      "imageUrl": "",
+      "state": "active"
+    },
+    {
+      "id": "2",
+      "productId": "PR-002",
+      "storeId": "ST-001",
+      "name": "Aceite Primor 1L",
+      "category": "Abarrotes",
+      "brand": "Primor",
+      "unit": "unit",
+      "cashPrice": 9.9,
+      "listPrice": 11,
+      "paymentMode": "single",
+      "imageUrl": "",
+      "state": "active"
+    },
+    {
+      "id": "3",
+      "productId": "PR-003",
+      "storeId": "ST-002",
+      "name": "Canasta de manzanas",
+      "category": "Frutas",
+      "brand": "",
+      "unit": "box",
+      "cashPrice": 280,
+      "listPrice": 300,
+      "paymentMode": "installments",
+      "imageUrl": "",
+      "state": "active"
+    }
+  ],
+  "credit-accounts": [
+    {
+      "id": "1",
+      "creditId": "CR-001",
+      "storeId": "ST-001",
+      "customerId": "1",
+      "balance": 150.75,
+      "creditLimit": 500,
+      "dueDate": "2026-10-15T00:00:00.000Z",
+      "state": "current"
+    },
+    {
+      "id": "2",
+      "creditId": "CR-002",
+      "storeId": "ST-001",
+      "customerId": "2",
+      "balance": 280,
+      "creditLimit": 300,
+      "dueDate": "2026-09-01T00:00:00.000Z",
+      "state": "overdue"
+    },
+    {
+      "id": "3",
+      "creditId": "CR-003",
+      "storeId": "ST-002",
+      "customerId": "3",
+      "balance": 0,
+      "creditLimit": 800,
+      "dueDate": "2026-11-30T00:00:00.000Z",
+      "state": "paid"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "1",
+      "purchaseId": "PU-001",
+      "storeId": "ST-001",
+      "customerId": "1",
+      "productId": "3",
+      "description": "Canasta de manzanas",
+      "quantity": 1,
+      "amount": 300,
+      "purchaseDate": "2026-09-15T00:00:00.000Z",
+      "months": 3,
+      "state": "active"
+    }
+  ],
+  "payments": [
+    {
+      "id": "1",
+      "creditId": "CR-001",
+      "customerId": "1",
+      "amount": 50,
+      "date": "2026-09-10"
+    }
+  ],
+  "installment-payments": [
+    {
+      "storeId": "ST-001",
+      "customerId": "1",
+      "purchaseId": "1",
+      "period": 1,
+      "scheduledDate": "2026-10-26",
+      "paidDate": "2026-11-05",
+      "installment": 106.83,
+      "lateFee": 1.4,
+      "interest": 8.62,
+      "principal": 98.21,
+      "total": 108.23,
+      "state": "paid",
+      "id": 1
+    },
+    {
+      "storeId": "ST-001",
+      "customerId": "1",
+      "purchaseId": "1",
+      "period": 2,
+      "scheduledDate": "2026-11-26",
+      "paidDate": "2026-09-18",
+      "installment": 106.83,
+      "lateFee": 0,
+      "interest": 5.83,
+      "principal": 101.01,
+      "total": 106.83,
+      "state": "paid",
+      "id": 2
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "userId": "US-001",
+      "email": "sistema@vaultchecker.pe",
+      "password": "sistema123",
+      "name": "Admin Sistema",
+      "role": "system-admin",
+      "storeId": null
+    },
+    {
+      "id": "2",
+      "userId": "US-002",
+      "email": "donpepe@bodega.pe",
+      "password": "pepe123",
+      "name": "Don Pepe",
+      "role": "store-admin",
+      "storeId": "ST-001",
+      "recoveryCode": null,
+      "recoveryExpiresAt": null
+    },
+    {
+      "id": "3",
+      "userId": "US-003",
+      "email": "estrella@fruta.pe",
+      "password": "estrella123",
+      "name": "La Estrella",
+      "role": "store-admin",
+      "storeId": "ST-002"
+    },
+    {
+      "id": "4",
+      "userId": "US-004",
+      "email": "maria@vecina.pe",
+      "password": "maria123",
+      "name": "María Quispe",
+      "role": "customer",
+      "storeId": "ST-001",
+      "customerId": "1"
+    }
+  ],
+  "audit-logs": [
+    {
+      "id": "1",
+      "auditId": "AU-001",
+      "userRole": "store-admin",
+      "action": "CREATE_CREDIT_ACCOUNT",
+      "date": "2026-09-10",
+      "time": "10:32",
+      "details": "Credit account CR-001 opened for María Quispe"
+    },
+    {
+      "id": "2",
+      "auditId": "AU-002",
+      "userRole": "store-admin",
+      "action": "REGISTER_PAYMENT",
+      "date": "2026-09-10",
+      "time": "16:05",
+      "details": "Payment of S/ 50 recorded on CR-001"
+    },
+    {
+      "auditId": "AU-1789759191873",
+      "userRole": "store-admin",
+      "action": "REGISTER_INSTALLMENT_PAYMENT",
+      "date": "2026-09-18",
+      "time": "14:19",
+      "details": "Installment #2 paid 106.83 (late fee 0)",
+      "id": "HRWLYiJ"
+    }
+  ]
+}
