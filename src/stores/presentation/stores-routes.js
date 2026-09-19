@@ -2,7 +2,7 @@ const storesRoutes = [
     {
         path: 'stores',
         name: 'stores',
-        component: () => import('@/shared/presentation/views/coming-soon.vue'),
+        component: () => import('@/stores/presentation/views/stores-list.vue'),
         meta: { title: 'nav.stores' }
     }
 ]
