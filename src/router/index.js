@@ -5,11 +5,14 @@ import customersRoutes from '@/customers/presentation/customers-routes.js'
 import catalogRoutes from '@/catalog/presentation/catalog-routes.js'
 import creditRoutes from '@/credit/presentation/credit-routes.js'
 import auditRoutes from '@/audit/presentation/audit-routes.js'
+import subscriptionsRoutes from '@/subscriptions/presentation/subscriptions-routes.js'
 
 const DashboardLayout = () => import('@/shared/presentation/components/dashboard-layout.vue')
 const HomeView = () => import('@/shared/presentation/views/home.vue')
 const PageNotFoundView = () => import('@/shared/presentation/views/page-not-found.vue')
 const LoginView = () => import('@/iam/presentation/views/login.vue')
+const RegisterView = () => import('@/iam/presentation/views/register.vue')
+const EmailVerificationView = () => import('@/iam/presentation/views/email-verification.vue')
 const PasswordRecoveryView = () => import('@/iam/presentation/views/password-recovery.vue')
 const ProfileView = () => import('@/iam/presentation/views/profile.vue')
 
@@ -19,6 +22,18 @@ const routes = [
         name: 'login',
         component: LoginView,
         meta: { public: true, title: 'nav.login' }
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: RegisterView,
+        meta: { public: true, title: 'register.title' }
+    },
+    {
+        path: '/verify',
+        name: 'verify',
+        component: EmailVerificationView,
+        meta: { public: true, title: 'verify.pendingTitle' }
     },
     {
         path: '/recover',
@@ -37,7 +52,8 @@ const routes = [
             ...customersRoutes,
             ...catalogRoutes,
             ...creditRoutes,
-            ...auditRoutes
+            ...auditRoutes,
+            ...subscriptionsRoutes
         ]
     },
     {
@@ -61,7 +77,7 @@ router.beforeEach(to => {
     if (!to.meta?.public && !iam.isAuthenticated) {
         return { name: 'login', query: { redirect: to.fullPath } }
     }
-    if (to.name === 'login' && iam.isAuthenticated) {
+    if ((to.name === 'login' || to.name === 'register') && iam.isAuthenticated) {
         return { name: 'home' }
     }
     return true

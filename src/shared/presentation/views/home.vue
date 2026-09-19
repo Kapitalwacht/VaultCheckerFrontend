@@ -2,15 +2,17 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 
 const { t } = useI18n()
 const router = useRouter()
+const { format } = useCurrencyFormatter()
 
 const kpis = computed(() => [
-    { key: 'outstanding', icon: 'pi-wallet',      value: 'S/ 0.00', tone: 'brand' },
+    { key: 'outstanding', icon: 'pi-wallet',      value: format(0), tone: 'brand' },
     { key: 'customers',   icon: 'pi-users',        value: '0',       tone: 'info' },
     { key: 'dueSoon',     icon: 'pi-calendar',     value: '0',       tone: 'accent' },
-    { key: 'overdue',     icon: 'pi-exclamation-triangle', value: 'S/ 0.00', tone: 'danger' }
+    { key: 'overdue',     icon: 'pi-exclamation-triangle', value: format(0), tone: 'danger' }
 ])
 
 const shortcuts = [

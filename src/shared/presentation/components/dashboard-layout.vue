@@ -24,6 +24,7 @@ const allNavItems = [
     { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit',        roles: ['store-admin'] },
     { labelKey: 'nav.plan',      icon: 'pi-calculator',  to: '/credit/plan',   roles: ['store-admin'] },
     { labelKey: 'nav.report',    icon: 'pi-file',        to: '/credit/report', roles: ['store-admin', 'customer'] },
+    { labelKey: 'nav.billing',   icon: 'pi-wallet',      to: '/billing',       roles: ['store-admin'] },
     { labelKey: 'nav.audit',     icon: 'pi-history',     to: '/audit',         roles: ['system-admin', 'store-admin'] }
 ]
 
