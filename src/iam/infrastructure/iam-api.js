@@ -4,12 +4,17 @@ import { AuthenticatedUserAssembler } from '@/iam/infrastructure/authenticated-u
 
 const usersPath = '/users'
 
+function normalizePhone(phone) {
+    return String(phone ?? '').replace(/\D/g, '')
+}
+
 function toAuthenticatedUser(record) {
     return AuthenticatedUserAssembler.toEntityFromResource({
         id: record.id,
         userId: record.userId,
         email: record.email,
         name: record.name,
+        phone: record.phone,
         role: record.role,
         storeId: record.storeId,
         customerId: record.customerId,
@@ -25,10 +30,21 @@ export class IamApi extends BaseApi {
         this.#usersEndpoint = new BaseEndpoint(this, usersPath)
     }
 
+    listUsers() {
+        return this.#usersEndpoint.getAll()
+    }
+
     findByEmail(email) {
         return this.http
             .get(`${usersPath}?email=${encodeURIComponent(email)}`)
             .then(response => (response.data || [])[0] || null)
+    }
+
+    findByPhone(phone) {
+        const normalized = normalizePhone(phone)
+        if (!normalized) return Promise.resolve(null)
+        return this.#usersEndpoint.getAll()
+            .then(response => (response.data || []).find(user => normalizePhone(user.phone) === normalized) || null)
     }
 
     patchUser(id, patch) {
@@ -39,6 +55,9 @@ export class IamApi extends BaseApi {
         return this.findByEmail(credentials.email).then(record => {
             if (!record || record.password !== credentials.password) {
                 throw new Error('invalid-credentials')
+            }
+            if (record.emailVerified === false) {
+                throw new Error('email-not-verified')
             }
             return toAuthenticatedUser(record)
         })

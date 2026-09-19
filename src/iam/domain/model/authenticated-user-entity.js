@@ -4,6 +4,7 @@ export class AuthenticatedUser {
         userId = null,
         email = '',
         name = '',
+        phone = '',
         role = 'store-admin',
         storeId = null,
         customerId = null,
@@ -13,6 +14,7 @@ export class AuthenticatedUser {
         this.userId = userId
         this.email = email
         this.name = name
+        this.phone = phone
         this.role = role
         this.storeId = storeId
         this.customerId = customerId

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
+import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
 import { signInWithGoogle as googleSignIn, isGoogleConfigured } from '@/iam/infrastructure/google-identity.js'
 
@@ -20,9 +21,67 @@ const recovered = ref(route.query.recovered === '1')
 const googleMessage = ref('')
 const googleLoading = ref(false)
 
+const mode = ref('email')
+const phone = ref('')
+const phoneStep = ref('request')
+const phoneCode = ref('')
+const phoneDemoCode = ref('')
+const phoneMessage = ref('')
+const phoneLoading = ref(false)
+
 function redirectAfterLogin(user) {
     const fallback = user.isCustomer ? '/credit/report' : '/home'
     router.push(route.query.redirect || fallback)
+}
+
+function phoneErrorKey(message) {
+    if (/Firebase|auth\//.test(message)) return 'sms-unavailable'
+    return message
+}
+
+function switchMode(next) {
+    mode.value = next
+    errorMessage.value = ''
+    phoneMessage.value = ''
+    phoneDemoCode.value = ''
+    phoneStep.value = 'request'
+    phoneCode.value = ''
+}
+
+function requestPhoneCode() {
+    phoneLoading.value = true
+    errorMessage.value = ''
+    phoneMessage.value = ''
+    phoneDemoCode.value = ''
+    iamStore.requestLoginCode(phone.value)
+        .then(result => {
+            phoneStep.value = 'code'
+            if (result.smsSent) {
+                phoneMessage.value = t('login.phone.sentSms', { phone: phone.value })
+            } else {
+                phoneDemoCode.value = result.code
+                phoneMessage.value = t('login.phone.sentDemo')
+            }
+        })
+        .catch(e => {
+            errorMessage.value = t(`login.error.${phoneErrorKey(e.message)}`, t('login.error.generic'))
+        })
+        .finally(() => {
+            phoneLoading.value = false
+        })
+}
+
+function submitPhoneCode() {
+    phoneLoading.value = true
+    errorMessage.value = ''
+    iamStore.signInWithPhone(phone.value, phoneCode.value)
+        .then(redirectAfterLogin)
+        .catch(e => {
+            errorMessage.value = t(`login.error.${phoneErrorKey(e.message)}`, t('login.error.generic'))
+        })
+        .finally(() => {
+            phoneLoading.value = false
+        })
 }
 
 function submit() {
@@ -61,6 +120,7 @@ async function handleGoogle() {
 <template>
     <div class="login">
         <div class="login__panel vc-card">
+            <LocaleToggle class="login__locale" />
             <BrandLogo :size="34" class="login__brand" />
             <h1 class="login__title">{{ t('login.title') }}</h1>
             <p class="login__subtitle">{{ t('login.subtitle') }}</p>
@@ -69,7 +129,7 @@ async function handleGoogle() {
                 <i class="pi pi-check-circle" /> {{ t('login.recoveredOk') }}
             </p>
 
-            <form class="login__form" @submit.prevent="submit">
+            <form v-if="mode === 'email'" class="login__form" @submit.prevent="submit">
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
                     <span class="field__control">
@@ -120,6 +180,53 @@ async function handleGoogle() {
                 </button>
             </form>
 
+            <form v-else class="login__form" @submit.prevent="phoneStep === 'request' ? requestPhoneCode() : submitPhoneCode()">
+                <label class="field">
+                    <span class="field__label">{{ t('login.phone.label') }}</span>
+                    <span class="field__control">
+                        <i class="pi pi-phone field__icon" />
+                        <input
+                            v-model="phone"
+                            type="tel"
+                            class="field__input"
+                            :placeholder="t('register.phonePlaceholder')"
+                            autocomplete="tel"
+                            :disabled="phoneStep === 'code'"
+                            required
+                        />
+                    </span>
+                </label>
+
+                <label v-if="phoneStep === 'code'" class="field">
+                    <span class="field__label">{{ t('login.phone.code') }}</span>
+                    <span class="field__control">
+                        <i class="pi pi-key field__icon" />
+                        <input
+                            v-model="phoneCode"
+                            type="text"
+                            inputmode="numeric"
+                            class="field__input"
+                            :placeholder="t('login.phone.codePlaceholder')"
+                            required
+                        />
+                    </span>
+                </label>
+
+                <p v-if="phoneMessage" class="login__phone-note">
+                    <i class="pi pi-info-circle" /> {{ phoneMessage }}
+                    <strong v-if="phoneDemoCode"> {{ phoneDemoCode }}</strong>
+                </p>
+
+                <p v-if="errorMessage" class="login__error">
+                    <i class="pi pi-exclamation-triangle" /> {{ errorMessage }}
+                </p>
+
+                <button class="login__submit" type="submit" :disabled="phoneLoading">
+                    <i v-if="phoneLoading" class="pi pi-spin pi-spinner" />
+                    <span>{{ phoneStep === 'request' ? t('login.phone.send') : t('login.phone.enter') }}</span>
+                </button>
+            </form>
+
             <div class="login__divider"><span>{{ t('login.or') }}</span></div>
 
             <button type="button" class="login__google-btn" :disabled="googleLoading" @click="handleGoogle">
@@ -133,7 +240,20 @@ async function handleGoogle() {
             </button>
             <p v-if="googleMessage" class="login__google-note">{{ googleMessage }}</p>
 
+            <button v-if="mode === 'email'" type="button" class="login__alt-btn" @click="switchMode('phone')">
+                <i class="pi pi-mobile" /> <span>{{ t('login.phone.usePhone') }}</span>
+            </button>
+            <button v-else type="button" class="login__alt-btn" @click="switchMode('email')">
+                <i class="pi pi-envelope" /> <span>{{ t('login.phone.useEmail') }}</span>
+            </button>
+
+            <p class="login__signup">
+                {{ t('login.noAccount') }}
+                <RouterLink class="login__link" :to="{ name: 'register' }">{{ t('login.createAccount') }}</RouterLink>
+            </p>
+
             <p class="login__hint">{{ t('login.hint') }}</p>
+            <div id="recaptcha-container"></div>
         </div>
     </div>
 </template>
@@ -149,12 +269,14 @@ async function handleGoogle() {
         var(--vc-bg);
 }
 .login__panel {
+    position: relative;
     width: 100%;
     max-width: 400px;
     padding: 2.25rem 2rem;
     display: flex;
     flex-direction: column;
 }
+.login__locale { position: absolute; top: 1rem; right: 1rem; }
 .login__brand { color: var(--vc-brand-500); margin-bottom: 1.25rem; }
 .login__title { font-size: 1.4rem; font-weight: 700; margin: 0; color: var(--vc-text); }
 .login__subtitle { color: var(--vc-text-muted); margin: 0.25rem 0 1.5rem; }
@@ -215,13 +337,15 @@ async function handleGoogle() {
     color: var(--vc-danger-500);
     font-size: 0.85rem;
 }
-.login__hint { text-align: center; color: var(--vc-text-muted); font-size: 0.8rem; margin: 1.25rem 0 0; }
+.login__signup { text-align: center; color: var(--vc-text-muted); font-size: 0.88rem; margin: 1.1rem 0 0; }
+.login__link { color: var(--vc-brand-500); font-weight: 600; }
+.login__hint { text-align: center; color: var(--vc-text-muted); font-size: 0.8rem; margin: 0.75rem 0 0; }
 .login__success {
     display: flex; align-items: center; gap: 0.5rem;
     margin: 0 0 1rem; padding: 0.6rem 0.8rem; border-radius: 10px;
     background: rgba(22, 163, 74, 0.12); color: var(--vc-brand-700, var(--vc-text)); font-size: 0.85rem;
 }
-.login__forgot { align-self: flex-end; margin-top: -0.5rem; color: var(--vc-brand-500); font-size: 0.82rem; font-weight: 600; }
+.login__forgot { align-self: center; margin-top: -0.25rem; color: var(--vc-brand-500); font-size: 0.82rem; font-weight: 600; }
 .login__divider {
     display: flex; align-items: center; gap: 0.75rem;
     margin: 1.25rem 0 1rem; color: var(--vc-text-muted); font-size: 0.8rem;
@@ -241,4 +365,19 @@ async function handleGoogle() {
 .login__google-btn:disabled { opacity: 0.7; cursor: default; }
 .login__google-icon { width: 18px; height: 18px; flex: none; }
 .login__google-note { text-align: center; color: var(--vc-text-muted); font-size: 0.78rem; margin: 0.6rem 0 0; }
+.login__alt-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    width: 100%; margin-top: 0.75rem; padding: 0.7rem 1rem;
+    border: 1px solid var(--vc-border); border-radius: 10px;
+    background: var(--vc-surface); color: var(--vc-text);
+    font: inherit; font-weight: 600; font-size: 0.92rem; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.login__alt-btn:hover { background: var(--vc-surface-2); border-color: var(--vc-text-muted); }
+.login__phone-note {
+    display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+    margin: 0; padding: 0.6rem 0.8rem; border-radius: 10px;
+    background: rgba(22, 163, 74, 0.1); color: var(--vc-text); font-size: 0.85rem;
+}
+.login__phone-note strong { font-size: 1.1rem; letter-spacing: 2px; color: var(--vc-brand-700, var(--vc-brand-600)); }
 </style>

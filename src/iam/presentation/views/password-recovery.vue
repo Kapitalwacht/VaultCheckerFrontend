@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
+import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
 
 const { t } = useI18n()
@@ -59,6 +60,7 @@ function resetPassword() {
 <template>
     <div class="login">
         <div class="login__panel vc-card">
+            <LocaleToggle class="login__locale" />
             <BrandLogo :size="34" class="login__brand" />
             <h1 class="login__title">{{ t('recover.title') }}</h1>
             <p class="login__subtitle">
@@ -126,7 +128,8 @@ function resetPassword() {
         radial-gradient(1200px 600px at 100% -10%, rgba(22, 163, 74, 0.14), transparent 60%),
         var(--vc-bg);
 }
-.login__panel { width: 100%; max-width: 400px; padding: 2.25rem 2rem; display: flex; flex-direction: column; }
+.login__panel { position: relative; width: 100%; max-width: 400px; padding: 2.25rem 2rem; display: flex; flex-direction: column; }
+.login__locale { position: absolute; top: 1rem; right: 1rem; }
 .login__brand { color: var(--vc-brand-500); margin-bottom: 1.25rem; }
 .login__title { font-size: 1.4rem; font-weight: 700; margin: 0; color: var(--vc-text); }
 .login__subtitle { color: var(--vc-text-muted); margin: 0.25rem 0 1.5rem; }

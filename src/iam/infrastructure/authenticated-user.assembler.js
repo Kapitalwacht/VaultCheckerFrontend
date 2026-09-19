@@ -7,6 +7,7 @@ export class AuthenticatedUserAssembler {
             userId: resource.userId,
             email: resource.email,
             name: resource.name,
+            phone: resource.phone,
             role: resource.role,
             storeId: resource.storeId,
             customerId: resource.customerId,

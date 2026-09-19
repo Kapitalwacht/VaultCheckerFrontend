@@ -3,24 +3,32 @@ import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useIamStore from '@/iam/application/iam.store.js'
+import { useCurrencyFormatter, setCurrency } from '@/shared/infrastructure/currency-formatter.js'
 
 const { t } = useI18n()
 const iamStore = useIamStore()
 const { currentUser } = storeToRefs(iamStore)
+const { currency } = useCurrencyFormatter()
 
-const profileForm = reactive({ name: '', email: '' })
+const profileForm = reactive({ name: '', phone: '' })
+const emailForm = reactive({ next: '' })
 const passwordForm = reactive({ current: '', next: '', confirm: '' })
+const showPasswords = ref(false)
 
 const savingProfile = ref(false)
+const savingEmail = ref(false)
 const savingPassword = ref(false)
 const profileMessage = ref('')
 const profileError = ref('')
+const emailMessage = ref('')
+const emailError = ref('')
+const emailVerificationLink = ref('')
 const passwordMessage = ref('')
 const passwordError = ref('')
 
 function loadProfile() {
     profileForm.name = currentUser.value?.name ?? ''
-    profileForm.email = currentUser.value?.email ?? ''
+    profileForm.phone = currentUser.value?.phone ?? ''
 }
 
 async function saveProfile() {
@@ -28,12 +36,36 @@ async function saveProfile() {
     profileMessage.value = ''
     profileError.value = ''
     try {
-        await iamStore.updateProfile({ name: profileForm.name, email: profileForm.email })
+        await iamStore.updateProfile({ name: profileForm.name, phone: profileForm.phone })
         profileMessage.value = t('profile.savedProfile')
     } catch (e) {
         profileError.value = t(`profile.error.${e.message}`, t('profile.error.generic'))
     } finally {
         savingProfile.value = false
+    }
+}
+
+async function changeEmail() {
+    emailMessage.value = ''
+    emailError.value = ''
+    emailVerificationLink.value = ''
+    const next = emailForm.next.trim()
+    if (next.toLowerCase() === (currentUser.value?.email ?? '').toLowerCase()) {
+        emailError.value = t('profile.error.same-email')
+        return
+    }
+    savingEmail.value = true
+    try {
+        const result = await iamStore.changeEmail(next)
+        emailForm.next = ''
+        emailVerificationLink.value = result.emailSent ? '' : result.link
+        emailMessage.value = result.emailSent
+            ? t('profile.emailSent', { email: next })
+            : t('profile.emailDemo')
+    } catch (e) {
+        emailError.value = t(`profile.error.${e.message}`, t('profile.error.generic'))
+    } finally {
+        savingEmail.value = false
     }
 }
 
@@ -72,6 +104,18 @@ onMounted(loadProfile)
 
         <div class="profile-grid">
             <section class="vc-card profile-card">
+                <h2 class="profile-card__title">{{ t('profile.preferences') }}</h2>
+                <p class="profile-card__role">{{ t('profile.preferencesHint') }}</p>
+                <label class="vc-field vc-field--full">
+                    <span class="vc-field__label">{{ t('profile.currency') }}</span>
+                    <select :value="currency" class="vc-input" @change="setCurrency($event.target.value)">
+                        <option value="PEN">{{ t('profile.currencyPen') }}</option>
+                        <option value="USD">{{ t('profile.currencyUsd') }}</option>
+                    </select>
+                </label>
+            </section>
+
+            <section class="vc-card profile-card">
                 <h2 class="profile-card__title">{{ t('profile.basic') }}</h2>
                 <p class="profile-card__role">
                     {{ t(`roles.${currentUser?.role}`, currentUser?.role) }}
@@ -83,8 +127,8 @@ onMounted(loadProfile)
                         <input v-model="profileForm.name" class="vc-input" required />
                     </label>
                     <label class="vc-field vc-field--full">
-                        <span class="vc-field__label">{{ t('profile.email') }}</span>
-                        <input v-model="profileForm.email" type="email" class="vc-input" required />
+                        <span class="vc-field__label">{{ t('profile.phone') }}</span>
+                        <input v-model="profileForm.phone" class="vc-input" type="tel" :placeholder="t('register.phonePlaceholder')" />
                     </label>
                     <p v-if="profileError" class="profile-msg profile-msg--error"><i class="pi pi-exclamation-triangle" /> {{ profileError }}</p>
                     <p v-if="profileMessage" class="profile-msg profile-msg--ok"><i class="pi pi-check-circle" /> {{ profileMessage }}</p>
@@ -97,20 +141,60 @@ onMounted(loadProfile)
             </section>
 
             <section class="vc-card profile-card">
+                <h2 class="profile-card__title">{{ t('profile.emailTitle') }}</h2>
+                <p class="profile-card__role">{{ t('profile.emailHint') }}</p>
+                <form class="vc-form-grid" @submit.prevent="changeEmail">
+                    <label class="vc-field vc-field--full">
+                        <span class="vc-field__label">{{ t('profile.currentEmail') }}</span>
+                        <input :value="currentUser?.email" class="vc-input" type="email" disabled />
+                    </label>
+                    <label class="vc-field vc-field--full">
+                        <span class="vc-field__label">{{ t('profile.newEmail') }}</span>
+                        <input v-model="emailForm.next" class="vc-input" type="email" :placeholder="t('profile.newEmailPlaceholder')" required />
+                    </label>
+                    <p v-if="emailError" class="profile-msg profile-msg--error"><i class="pi pi-exclamation-triangle" /> {{ emailError }}</p>
+                    <p v-if="emailMessage" class="profile-msg profile-msg--ok"><i class="pi pi-check-circle" /> {{ emailMessage }}</p>
+                    <a v-if="emailVerificationLink" class="profile-msg profile-verify" :href="emailVerificationLink">
+                        <i class="pi pi-link" /> {{ t('profile.verifyNow') }}
+                    </a>
+                    <div class="profile-actions">
+                        <button class="vc-btn vc-btn--primary" type="submit" :disabled="savingEmail">
+                            <i v-if="savingEmail" class="pi pi-spinner vc-spin" /> {{ t('profile.changeEmail') }}
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="vc-card profile-card">
                 <h2 class="profile-card__title">{{ t('profile.password') }}</h2>
                 <p class="profile-card__role">{{ t('profile.passwordHint') }}</p>
                 <form class="vc-form-grid" @submit.prevent="savePassword">
                     <label class="vc-field vc-field--full">
                         <span class="vc-field__label">{{ t('profile.currentPassword') }}</span>
-                        <input v-model="passwordForm.current" type="password" class="vc-input" required />
+                        <span class="vc-password">
+                            <input v-model="passwordForm.current" :type="showPasswords ? 'text' : 'password'" class="vc-input vc-password__input" required />
+                            <button type="button" class="vc-password__toggle" :aria-label="t('login.togglePassword')" @click="showPasswords = !showPasswords">
+                                <i :class="showPasswords ? 'pi pi-eye-slash' : 'pi pi-eye'" />
+                            </button>
+                        </span>
                     </label>
                     <label class="vc-field vc-field--full">
                         <span class="vc-field__label">{{ t('profile.newPassword') }}</span>
-                        <input v-model="passwordForm.next" type="password" class="vc-input" required />
+                        <span class="vc-password">
+                            <input v-model="passwordForm.next" :type="showPasswords ? 'text' : 'password'" class="vc-input vc-password__input" required />
+                            <button type="button" class="vc-password__toggle" :aria-label="t('login.togglePassword')" @click="showPasswords = !showPasswords">
+                                <i :class="showPasswords ? 'pi pi-eye-slash' : 'pi pi-eye'" />
+                            </button>
+                        </span>
                     </label>
                     <label class="vc-field vc-field--full">
                         <span class="vc-field__label">{{ t('profile.confirmPassword') }}</span>
-                        <input v-model="passwordForm.confirm" type="password" class="vc-input" required />
+                        <span class="vc-password">
+                            <input v-model="passwordForm.confirm" :type="showPasswords ? 'text' : 'password'" class="vc-input vc-password__input" required />
+                            <button type="button" class="vc-password__toggle" :aria-label="t('login.togglePassword')" @click="showPasswords = !showPasswords">
+                                <i :class="showPasswords ? 'pi pi-eye-slash' : 'pi pi-eye'" />
+                            </button>
+                        </span>
                     </label>
                     <p v-if="passwordError" class="profile-msg profile-msg--error"><i class="pi pi-exclamation-triangle" /> {{ passwordError }}</p>
                     <p v-if="passwordMessage" class="profile-msg profile-msg--ok"><i class="pi pi-check-circle" /> {{ passwordMessage }}</p>
@@ -137,5 +221,14 @@ onMounted(loadProfile)
 .profile-msg { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
 .profile-msg--error { color: var(--vc-danger-500); }
 .profile-msg--ok { color: var(--vc-brand-600, var(--vc-success-500)); }
-.profile-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+.profile-verify { color: var(--vc-brand-500); font-weight: 600; font-size: 0.85rem; text-decoration: none; word-break: break-all; }
+.profile-actions { grid-column: 1 / -1; display: flex; justify-content: center; }
+.profile-actions .vc-btn { min-width: 180px; justify-content: center; }
+.vc-password { position: relative; display: block; }
+.vc-password__input { width: 100%; padding-right: 2.5rem; box-sizing: border-box; }
+.vc-password__toggle {
+    position: absolute; top: 50%; right: 0.5rem; transform: translateY(-50%);
+    border: none; background: transparent; cursor: pointer;
+    color: var(--vc-text-muted); padding: 0.25rem; display: flex; align-items: center;
+}
 </style>
