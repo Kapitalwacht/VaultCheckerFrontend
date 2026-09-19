@@ -2,7 +2,7 @@ const auditRoutes = [
     {
         path: 'audit',
         name: 'audit',
-        component: () => import('@/shared/presentation/views/coming-soon.vue'),
+        component: () => import('@/audit/presentation/views/audit-list.vue'),
         meta: { title: 'nav.audit' }
     }
 ]
