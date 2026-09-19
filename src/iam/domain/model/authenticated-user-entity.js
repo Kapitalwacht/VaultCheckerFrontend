@@ -3,17 +3,35 @@ export class AuthenticatedUser {
         id = null,
         userId = null,
         email = '',
-        role = 'seller',
+        name = '',
+        role = 'store-admin',
+        storeId = null,
+        customerId = null,
         token = ''
     } = {}) {
         this.id = id
         this.userId = userId
         this.email = email
+        this.name = name
         this.role = role
+        this.storeId = storeId
+        this.customerId = customerId
         this.token = token
     }
 
     get isAuthenticated() {
         return Boolean(this.token)
+    }
+
+    get isSystemAdmin() {
+        return this.role === 'system-admin'
+    }
+
+    get isStoreAdmin() {
+        return this.role === 'store-admin'
+    }
+
+    get isCustomer() {
+        return this.role === 'customer'
     }
 }
