@@ -2,7 +2,7 @@ const catalogRoutes = [
     {
         path: 'catalog',
         name: 'catalog',
-        component: () => import('@/shared/presentation/views/coming-soon.vue'),
+        component: () => import('@/catalog/presentation/views/catalog-list.vue'),
         meta: { title: 'nav.catalog' }
     }
 ]

@@ -5,9 +5,12 @@ export class Product {
         storeId = null,
         name = '',
         category = '',
+        brand = '',
         unit = 'unit',
-        price = 0,
-        stock = 0,
+        cashPrice = 0,
+        listPrice = 0,
+        paymentMode = 'both',
+        imageUrl = '',
         state = 'active'
     } = {}) {
         this.id = id
@@ -15,13 +18,24 @@ export class Product {
         this.storeId = storeId
         this.name = name
         this.category = category
+        this.brand = brand
         this.unit = unit
-        this.price = price
-        this.stock = stock
+        this.cashPrice = cashPrice
+        this.listPrice = listPrice
+        this.paymentMode = paymentMode
+        this.imageUrl = imageUrl
         this.state = state
     }
 
-    get isAvailable() {
-        return this.state === 'active' && this.stock > 0
+    get isActive() {
+        return this.state === 'active'
+    }
+
+    get allowsInstallments() {
+        return this.paymentMode === 'installments' || this.paymentMode === 'both'
+    }
+
+    get allowsSinglePayment() {
+        return this.paymentMode === 'single' || this.paymentMode === 'both'
     }
 }

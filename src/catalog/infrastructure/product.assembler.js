@@ -8,9 +8,12 @@ export class ProductAssembler {
             storeId: resource.storeId,
             name: resource.name,
             category: resource.category,
+            brand: resource.brand,
             unit: resource.unit,
-            price: resource.price,
-            stock: resource.stock,
+            cashPrice: resource.cashPrice,
+            listPrice: resource.listPrice,
+            paymentMode: resource.paymentMode,
+            imageUrl: resource.imageUrl,
             state: resource.state
         })
     }
@@ -21,9 +24,12 @@ export class ProductAssembler {
             storeId: product.storeId,
             name: product.name,
             category: product.category,
+            brand: product.brand,
             unit: product.unit,
-            price: product.price,
-            stock: product.stock,
+            cashPrice: product.cashPrice,
+            listPrice: product.listPrice,
+            paymentMode: product.paymentMode,
+            imageUrl: product.imageUrl,
             state: product.state
         }
     }
