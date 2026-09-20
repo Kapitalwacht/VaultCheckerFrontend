@@ -25,12 +25,64 @@ const done = ref(false)
 const emailSent = ref(false)
 const verificationLink = ref('')
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MIN_PASSWORD_LENGTH = 8
+
+const fieldErrors = ref({})
+const submitted = ref(false)
+
+function checkField(field) {
+    switch (field) {
+        case 'businessName':
+            return businessName.value.trim() ? '' : 'businessNameRequired'
+        case 'ownerName':
+            return ownerName.value.trim() ? '' : 'ownerNameRequired'
+        case 'email':
+            if (!email.value.trim()) return 'emailRequired'
+            return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
+        case 'phone':
+            return phone.value.trim() ? '' : 'phoneRequired'
+        case 'password':
+            if (!password.value) return 'passwordRequired'
+            return password.value.length < MIN_PASSWORD_LENGTH ? 'passwordShort' : ''
+        case 'confirmPassword':
+            if (!confirmPassword.value) return 'confirmRequired'
+            return password.value === confirmPassword.value ? '' : 'mismatch'
+        default:
+            return ''
+    }
+}
+
+const FIELDS = ['businessName', 'ownerName', 'email', 'phone', 'password', 'confirmPassword']
+
+function validate() {
+    const errors = {}
+    FIELDS.forEach(field => {
+        const key = checkField(field)
+        if (key) errors[field] = key
+    })
+    fieldErrors.value = errors
+    return Object.keys(errors).length === 0
+}
+
+function revalidate(field) {
+    if (!submitted.value) return
+    const key = checkField(field)
+    const next = { ...fieldErrors.value }
+    if (key) next[field] = key
+    else delete next[field]
+    if (field === 'password') {
+        const confirmKey = checkField('confirmPassword')
+        if (confirmKey) next.confirmPassword = confirmKey
+        else delete next.confirmPassword
+    }
+    fieldErrors.value = next
+}
+
 function submit() {
     errorMessage.value = ''
-    if (password.value !== confirmPassword.value) {
-        errorMessage.value = t('register.error.mismatch')
-        return
-    }
+    submitted.value = true
+    if (!validate()) return
     submitting.value = true
     iamStore.registerAccount({
         businessName: businessName.value,
@@ -80,13 +132,14 @@ function submit() {
             <h1 class="login__title">{{ t('register.title') }}</h1>
             <p class="login__subtitle">{{ t('register.subtitle') }}</p>
 
-            <form class="login__form" @submit.prevent="submit">
+            <form class="login__form" novalidate @submit.prevent="submit">
                 <label class="field">
                     <span class="field__label">{{ t('register.businessName') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.businessName }">
                         <i class="pi pi-shop field__icon" />
-                        <input v-model="businessName" type="text" class="field__input" :placeholder="t('register.businessNamePlaceholder')" required />
+                        <input v-model="businessName" type="text" class="field__input" :placeholder="t('register.businessNamePlaceholder')" @input="revalidate('businessName')" />
                     </span>
+                    <span v-if="fieldErrors.businessName" class="field__error">{{ t(`register.error.${fieldErrors.businessName}`) }}</span>
                 </label>
 
                 <div class="login__row">
@@ -108,31 +161,34 @@ function submit() {
 
                 <label class="field">
                     <span class="field__label">{{ t('register.ownerName') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.ownerName }">
                         <i class="pi pi-user field__icon" />
-                        <input v-model="ownerName" type="text" class="field__input" :placeholder="t('register.ownerNamePlaceholder')" required />
+                        <input v-model="ownerName" type="text" class="field__input" :placeholder="t('register.ownerNamePlaceholder')" @input="revalidate('ownerName')" />
                     </span>
+                    <span v-if="fieldErrors.ownerName" class="field__error">{{ t(`register.error.${fieldErrors.ownerName}`) }}</span>
                 </label>
 
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.email }">
                         <i class="pi pi-envelope field__icon" />
-                        <input v-model="email" type="email" class="field__input" :placeholder="t('login.emailPlaceholder')" autocomplete="username" required />
+                        <input v-model="email" type="email" class="field__input" :placeholder="t('login.emailPlaceholder')" autocomplete="username" @input="revalidate('email')" />
                     </span>
+                    <span v-if="fieldErrors.email" class="field__error">{{ t(`register.error.${fieldErrors.email}`) }}</span>
                 </label>
 
                 <label class="field">
                     <span class="field__label">{{ t('register.phone') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.phone }">
                         <i class="pi pi-phone field__icon" />
-                        <input v-model="phone" type="tel" class="field__input" :placeholder="t('register.phonePlaceholder')" autocomplete="tel" required />
+                        <input v-model="phone" type="tel" class="field__input" :placeholder="t('register.phonePlaceholder')" autocomplete="tel" @input="revalidate('phone')" />
                     </span>
+                    <span v-if="fieldErrors.phone" class="field__error">{{ t(`register.error.${fieldErrors.phone}`) }}</span>
                 </label>
 
                 <label class="field">
                     <span class="field__label">{{ t('login.password') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.password }">
                         <i class="pi pi-lock field__icon" />
                         <input
                             v-model="password"
@@ -140,7 +196,7 @@ function submit() {
                             class="field__input"
                             :placeholder="t('login.passwordPlaceholder')"
                             autocomplete="new-password"
-                            required
+                            @input="revalidate('password')"
                         />
                         <button
                             type="button"
@@ -151,11 +207,12 @@ function submit() {
                             <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" />
                         </button>
                     </span>
+                    <span v-if="fieldErrors.password" class="field__error">{{ t(`register.error.${fieldErrors.password}`) }}</span>
                 </label>
 
                 <label class="field">
                     <span class="field__label">{{ t('register.confirmPassword') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.confirmPassword }">
                         <i class="pi pi-lock field__icon" />
                         <input
                             v-model="confirmPassword"
@@ -163,9 +220,10 @@ function submit() {
                             class="field__input"
                             :placeholder="t('register.confirmPasswordPlaceholder')"
                             autocomplete="new-password"
-                            required
+                            @input="revalidate('confirmPassword')"
                         />
                     </span>
+                    <span v-if="fieldErrors.confirmPassword" class="field__error">{{ t(`register.error.${fieldErrors.confirmPassword}`) }}</span>
                 </label>
 
                 <p v-if="errorMessage" class="login__error">
@@ -231,6 +289,17 @@ function submit() {
 .field__control:focus-within {
     border-color: var(--vc-brand-500);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+.field__control--error {
+    border-color: var(--vc-danger-500);
+}
+.field__control--error:focus-within {
+    border-color: var(--vc-danger-500);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+.field__error {
+    font-size: 0.78rem;
+    color: var(--vc-danger-500);
 }
 .field__icon { color: var(--vc-text-muted); font-size: 0.95rem; }
 .field__input {
