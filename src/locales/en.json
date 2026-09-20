@@ -284,6 +284,11 @@
             "invalid-code": "The code is incorrect.",
             "code-expired": "The code expired, request a new one.",
             "sms-unavailable": "Could not send the SMS. Check the number or try again later.",
+            "emailRequired": "Email is required.",
+            "emailInvalid": "Enter a valid email address.",
+            "passwordRequired": "Password is required.",
+            "phoneRequired": "Phone number is required.",
+            "codeRequired": "Enter the code we sent you.",
             "generic": "Could not sign in. Please try again."
         }
     },
@@ -291,13 +296,13 @@
         "title": "Create your account",
         "subtitle": "Register your business and start managing store credit.",
         "businessName": "Business name",
-        "businessNamePlaceholder": "e.g. Bodega Don Pepe",
+        "businessNamePlaceholder": "e.g. Joe's Corner Store",
         "ruc": "Tax ID (optional)",
         "rucPlaceholder": "20512345678",
         "category": "Category (optional)",
         "categoryPlaceholder": "e.g. Grocery",
         "ownerName": "Your name",
-        "ownerNamePlaceholder": "Owner name",
+        "ownerNamePlaceholder": "e.g. John Doe",
         "phone": "Phone",
         "phonePlaceholder": "+51 987654321",
         "confirmPassword": "Confirm password",
@@ -313,6 +318,14 @@
         "error": {
             "email-taken": "An account with that email already exists.",
             "mismatch": "Passwords do not match.",
+            "businessNameRequired": "Business name is required.",
+            "ownerNameRequired": "Your name is required.",
+            "emailRequired": "Email is required.",
+            "emailInvalid": "Enter a valid email address.",
+            "phoneRequired": "Phone number is required.",
+            "passwordRequired": "Password is required.",
+            "passwordShort": "Password must be at least 8 characters.",
+            "confirmRequired": "Please confirm your password.",
             "generic": "Could not create the account. Please try again."
         }
     },
@@ -395,6 +408,12 @@
             "invalid-code": "The code is incorrect.",
             "code-expired": "The code expired, request a new one.",
             "mismatch": "Passwords don't match.",
+            "emailRequired": "Email is required.",
+            "emailInvalid": "Enter a valid email address.",
+            "codeRequired": "Enter the code we sent you.",
+            "passwordRequired": "Password is required.",
+            "passwordShort": "Password must be at least 8 characters.",
+            "confirmRequired": "Please confirm your password.",
             "generic": "Could not complete the recovery."
         }
     },
@@ -438,6 +457,12 @@
             "same-email": "The new email is the same as the current one.",
             "mismatch": "Passwords don't match.",
             "not-authenticated": "Your session expired, please sign in again.",
+            "emailRequired": "Email is required.",
+            "emailInvalid": "Enter a valid email address.",
+            "currentPasswordRequired": "Enter your current password.",
+            "passwordRequired": "Password is required.",
+            "passwordShort": "Password must be at least 8 characters.",
+            "confirmRequired": "Please confirm your password.",
             "generic": "Could not save the changes."
         }
     }

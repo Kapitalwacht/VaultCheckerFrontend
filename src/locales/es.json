@@ -285,6 +285,11 @@
             "invalid-code": "El código es incorrecto.",
             "code-expired": "El código expiró, solicita uno nuevo.",
             "sms-unavailable": "No se pudo enviar el SMS. Verifica el número o intenta más tarde.",
+            "emailRequired": "El correo es obligatorio.",
+            "emailInvalid": "Ingresa un correo válido.",
+            "passwordRequired": "La contraseña es obligatoria.",
+            "phoneRequired": "El número de teléfono es obligatorio.",
+            "codeRequired": "Ingresa el código que te enviamos.",
             "generic": "No se pudo iniciar sesión. Inténtalo de nuevo."
         }
     },
@@ -314,6 +319,14 @@
         "error": {
             "email-taken": "Ya existe una cuenta con ese correo.",
             "mismatch": "Las contraseñas no coinciden.",
+            "businessNameRequired": "El nombre del negocio es obligatorio.",
+            "ownerNameRequired": "Tu nombre es obligatorio.",
+            "emailRequired": "El correo es obligatorio.",
+            "emailInvalid": "Ingresa un correo válido.",
+            "phoneRequired": "El número de teléfono es obligatorio.",
+            "passwordRequired": "La contraseña es obligatoria.",
+            "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
+            "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudo crear la cuenta. Inténtalo de nuevo."
         }
     },
@@ -396,6 +409,12 @@
             "invalid-code": "El código es incorrecto.",
             "code-expired": "El código expiró, solicita uno nuevo.",
             "mismatch": "Las contraseñas no coinciden.",
+            "emailRequired": "El correo es obligatorio.",
+            "emailInvalid": "Ingresa un correo válido.",
+            "codeRequired": "Ingresa el código que te enviamos.",
+            "passwordRequired": "La contraseña es obligatoria.",
+            "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
+            "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudo completar la recuperación."
         }
     },
@@ -439,6 +458,12 @@
             "same-email": "El nuevo correo es igual al actual.",
             "mismatch": "Las contraseñas no coinciden.",
             "not-authenticated": "Tu sesión expiró, vuelve a iniciar sesión.",
+            "emailRequired": "El correo es obligatorio.",
+            "emailInvalid": "Ingresa un correo válido.",
+            "currentPasswordRequired": "Ingresa tu contraseña actual.",
+            "passwordRequired": "La contraseña es obligatoria.",
+            "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
+            "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudieron guardar los cambios."
         }
     }
