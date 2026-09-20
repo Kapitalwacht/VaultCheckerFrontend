@@ -20,7 +20,56 @@ const infoMessage = ref('')
 const errorMessage = ref('')
 const submitting = ref(false)
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MIN_PASSWORD_LENGTH = 8
+const fieldErrors = ref({})
+const submitted = ref(false)
+
+function checkField(field) {
+    switch (field) {
+        case 'email':
+            if (!email.value.trim()) return 'emailRequired'
+            return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
+        case 'code':
+            return code.value.trim() ? '' : 'codeRequired'
+        case 'newPassword':
+            if (!newPassword.value) return 'passwordRequired'
+            return newPassword.value.length < MIN_PASSWORD_LENGTH ? 'passwordShort' : ''
+        case 'confirmPassword':
+            if (!confirmPassword.value) return 'confirmRequired'
+            return newPassword.value === confirmPassword.value ? '' : 'mismatch'
+        default:
+            return ''
+    }
+}
+
+function validateFields(fields) {
+    const errors = {}
+    fields.forEach(field => {
+        const key = checkField(field)
+        if (key) errors[field] = key
+    })
+    fieldErrors.value = errors
+    return Object.keys(errors).length === 0
+}
+
+function revalidate(field) {
+    if (!submitted.value) return
+    const key = checkField(field)
+    const next = { ...fieldErrors.value }
+    if (key) next[field] = key
+    else delete next[field]
+    if (field === 'newPassword') {
+        const confirmKey = checkField('confirmPassword')
+        if (confirmKey) next.confirmPassword = confirmKey
+        else delete next.confirmPassword
+    }
+    fieldErrors.value = next
+}
+
 function requestCode() {
+    submitted.value = true
+    if (!validateFields(['email'])) return
     submitting.value = true
     errorMessage.value = ''
     infoMessage.value = ''
@@ -28,6 +77,8 @@ function requestCode() {
     iamStore.requestRecovery(email.value)
         .then(result => {
             step.value = 2
+            submitted.value = false
+            fieldErrors.value = {}
             if (result.emailSent) {
                 infoMessage.value = t('recover.sentEmail', { email: email.value })
             } else {
@@ -42,11 +93,9 @@ function requestCode() {
 }
 
 function resetPassword() {
+    submitted.value = true
     errorMessage.value = ''
-    if (newPassword.value !== confirmPassword.value) {
-        errorMessage.value = t('recover.error.mismatch')
-        return
-    }
+    if (!validateFields(['code', 'newPassword', 'confirmPassword'])) return
     submitting.value = true
     iamStore.resetPassword(email.value, code.value, newPassword.value)
         .then(() => router.push({ name: 'login', query: { recovered: '1' } }))
@@ -67,13 +116,14 @@ function resetPassword() {
                 {{ step === 1 ? t('recover.subtitleEmail') : t('recover.subtitleCode') }}
             </p>
 
-            <form v-if="step === 1" class="login__form" @submit.prevent="requestCode">
+            <form v-if="step === 1" class="login__form" novalidate @submit.prevent="requestCode">
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.email }">
                         <i class="pi pi-envelope field__icon" />
-                        <input v-model="email" type="email" class="field__input" :placeholder="t('login.emailPlaceholder')" required />
+                        <input v-model="email" type="email" class="field__input" :placeholder="t('login.emailPlaceholder')" @input="revalidate('email')" />
                     </span>
+                    <span v-if="fieldErrors.email" class="field__error">{{ t(`recover.error.${fieldErrors.email}`) }}</span>
                 </label>
                 <p v-if="errorMessage" class="login__error"><i class="pi pi-exclamation-triangle" /> {{ errorMessage }}</p>
                 <button class="login__submit" type="submit" :disabled="submitting">
@@ -82,29 +132,32 @@ function resetPassword() {
                 </button>
             </form>
 
-            <form v-else class="login__form" @submit.prevent="resetPassword">
+            <form v-else class="login__form" novalidate @submit.prevent="resetPassword">
                 <p v-if="infoMessage" class="login__info"><i class="pi pi-info-circle" /> {{ infoMessage }}</p>
                 <p v-if="demoCode" class="login__code">{{ t('recover.yourCode') }}: <strong>{{ demoCode }}</strong></p>
                 <label class="field">
                     <span class="field__label">{{ t('recover.code') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.code }">
                         <i class="pi pi-key field__icon" />
-                        <input v-model="code" type="text" inputmode="numeric" class="field__input" :placeholder="t('recover.codePlaceholder')" required />
+                        <input v-model="code" type="text" inputmode="numeric" class="field__input" :placeholder="t('recover.codePlaceholder')" @input="revalidate('code')" />
                     </span>
+                    <span v-if="fieldErrors.code" class="field__error">{{ t(`recover.error.${fieldErrors.code}`) }}</span>
                 </label>
                 <label class="field">
                     <span class="field__label">{{ t('recover.newPassword') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.newPassword }">
                         <i class="pi pi-lock field__icon" />
-                        <input v-model="newPassword" type="password" class="field__input" :placeholder="t('recover.newPasswordPlaceholder')" required />
+                        <input v-model="newPassword" type="password" class="field__input" :placeholder="t('recover.newPasswordPlaceholder')" @input="revalidate('newPassword')" />
                     </span>
+                    <span v-if="fieldErrors.newPassword" class="field__error">{{ t(`recover.error.${fieldErrors.newPassword}`) }}</span>
                 </label>
                 <label class="field">
                     <span class="field__label">{{ t('recover.confirmPassword') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.confirmPassword }">
                         <i class="pi pi-lock field__icon" />
-                        <input v-model="confirmPassword" type="password" class="field__input" :placeholder="t('recover.confirmPassword')" required />
+                        <input v-model="confirmPassword" type="password" class="field__input" :placeholder="t('recover.confirmPassword')" @input="revalidate('confirmPassword')" />
                     </span>
+                    <span v-if="fieldErrors.confirmPassword" class="field__error">{{ t(`recover.error.${fieldErrors.confirmPassword}`) }}</span>
                 </label>
                 <p v-if="errorMessage" class="login__error"><i class="pi pi-exclamation-triangle" /> {{ errorMessage }}</p>
                 <button class="login__submit" type="submit" :disabled="submitting">
@@ -143,6 +196,9 @@ function resetPassword() {
     transition: border-color 0.15s ease;
 }
 .field__control:focus-within { border-color: var(--vc-brand-500); }
+.field__control--error { border-color: var(--vc-danger-500); }
+.field__control--error:focus-within { border-color: var(--vc-danger-500); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15); }
+.field__error { font-size: 0.78rem; color: var(--vc-danger-500); }
 .field__icon { color: var(--vc-text-muted); font-size: 0.95rem; }
 .field__input { flex: 1; border: none; background: transparent; padding: 0.7rem 0.6rem; font: inherit; color: var(--vc-text); outline: none; }
 .login__submit {

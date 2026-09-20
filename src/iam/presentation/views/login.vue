@@ -29,6 +29,45 @@ const phoneDemoCode = ref('')
 const phoneMessage = ref('')
 const phoneLoading = ref(false)
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const fieldErrors = ref({})
+const submitted = ref(false)
+
+function checkField(field) {
+    switch (field) {
+        case 'email':
+            if (!email.value.trim()) return 'emailRequired'
+            return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
+        case 'password':
+            return password.value ? '' : 'passwordRequired'
+        case 'phone':
+            return phone.value.trim() ? '' : 'phoneRequired'
+        case 'code':
+            return phoneCode.value.trim() ? '' : 'codeRequired'
+        default:
+            return ''
+    }
+}
+
+function validateFields(fields) {
+    const errors = {}
+    fields.forEach(field => {
+        const key = checkField(field)
+        if (key) errors[field] = key
+    })
+    fieldErrors.value = errors
+    return Object.keys(errors).length === 0
+}
+
+function revalidate(field) {
+    if (!submitted.value) return
+    const key = checkField(field)
+    const next = { ...fieldErrors.value }
+    if (key) next[field] = key
+    else delete next[field]
+    fieldErrors.value = next
+}
+
 function redirectAfterLogin(user) {
     const fallback = user.isCustomer ? '/credit/report' : '/home'
     router.push(route.query.redirect || fallback)
@@ -46,9 +85,13 @@ function switchMode(next) {
     phoneDemoCode.value = ''
     phoneStep.value = 'request'
     phoneCode.value = ''
+    fieldErrors.value = {}
+    submitted.value = false
 }
 
 function requestPhoneCode() {
+    submitted.value = true
+    if (!validateFields(['phone'])) return
     phoneLoading.value = true
     errorMessage.value = ''
     phoneMessage.value = ''
@@ -72,6 +115,8 @@ function requestPhoneCode() {
 }
 
 function submitPhoneCode() {
+    submitted.value = true
+    if (!validateFields(['code'])) return
     phoneLoading.value = true
     errorMessage.value = ''
     iamStore.signInWithPhone(phone.value, phoneCode.value)
@@ -85,8 +130,10 @@ function submitPhoneCode() {
 }
 
 function submit() {
-    submitting.value = true
+    submitted.value = true
     errorMessage.value = ''
+    if (!validateFields(['email', 'password'])) return
+    submitting.value = true
     iamStore.signIn({ email: email.value, password: password.value })
         .then(redirectAfterLogin)
         .catch(e => {
@@ -129,10 +176,10 @@ async function handleGoogle() {
                 <i class="pi pi-check-circle" /> {{ t('login.recoveredOk') }}
             </p>
 
-            <form v-if="mode === 'email'" class="login__form" @submit.prevent="submit">
+            <form v-if="mode === 'email'" class="login__form" novalidate @submit.prevent="submit">
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.email }">
                         <i class="pi pi-envelope field__icon" />
                         <input
                             v-model="email"
@@ -140,14 +187,15 @@ async function handleGoogle() {
                             class="field__input"
                             :placeholder="t('login.emailPlaceholder')"
                             autocomplete="username"
-                            required
+                            @input="revalidate('email')"
                         />
                     </span>
+                    <span v-if="fieldErrors.email" class="field__error">{{ t(`login.error.${fieldErrors.email}`) }}</span>
                 </label>
 
                 <label class="field">
                     <span class="field__label">{{ t('login.password') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.password }">
                         <i class="pi pi-lock field__icon" />
                         <input
                             v-model="password"
@@ -155,7 +203,7 @@ async function handleGoogle() {
                             class="field__input"
                             :placeholder="t('login.passwordPlaceholder')"
                             autocomplete="current-password"
-                            required
+                            @input="revalidate('password')"
                         />
                         <button
                             type="button"
@@ -166,6 +214,7 @@ async function handleGoogle() {
                             <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" />
                         </button>
                     </span>
+                    <span v-if="fieldErrors.password" class="field__error">{{ t(`login.error.${fieldErrors.password}`) }}</span>
                 </label>
 
                 <RouterLink class="login__forgot" :to="{ name: 'recover' }">{{ t('login.forgot') }}</RouterLink>
@@ -180,10 +229,10 @@ async function handleGoogle() {
                 </button>
             </form>
 
-            <form v-else class="login__form" @submit.prevent="phoneStep === 'request' ? requestPhoneCode() : submitPhoneCode()">
+            <form v-else class="login__form" novalidate @submit.prevent="phoneStep === 'request' ? requestPhoneCode() : submitPhoneCode()">
                 <label class="field">
                     <span class="field__label">{{ t('login.phone.label') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.phone }">
                         <i class="pi pi-phone field__icon" />
                         <input
                             v-model="phone"
@@ -192,14 +241,15 @@ async function handleGoogle() {
                             :placeholder="t('register.phonePlaceholder')"
                             autocomplete="tel"
                             :disabled="phoneStep === 'code'"
-                            required
+                            @input="revalidate('phone')"
                         />
                     </span>
+                    <span v-if="fieldErrors.phone" class="field__error">{{ t(`login.error.${fieldErrors.phone}`) }}</span>
                 </label>
 
                 <label v-if="phoneStep === 'code'" class="field">
                     <span class="field__label">{{ t('login.phone.code') }}</span>
-                    <span class="field__control">
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.code }">
                         <i class="pi pi-key field__icon" />
                         <input
                             v-model="phoneCode"
@@ -207,9 +257,10 @@ async function handleGoogle() {
                             inputmode="numeric"
                             class="field__input"
                             :placeholder="t('login.phone.codePlaceholder')"
-                            required
+                            @input="revalidate('code')"
                         />
                     </span>
+                    <span v-if="fieldErrors.code" class="field__error">{{ t(`login.error.${fieldErrors.code}`) }}</span>
                 </label>
 
                 <p v-if="phoneMessage" class="login__phone-note">
@@ -296,6 +347,17 @@ async function handleGoogle() {
 .field__control:focus-within {
     border-color: var(--vc-brand-500);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+.field__control--error {
+    border-color: var(--vc-danger-500);
+}
+.field__control--error:focus-within {
+    border-color: var(--vc-danger-500);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+.field__error {
+    font-size: 0.78rem;
+    color: var(--vc-danger-500);
 }
 .field__icon { color: var(--vc-text-muted); font-size: 0.95rem; }
 .field__input {
