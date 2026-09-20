@@ -18,7 +18,7 @@ const isDark = ref(false)
 
 const allNavItems = [
     { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: ['system-admin', 'store-admin', 'customer'] },
-    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: ['system-admin'] },
+    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: ['system-admin', 'store-admin'] },
     { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers',     roles: ['store-admin'] },
     { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog',       roles: ['store-admin'] },
     { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit',        roles: ['store-admin'] },
