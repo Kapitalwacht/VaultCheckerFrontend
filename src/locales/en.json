@@ -274,7 +274,7 @@
             "usePhone": "Sign in with phone",
             "useEmail": "Sign in with email",
             "sentSms": "We sent a code by SMS to {phone}.",
-            "sentDemo": "Demo mode (no SMS configured): use this code:"
+            "sentDemo": "For now we show your sign-in code here instead of sending an SMS. Use this code:"
         },
         "error": {
             "invalid-credentials": "Wrong email or password.",

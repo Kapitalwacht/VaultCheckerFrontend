@@ -275,7 +275,7 @@
             "usePhone": "Iniciar sesión con teléfono",
             "useEmail": "Iniciar sesión con correo",
             "sentSms": "Te enviamos un código por SMS al {phone}.",
-            "sentDemo": "Modo demo (sin SMS configurado): usa este código:"
+            "sentDemo": "Por ahora te mostramos aquí tu código de acceso en vez de enviar un SMS. Usa este código:"
         },
         "error": {
             "invalid-credentials": "Correo o contraseña incorrectos.",
