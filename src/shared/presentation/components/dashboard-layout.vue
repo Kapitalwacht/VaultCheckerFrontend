@@ -94,7 +94,7 @@ watch(() => route.fullPath, () => closeMobileMenu())
                 </RouterLink>
                 <button class="ghost-btn" @click="toggleLocale">
                     <i class="pi pi-globe" />
-                    <span>{{ locale === 'es' ? 'ES' : 'EN' }}</span>
+                    <span>{{ locale === 'es' ? 'EN' : 'ES' }}</span>
                 </button>
                 <button class="ghost-btn ghost-btn--desktop-theme" @click="toggleTheme">
                     <i :class="isDark ? 'pi pi-sun' : 'pi pi-moon'" />
