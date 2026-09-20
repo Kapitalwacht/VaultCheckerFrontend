@@ -51,6 +51,7 @@ function restoreSession() {
 
 const useIamStore = defineStore('iam', () => {
     const currentUser = ref(restoreSession())
+    const phoneCodeMode = ref('demo')
 
     const isAuthenticated = computed(() => currentUser.value?.isAuthenticated ?? false)
     const role = computed(() => currentUser.value?.role ?? null)
@@ -140,24 +141,37 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
+    function issueDemoLoginCode(record) {
+        const code = generateCode()
+        const expiresAt = Date.now() + LOGIN_CODE_TTL_MS
+        return iamApi.patchUser(record.id, { loginCode: code, loginCodeExpiresAt: expiresAt })
+            .then(() => sendLoginCodeSms({ phone: record.phone, name: record.name, code }))
+            .then(result => ({ smsSent: result.sent, code: result.sent ? null : code }))
+    }
+
     function requestLoginCode(phone) {
         return iamApi.findByPhone(phone).then(record => {
             if (!record) throw new Error('phone-not-found')
             if (isFirebasePhoneConfigured()) {
-                return sendPhoneCode(record.phone).then(() => ({ smsSent: true, code: null }))
+                return sendPhoneCode(record.phone)
+                    .then(() => {
+                        phoneCodeMode.value = 'firebase'
+                        return { smsSent: true, code: null }
+                    })
+                    .catch(() => {
+                        phoneCodeMode.value = 'demo'
+                        return issueDemoLoginCode(record)
+                    })
             }
-            const code = generateCode()
-            const expiresAt = Date.now() + LOGIN_CODE_TTL_MS
-            return iamApi.patchUser(record.id, { loginCode: code, loginCodeExpiresAt: expiresAt })
-                .then(() => sendLoginCodeSms({ phone: record.phone, name: record.name, code }))
-                .then(result => ({ smsSent: result.sent, code: result.sent ? null : code }))
+            phoneCodeMode.value = 'demo'
+            return issueDemoLoginCode(record)
         })
     }
 
     function signInWithPhone(phone, code) {
         return iamApi.findByPhone(phone).then(record => {
             if (!record) throw new Error('phone-not-found')
-            if (isFirebasePhoneConfigured()) {
+            if (isFirebasePhoneConfigured() && phoneCodeMode.value === 'firebase') {
                 return confirmPhoneCode(code)
                     .catch(() => { throw new Error('invalid-code') })
                     .then(() => {

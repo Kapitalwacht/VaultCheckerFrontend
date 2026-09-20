@@ -17,7 +17,8 @@ let recaptchaVerifier = null
 let confirmationResult = null
 
 export function isFirebasePhoneConfigured() {
-    return Boolean(config.apiKey && config.authDomain && config.projectId && config.appId)
+    const smsEnabled = import.meta.env.VITE_FIREBASE_SMS_ENABLED === 'true'
+    return Boolean(smsEnabled && config.apiKey && config.authDomain && config.projectId && config.appId)
 }
 
 function toE164(phone) {
