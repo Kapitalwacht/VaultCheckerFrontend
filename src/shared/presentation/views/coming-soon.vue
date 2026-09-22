@@ -1,4 +1,5 @@
 <script setup>
+
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -10,6 +11,7 @@ const sectionLabel = computed(() => {
     const key = route.meta?.title
     return key ? t(key) : ''
 })
+
 </script>
 
 <template>

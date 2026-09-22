@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
@@ -155,6 +156,7 @@ async function savePassword() {
 }
 
 onMounted(loadProfile)
+
 </script>
 
 <template>

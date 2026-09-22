@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -104,6 +105,7 @@ function resetPassword() {
         })
         .finally(() => { submitting.value = false })
 }
+
 </script>
 
 <template>

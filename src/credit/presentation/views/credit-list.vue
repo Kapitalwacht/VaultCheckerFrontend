@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
@@ -103,6 +104,7 @@ onMounted(() => {
     creditStore.fetchAccounts()
     customersStore.fetchCustomers()
 })
+
 </script>
 
 <template>
@@ -187,7 +189,6 @@ onMounted(() => {
             </table>
         </div>
 
-        <!-- New account modal -->
         <VcModal :open="accountModalOpen" :title="t('credit.new')" @close="!saving && (accountModalOpen = false)">
             <form id="account-form" class="vc-form-grid" @submit.prevent="submitAccount">
                 <label class="vc-field vc-field--full">

@@ -1,4 +1,5 @@
 <script setup>
+
 import { watch, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
@@ -29,6 +30,7 @@ onBeforeUnmount(() => {
     document.removeEventListener('keydown', onKey)
     document.body.style.overflow = ''
 })
+
 </script>
 
 <template>

@@ -42,7 +42,7 @@ const useAuditStore = defineStore('audit', () => {
             .then(response => {
                 logs.value.unshift(AuditLogAssembler.toEntityFromResource(response.data))
             })
-            .catch(() => { /* auditing must never block the main operation */ })
+            .catch(() => {  })
     }
 
     return { logs, loading, error, fetchLogs, recordAction }

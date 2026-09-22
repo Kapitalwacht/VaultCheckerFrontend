@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
@@ -50,6 +51,7 @@ function choosePlan(plan) {
 onMounted(() => {
     if (storeId.value) subscriptionsStore.fetchBilling(storeId.value)
 })
+
 </script>
 
 <template>

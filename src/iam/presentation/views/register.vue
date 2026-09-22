@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -105,6 +106,7 @@ function submit() {
             submitting.value = false
         })
 }
+
 </script>
 
 <template>

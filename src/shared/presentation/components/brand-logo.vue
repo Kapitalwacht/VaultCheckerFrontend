@@ -1,9 +1,11 @@
 <script setup>
+
 defineProps({
     size: { type: Number, default: 28 },
     showText: { type: Boolean, default: true },
     color: { type: String, default: 'currentColor' }
 })
+
 </script>
 
 <template>

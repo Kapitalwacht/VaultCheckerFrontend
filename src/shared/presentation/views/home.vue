@@ -1,4 +1,5 @@
 <script setup>
+
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -23,6 +24,7 @@ const shortcuts = [
 ]
 
 function go(to) { router.push(to) }
+
 </script>
 
 <template>

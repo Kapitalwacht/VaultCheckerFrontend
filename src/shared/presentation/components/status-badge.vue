@@ -1,4 +1,5 @@
 <script setup>
+
 defineProps({
     label: { type: String, required: true },
     tone: {
@@ -7,6 +8,7 @@ defineProps({
         validator: value => ['success', 'neutral', 'danger', 'accent', 'info'].includes(value)
     }
 })
+
 </script>
 
 <template>

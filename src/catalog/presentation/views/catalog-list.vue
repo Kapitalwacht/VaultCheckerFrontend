@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
@@ -98,6 +99,7 @@ async function remove(product) {
 }
 
 onMounted(() => catalogStore.fetchProducts())
+
 </script>
 
 <template>

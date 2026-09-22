@@ -1,4 +1,5 @@
 <script setup>
+
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '@/i18n.js'
 
@@ -7,6 +8,7 @@ const { t, locale } = useI18n()
 function toggle() {
     setLocale(locale.value === 'es' ? 'en' : 'es')
 }
+
 </script>
 
 <template>
