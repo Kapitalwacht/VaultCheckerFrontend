@@ -8,6 +8,7 @@ import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -224,86 +225,134 @@ onMounted(() => customersStore.fetchCustomers())
         <VcModal :open="modalOpen" :title="editingId ? t('customers.edit') : t('customers.new')" @close="closeModal">
             <form id="customer-form" class="vc-form-grid" @submit.prevent="submit">
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.firstName') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.firstName') }}
+                        <FieldHelp :tip="t('help.customer.firstName.tip')" />
+                    </span>
                     <input v-model="form.firstName" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.customer.firstName.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.lastName') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.lastName') }}
+                        <FieldHelp :tip="t('help.customer.lastName.tip')" />
+                    </span>
                     <input v-model="form.lastName" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.customer.lastName.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.dni') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.dni') }}
+                        <FieldHelp :tip="t('help.customer.dni.tip')" />
+                    </span>
                     <input v-model="form.dni" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.dni.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.phone') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.phone') }}
+                        <FieldHelp :tip="t('help.customer.phone.tip')" />
+                    </span>
                     <input v-model="form.phone" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.phone.hint') }}</small>
                 </label>
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('customers.field.address') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.address') }}
+                        <FieldHelp :tip="t('help.customer.address.tip')" />
+                    </span>
                     <input v-model="form.address" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.address.hint') }}</small>
                 </label>
 
                 <p class="vc-form-section">{{ t('customers.section.credit') }}</p>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.creditLimit') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.creditLimit') }}
+                        <FieldHelp :tip="t('help.customer.creditLimit.tip')" />
+                    </span>
                     <input v-model="form.creditLimit" type="number" min="0" step="0.01" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.creditLimit.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.currency') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.currency') }}
+                        <FieldHelp :tip="t('help.customer.currency.tip')" />
+                    </span>
                     <select v-model="form.currency" class="vc-select">
                         <option v-for="c in CURRENCIES" :key="c" :value="c">{{ c }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.customer.currency.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.maxMonths') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.maxMonths') }}
+                        <FieldHelp :tip="t('help.customer.maxMonths.tip')" />
+                    </span>
                     <input v-model="form.maxMonths" type="number" min="1" step="1" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.maxMonths.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.cutoffDay') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.cutoffDay') }}
+                        <FieldHelp :tip="t('help.customer.cutoffDay.tip')" />
+                    </span>
                     <input v-model="form.cutoffDay" type="number" min="1" max="31" step="1" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.cutoffDay.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.paymentDay') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.paymentDay') }}
+                        <FieldHelp :tip="t('help.customer.paymentDay.tip')" />
+                    </span>
                     <input v-model="form.paymentDay" type="number" min="1" max="31" step="1" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.paymentDay.hint') }}</small>
                 </label>
 
                 <p class="vc-form-section">{{ t('customers.section.rates') }}</p>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.rateType') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.rateType') }}
+                        <FieldHelp :tip="t('help.customer.rateType.tip')" />
+                    </span>
                     <select v-model="form.rateType" class="vc-select">
                         <option v-for="rt in RATE_TYPES" :key="rt" :value="rt">{{ t(`customers.rateType.${rt}`) }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.customer.rateType.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.rateValue') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.rateValue') }}
+                        <FieldHelp :tip="t('help.customer.rateValue.tip')" />
+                    </span>
                     <input v-model="form.ratePercent" type="number" min="0" step="0.0000001" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.rateValue.hint') }}</small>
                 </label>
                 <label v-if="form.rateType === 'nominal'" class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.capitalization') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.capitalization') }}
+                        <FieldHelp :tip="t('help.customer.capitalization.tip')" />
+                    </span>
                     <select v-model.number="form.rateCapitalizationDays" class="vc-select">
                         <option v-for="cap in CAPITALIZATIONS" :key="cap.days" :value="cap.days">
                             {{ t(`customers.capitalization.${cap.label}`) }}
                         </option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.customer.capitalization.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.moratoriumRateType') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.moratoriumRateType') }}
+                        <FieldHelp :tip="t('help.customer.moratoriumRateType.tip')" />
+                    </span>
                     <select v-model="form.moratoriumRateType" class="vc-select">
                         <option v-for="rt in RATE_TYPES" :key="rt" :value="rt">{{ t(`customers.rateType.${rt}`) }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.customer.moratoriumRateType.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('customers.field.moratoriumRateValue') }}</span>
+                    <span class="vc-field__label">{{ t('customers.field.moratoriumRateValue') }}
+                        <FieldHelp :tip="t('help.customer.moratoriumRateValue.tip')" />
+                    </span>
                     <input v-model="form.moratoriumRatePercent" type="number" min="0" step="0.0000001" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.customer.moratoriumRateValue.hint') }}</small>
                 </label>
 
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('common.state') }}</span>
+                    <span class="vc-field__label">{{ t('common.state') }}
+                        <FieldHelp :tip="t('help.customer.state.tip')" />
+                    </span>
                     <select v-model="form.state" class="vc-select">
                         <option value="active">{{ t('common.active') }}</option>
                         <option value="inactive">{{ t('common.inactive') }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.customer.state.hint') }}</small>
                 </label>
             </form>
 

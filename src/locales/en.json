@@ -47,7 +47,8 @@
         "loading": "Loading…",
         "error": "Something went wrong",
         "retry": "Retry",
-        "toggleLanguage": "Switch language"
+        "toggleLanguage": "Switch language",
+        "help": "Help"
     },
     "stores": {
         "subtitle": "Manage the stores registered on the platform.",
@@ -464,6 +465,222 @@
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
             "generic": "Could not save the changes."
+        }
+    },
+    "help": {
+        "customer": {
+            "firstName": {
+                "tip": "Customer's first names as shown on their ID.",
+                "hint": "E.g. María Elena"
+            },
+            "lastName": {
+                "tip": "Customer's last names as shown on their ID.",
+                "hint": "E.g. Flores Ramos"
+            },
+            "dni": {
+                "tip": "Customer's national ID number (8 digits).",
+                "hint": "Numbers only, 8 digits."
+            },
+            "phone": {
+                "tip": "Phone or WhatsApp used for payment reminders.",
+                "hint": "E.g. +51 987 654 321"
+            },
+            "address": {
+                "tip": "Customer's address within the store's area.",
+                "hint": "Street, number and landmark."
+            },
+            "creditLimit": {
+                "tip": "Maximum debt the customer may have; purchases above it are rejected.",
+                "hint": "Maximum allowed debt."
+            },
+            "currency": {
+                "tip": "Currency in which the credit is granted and collected.",
+                "hint": "PEN = soles, USD = dollars."
+            },
+            "maxMonths": {
+                "tip": "Maximum number of installments allowed in a purchase.",
+                "hint": "1 = single end-of-month payment only."
+            },
+            "cutoffDay": {
+                "tip": "Purchases up to this day are charged on this month's payment date; later ones, next month.",
+                "hint": "Billing cycle closing day (1 to 31)."
+            },
+            "paymentDay": {
+                "tip": "Day of the month the customer pays; after it, late interest applies.",
+                "hint": "Monthly payment day (1 to 31)."
+            },
+            "rateType": {
+                "tip": "Nominal: set how often it compounds. Effective: compounding is already included.",
+                "hint": "Nominal or effective."
+            },
+            "rateValue": {
+                "tip": "Annual rate in percent; for example, 25 for a 25 % effective annual rate.",
+                "hint": "Annual, in %. E.g. 25"
+            },
+            "capitalization": {
+                "tip": "How often a nominal rate compounds its interest (for example, 30 = monthly).",
+                "hint": "Nominal rates only."
+            },
+            "moratoriumRateType": {
+                "tip": "Nominal: compounds like the compensatory rate. Effective: compounding is already included.",
+                "hint": "Nominal or effective."
+            },
+            "moratoriumRateValue": {
+                "tip": "Annual rate charged for each day late after the payment date.",
+                "hint": "Annual, in %. E.g. 10"
+            },
+            "state": {
+                "tip": "An inactive customer cannot register new credit purchases.",
+                "hint": "Active or inactive."
+            }
+        },
+        "product": {
+            "name": {
+                "tip": "Name shown when registering a purchase.",
+                "hint": "E.g. Rice 5 kg"
+            },
+            "category": {
+                "tip": "Group the product belongs to, used to organize the catalog.",
+                "hint": "E.g. Groceries"
+            },
+            "brand": {
+                "tip": "Product brand, if any.",
+                "hint": "E.g. Gloria"
+            },
+            "unit": {
+                "tip": "Unit of measure in which the product is sold.",
+                "hint": "E.g. kg, unit, liter."
+            },
+            "paymentMode": {
+                "tip": "Whether the product can be sold as a single end-of-month payment, in installments, or both.",
+                "hint": "Single, installments or both."
+            },
+            "cashPrice": {
+                "tip": "Price the customer pays when buying and paying today. It earns no interest.",
+                "hint": "Cash sale; not financed."
+            },
+            "listPrice": {
+                "tip": "Price for credit sales; interest, installments and late fees are calculated on it.",
+                "hint": "Basis of every credit calculation."
+            },
+            "imageUrl": {
+                "tip": "Link to a product image shown in the catalog.",
+                "hint": "Must start with https://"
+            },
+            "state": {
+                "tip": "An inactive product is hidden when registering purchases.",
+                "hint": "Active or inactive."
+            }
+        },
+        "plan": {
+            "customer": {
+                "tip": "Customer whose purchases, schedules and payments you want to manage.",
+                "hint": "Pick a customer from your store."
+            }
+        },
+        "purchase": {
+            "product": {
+                "tip": "Catalog product; choosing it loads its list price. Use \"free item\" for anything else.",
+                "hint": "Uses the catalog list price."
+            },
+            "description": {
+                "tip": "What the customer takes; shown on the statement.",
+                "hint": "E.g. Rice 5 kg x2"
+            },
+            "quantity": {
+                "tip": "Units bought; the financed amount is quantity × list price.",
+                "hint": "Whole number, 1 or more."
+            },
+            "unitPrice": {
+                "tip": "List (credit) price per unit; interest is calculated on it.",
+                "hint": "List price per unit."
+            },
+            "purchaseDate": {
+                "tip": "Purchase date; with the cutoff day it sets the payment date and grace days.",
+                "hint": "Sets the grace period."
+            },
+            "months": {
+                "tip": "1 = single end-of-month payment; more than 1 = monthly installments (French method).",
+                "hint": "Cannot exceed the customer's maximum months."
+            }
+        },
+        "payment": {
+            "paidDate": {
+                "tip": "Date the customer pays; if it is after the due date, late interest is calculated.",
+                "hint": "Full installment only, no partial payments."
+            }
+        },
+        "account": {
+            "customer": {
+                "tip": "Customer for whom the credit account is opened.",
+                "hint": "One account per customer."
+            },
+            "creditLimit": {
+                "tip": "Maximum debt the customer may have; purchases above it are rejected.",
+                "hint": "Maximum allowed debt."
+            },
+            "balance": {
+                "tip": "Outstanding debt the account starts with (used credit).",
+                "hint": "Usually 0 when opening."
+            },
+            "dueDate": {
+                "tip": "Next date the customer must pay the balance.",
+                "hint": "Next due date."
+            },
+            "state": {
+                "tip": "Current, overdue or paid. An overdue account accrues late interest.",
+                "hint": "Current account status."
+            }
+        },
+        "accountPayment": {
+            "amount": {
+                "tip": "Amount paid; applied to late interest first, then interest, then principal.",
+                "hint": "Order: late fee, interest, principal."
+            },
+            "date": {
+                "tip": "Date the customer makes the payment.",
+                "hint": "Payment date."
+            }
+        },
+        "report": {
+            "customer": {
+                "tip": "Customer whose statement you want to generate.",
+                "hint": "Pick a customer from your store."
+            },
+            "cutoffDate": {
+                "tip": "Statement cutoff date: shows pending purchases, interest and late fees as of that date.",
+                "hint": "Late fees are calculated up to this date."
+            }
+        },
+        "store": {
+            "businessName": {
+                "tip": "Legal or trade name of the store.",
+                "hint": "E.g. Doña Rosa Grocery"
+            },
+            "ruc": {
+                "tip": "Store's tax ID (RUC, 11 digits).",
+                "hint": "Numbers only, 11 digits."
+            },
+            "category": {
+                "tip": "Type of business: grocery, butcher, bakery, salon, etc.",
+                "hint": "Business type."
+            },
+            "phone": {
+                "tip": "Store's contact phone.",
+                "hint": "E.g. +51 01 234 5678"
+            },
+            "email": {
+                "tip": "Store's contact email.",
+                "hint": "E.g. store{'@'}mail.com"
+            },
+            "address": {
+                "tip": "Store's address.",
+                "hint": "Street, number and district."
+            },
+            "description": {
+                "tip": "Additional information about the store.",
+                "hint": "Optional."
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -192,31 +193,46 @@ onMounted(() => {
         <VcModal :open="accountModalOpen" :title="t('credit.new')" @close="!saving && (accountModalOpen = false)">
             <form id="account-form" class="vc-form-grid" @submit.prevent="submitAccount">
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('credit.field.customer') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.customer') }}
+                        <FieldHelp :tip="t('help.account.customer.tip')" />
+                    </span>
                     <select v-model="accountForm.customerId" class="vc-select" required>
                         <option value="" disabled>{{ t('credit.selectCustomer') }}</option>
                         <option v-for="c in scopedCustomers" :key="c.id" :value="c.id">{{ c.fullName }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.account.customer.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.field.creditLimit') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.creditLimit') }}
+                        <FieldHelp :tip="t('help.account.creditLimit.tip')" />
+                    </span>
                     <input v-model="accountForm.creditLimit" type="number" min="0" step="0.01" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.account.creditLimit.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.field.balance') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.balance') }}
+                        <FieldHelp :tip="t('help.account.balance.tip')" />
+                    </span>
                     <input v-model="accountForm.balance" type="number" min="0" step="0.01" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.account.balance.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.field.dueDate') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.dueDate') }}
+                        <FieldHelp :tip="t('help.account.dueDate.tip')" />
+                    </span>
                     <input v-model="accountForm.dueDate" type="date" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.account.dueDate.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('common.state') }}</span>
+                    <span class="vc-field__label">{{ t('common.state') }}
+                        <FieldHelp :tip="t('help.account.state.tip')" />
+                    </span>
                     <select v-model="accountForm.state" class="vc-select">
                         <option value="current">{{ t('credit.state.current') }}</option>
                         <option value="overdue">{{ t('credit.state.overdue') }}</option>
                         <option value="paid">{{ t('credit.state.paid') }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.account.state.hint') }}</small>
                 </label>
             </form>
             <template #footer>
@@ -236,12 +252,18 @@ onMounted(() => {
             </p>
             <form id="payment-form" class="vc-form-grid" @submit.prevent="submitPayment">
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.field.amount') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.amount') }}
+                        <FieldHelp :tip="t('help.accountPayment.amount.tip')" />
+                    </span>
                     <input v-model="paymentForm.amount" type="number" min="0" step="0.01" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.accountPayment.amount.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.field.date') }}</span>
+                    <span class="vc-field__label">{{ t('credit.field.date') }}
+                        <FieldHelp :tip="t('help.accountPayment.date.tip')" />
+                    </span>
                     <input v-model="paymentForm.date" type="date" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.accountPayment.date.hint') }}</small>
                 </label>
             </form>
             <template #footer>

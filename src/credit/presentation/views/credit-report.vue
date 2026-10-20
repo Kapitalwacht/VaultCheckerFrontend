@@ -9,6 +9,7 @@ import useIamStore from '@/iam/application/iam.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import { buildPaymentPlan, buildStatement } from '@/credit/domain/services/payment-plan.js'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -79,15 +80,21 @@ onMounted(() => {
 
         <div class="vc-toolbar report-toolbar">
             <label v-if="!isCustomerView" class="vc-field report-picker">
-                <span class="vc-field__label">{{ t('credit.field.customer') }}</span>
+                <span class="vc-field__label">{{ t('credit.field.customer') }}
+                    <FieldHelp :tip="t('help.report.customer.tip')" />
+                </span>
                 <select v-model="selectedCustomerId" class="vc-select">
                     <option value="">{{ t('credit.selectCustomer') }}</option>
                     <option v-for="c in scopedCustomers" :key="c.id" :value="c.id">{{ c.fullName }}</option>
                 </select>
+                <small class="vc-field__hint">{{ t('help.report.customer.hint') }}</small>
             </label>
             <label class="vc-field report-picker">
-                <span class="vc-field__label">{{ t('credit.report.cutoffDate') }}</span>
+                <span class="vc-field__label">{{ t('credit.report.cutoffDate') }}
+                    <FieldHelp :tip="t('help.report.cutoffDate.tip')" />
+                </span>
                 <input v-model="referenceDate" type="date" class="vc-input" />
+                <small class="vc-field__hint">{{ t('help.report.cutoffDate.hint') }}</small>
             </label>
         </div>
 

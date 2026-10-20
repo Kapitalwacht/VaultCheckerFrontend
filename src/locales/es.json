@@ -47,7 +47,8 @@
         "loading": "Cargando…",
         "error": "Ocurrió un error",
         "retry": "Reintentar",
-        "toggleLanguage": "Cambiar idioma"
+        "toggleLanguage": "Cambiar idioma",
+        "help": "Ayuda"
     },
     "stores": {
         "subtitle": "Gestiona las tiendas registradas en la plataforma.",
@@ -465,6 +466,222 @@
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudieron guardar los cambios."
+        }
+    },
+    "help": {
+        "customer": {
+            "firstName": {
+                "tip": "Nombres del cliente tal como figuran en su documento.",
+                "hint": "Ej.: María Elena"
+            },
+            "lastName": {
+                "tip": "Apellidos del cliente tal como figuran en su documento.",
+                "hint": "Ej.: Flores Ramos"
+            },
+            "dni": {
+                "tip": "Documento de identidad del cliente (8 dígitos).",
+                "hint": "Solo números, 8 dígitos."
+            },
+            "phone": {
+                "tip": "Teléfono o WhatsApp para coordinar cobros y avisos de vencimiento.",
+                "hint": "Ej.: +51 987 654 321"
+            },
+            "address": {
+                "tip": "Dirección del cliente dentro de la zona del negocio.",
+                "hint": "Calle, número y referencia."
+            },
+            "creditLimit": {
+                "tip": "Deuda máxima que el cliente puede tener; no se aceptan compras que la superen.",
+                "hint": "Monto máximo de deuda permitido."
+            },
+            "currency": {
+                "tip": "Moneda en la que se otorga y se cobra el crédito.",
+                "hint": "PEN = soles, USD = dólares."
+            },
+            "maxMonths": {
+                "tip": "Número máximo de cuotas que se le puede dar al cliente en una compra.",
+                "hint": "1 = solo pago único a fin de mes."
+            },
+            "cutoffDay": {
+                "tip": "Las compras hasta este día se cobran en la fecha de pago del mismo mes; las posteriores, el mes siguiente.",
+                "hint": "Día de cierre del ciclo (1 a 31)."
+            },
+            "paymentDay": {
+                "tip": "Día del mes en que el cliente paga su deuda; después de este día se cobra mora.",
+                "hint": "Día de pago mensual (1 a 31)."
+            },
+            "rateType": {
+                "tip": "Nominal: indique cada cuántos días capitaliza. Efectiva: ya incluye la capitalización.",
+                "hint": "Nominal o efectiva."
+            },
+            "rateValue": {
+                "tip": "Tasa anual en porcentaje; por ejemplo, 25 para una TEA de 25 %.",
+                "hint": "Anual, en %. Ej.: 25"
+            },
+            "capitalization": {
+                "tip": "Cada cuántos días se capitalizan los intereses de una tasa nominal (por ejemplo, 30 = mensual).",
+                "hint": "Solo para tasas nominales."
+            },
+            "moratoriumRateType": {
+                "tip": "Nominal: capitaliza con la misma frecuencia que la tasa compensatoria. Efectiva: ya incluye la capitalización.",
+                "hint": "Nominal o efectiva."
+            },
+            "moratoriumRateValue": {
+                "tip": "Tasa anual que se cobra por cada día de atraso después de la fecha de pago.",
+                "hint": "Anual, en %. Ej.: 10"
+            },
+            "state": {
+                "tip": "Un cliente inactivo no puede registrar nuevas compras a crédito.",
+                "hint": "Activo o inactivo."
+            }
+        },
+        "product": {
+            "name": {
+                "tip": "Nombre con el que el producto o servicio aparece al registrar una compra.",
+                "hint": "Ej.: Arroz Costeño 5 kg"
+            },
+            "category": {
+                "tip": "Grupo al que pertenece el producto, para ordenar el catálogo.",
+                "hint": "Ej.: Abarrotes"
+            },
+            "brand": {
+                "tip": "Marca del producto, si la tiene.",
+                "hint": "Ej.: Gloria"
+            },
+            "unit": {
+                "tip": "Unidad de medida en la que se vende el producto.",
+                "hint": "Ej.: kg, unidad, litro."
+            },
+            "paymentMode": {
+                "tip": "Indique si el producto se puede vender en un solo pago a fin de mes, en cuotas o de ambas formas.",
+                "hint": "Pago único, cuotas o ambos."
+            },
+            "cashPrice": {
+                "tip": "Precio que paga el cliente si compra y paga hoy. No genera intereses.",
+                "hint": "Venta al contado; no entra al cálculo."
+            },
+            "listPrice": {
+                "tip": "Precio para ventas a crédito; sobre este monto se calculan intereses, cuotas y mora.",
+                "hint": "Base de todos los cálculos del crédito."
+            },
+            "imageUrl": {
+                "tip": "Enlace a una imagen del producto para reconocerlo en el catálogo.",
+                "hint": "Debe empezar con https://"
+            },
+            "state": {
+                "tip": "Un producto inactivo no aparece al registrar nuevas compras.",
+                "hint": "Activo o inactivo."
+            }
+        },
+        "plan": {
+            "customer": {
+                "tip": "Cliente cuyas compras, cronogramas y pagos desea ver o registrar.",
+                "hint": "Elija un cliente de su tienda."
+            }
+        },
+        "purchase": {
+            "product": {
+                "tip": "Producto del catálogo; al elegirlo se carga su precio de lista. Use \"ítem libre\" para algo fuera del catálogo.",
+                "hint": "Toma el precio de lista del catálogo."
+            },
+            "description": {
+                "tip": "Detalle de lo que se lleva el cliente; aparece en el estado de cuenta.",
+                "hint": "Ej.: Arroz 5 kg x2"
+            },
+            "quantity": {
+                "tip": "Cantidad de unidades compradas; el monto financiado es cantidad × precio de lista.",
+                "hint": "Entero mayor o igual a 1."
+            },
+            "unitPrice": {
+                "tip": "Precio de lista (crédito) de cada unidad; sobre este monto se calculan los intereses.",
+                "hint": "Precio de lista por unidad."
+            },
+            "purchaseDate": {
+                "tip": "Fecha de la compra; junto con la fecha de corte define la fecha de pago y los días de gracia.",
+                "hint": "Define el período de gracia."
+            },
+            "months": {
+                "tip": "1 = pago único a fin de mes; más de 1 = cuotas mensuales por el método francés.",
+                "hint": "No puede superar el máximo de meses del cliente."
+            }
+        },
+        "payment": {
+            "paidDate": {
+                "tip": "Fecha en que el cliente paga; si es posterior al vencimiento, se calcula la mora.",
+                "hint": "Se paga la cuota completa, sin pagos parciales."
+            }
+        },
+        "account": {
+            "customer": {
+                "tip": "Cliente al que se le abre la cuenta corriente de crédito.",
+                "hint": "Una cuenta por cliente."
+            },
+            "creditLimit": {
+                "tip": "Deuda máxima que el cliente puede tener; no se aceptan compras que la superen.",
+                "hint": "Monto máximo de deuda permitido."
+            },
+            "balance": {
+                "tip": "Deuda pendiente con la que se abre la cuenta (línea utilizada).",
+                "hint": "Normalmente 0 al abrir."
+            },
+            "dueDate": {
+                "tip": "Próxima fecha en que el cliente debe pagar su saldo.",
+                "hint": "Fecha del próximo vencimiento."
+            },
+            "state": {
+                "tip": "Al día, vencida o pagada. Una cuenta vencida genera mora.",
+                "hint": "Estado actual de la cuenta."
+            }
+        },
+        "accountPayment": {
+            "amount": {
+                "tip": "Monto que paga el cliente; se aplica primero a la mora, luego al interés y al final al capital.",
+                "hint": "Prelación: mora, interés y capital."
+            },
+            "date": {
+                "tip": "Fecha en que el cliente realiza el pago.",
+                "hint": "Fecha del abono."
+            }
+        },
+        "report": {
+            "customer": {
+                "tip": "Cliente cuyo estado de cuenta desea generar.",
+                "hint": "Elija un cliente de su tienda."
+            },
+            "cutoffDate": {
+                "tip": "Fecha de corte del reporte: muestra las compras pendientes, sus intereses y la mora a esa fecha.",
+                "hint": "La mora se calcula hasta esta fecha."
+            }
+        },
+        "store": {
+            "businessName": {
+                "tip": "Razón social o nombre comercial de la tienda.",
+                "hint": "Ej.: Bodega Doña Rosa"
+            },
+            "ruc": {
+                "tip": "Registro Único de Contribuyentes de la tienda (11 dígitos).",
+                "hint": "Solo números, 11 dígitos."
+            },
+            "category": {
+                "tip": "Giro del negocio: bodega, carnicería, panadería, peluquería, etc.",
+                "hint": "Rubro de la tienda."
+            },
+            "phone": {
+                "tip": "Teléfono de contacto de la tienda.",
+                "hint": "Ej.: +51 01 234 5678"
+            },
+            "email": {
+                "tip": "Correo de contacto de la tienda.",
+                "hint": "Ej.: tienda{'@'}correo.com"
+            },
+            "address": {
+                "tip": "Dirección del local.",
+                "hint": "Calle, número y distrito."
+            },
+            "description": {
+                "tip": "Información adicional sobre la tienda.",
+                "hint": "Opcional."
+            }
         }
     }
 }

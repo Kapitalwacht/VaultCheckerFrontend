@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia'
 import useStoresStore from '@/stores/application/stores.store.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const storesStore = useStoresStore()
@@ -170,32 +171,53 @@ onMounted(() => storesStore.fetchStores())
         <VcModal :open="modalOpen" :title="editingId ? t('stores.edit') : t('stores.new')" @close="closeModal">
             <form id="store-form" class="vc-form-grid" @submit.prevent="submit">
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('stores.field.businessName') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.businessName') }}
+                        <FieldHelp :tip="t('help.store.businessName.tip')" />
+                    </span>
                     <input v-model="form.businessName" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.store.businessName.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('stores.field.ruc') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.ruc') }}
+                        <FieldHelp :tip="t('help.store.ruc.tip')" />
+                    </span>
                     <input v-model="form.ruc" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.store.ruc.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('stores.field.category') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.category') }}
+                        <FieldHelp :tip="t('help.store.category.tip')" />
+                    </span>
                     <input v-model="form.category" class="vc-input" :placeholder="t('stores.categoryHint')" />
+                    <small class="vc-field__hint">{{ t('help.store.category.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('stores.field.phone') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.phone') }}
+                        <FieldHelp :tip="t('help.store.phone.tip')" />
+                    </span>
                     <input v-model="form.phone" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.store.phone.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('stores.field.email') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.email') }}
+                        <FieldHelp :tip="t('help.store.email.tip')" />
+                    </span>
                     <input v-model="form.email" type="email" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.store.email.hint') }}</small>
                 </label>
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('stores.field.address') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.address') }}
+                        <FieldHelp :tip="t('help.store.address.tip')" />
+                    </span>
                     <input v-model="form.address" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.store.address.hint') }}</small>
                 </label>
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('stores.field.description') }}</span>
+                    <span class="vc-field__label">{{ t('stores.field.description') }}
+                        <FieldHelp :tip="t('help.store.description.tip')" />
+                    </span>
                     <textarea v-model="form.description" class="vc-textarea" />
+                    <small class="vc-field__hint">{{ t('help.store.description.hint') }}</small>
                 </label>
             </form>
 

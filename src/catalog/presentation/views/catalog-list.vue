@@ -8,6 +8,7 @@ import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -184,47 +185,74 @@ onMounted(() => catalogStore.fetchProducts())
         <VcModal :open="modalOpen" :title="editingId ? t('catalog.edit') : t('catalog.new')" @close="closeModal">
             <form id="product-form" class="vc-form-grid" @submit.prevent="submit">
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('catalog.field.name') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.name') }}
+                        <FieldHelp :tip="t('help.product.name.tip')" />
+                    </span>
                     <input v-model="form.name" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.product.name.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.category') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.category') }}
+                        <FieldHelp :tip="t('help.product.category.tip')" />
+                    </span>
                     <input v-model="form.category" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.product.category.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.brand') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.brand') }}
+                        <FieldHelp :tip="t('help.product.brand.tip')" />
+                    </span>
                     <input v-model="form.brand" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.product.brand.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.unit') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.unit') }}
+                        <FieldHelp :tip="t('help.product.unit.tip')" />
+                    </span>
                     <select v-model="form.unit" class="vc-select">
                         <option v-for="u in UNITS" :key="u" :value="u">{{ t(`catalog.unit.${u}`, u) }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.product.unit.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.paymentMode') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.paymentMode') }}
+                        <FieldHelp :tip="t('help.product.paymentMode.tip')" />
+                    </span>
                     <select v-model="form.paymentMode" class="vc-select">
                         <option v-for="m in PAYMENT_MODES" :key="m" :value="m">{{ t(`catalog.paymentMode.${m}`) }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.product.paymentMode.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.cashPrice') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.cashPrice') }}
+                        <FieldHelp :tip="t('help.product.cashPrice.tip')" />
+                    </span>
                     <input v-model="form.cashPrice" type="number" min="0" step="0.01" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.product.cashPrice.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('catalog.field.listPrice') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.listPrice') }}
+                        <FieldHelp :tip="t('help.product.listPrice.tip')" />
+                    </span>
                     <input v-model="form.listPrice" type="number" min="0" step="0.01" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.product.listPrice.hint') }}</small>
                 </label>
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('catalog.field.imageUrl') }}</span>
+                    <span class="vc-field__label">{{ t('catalog.field.imageUrl') }}
+                        <FieldHelp :tip="t('help.product.imageUrl.tip')" />
+                    </span>
                     <input v-model="form.imageUrl" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.product.imageUrl.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('common.state') }}</span>
+                    <span class="vc-field__label">{{ t('common.state') }}
+                        <FieldHelp :tip="t('help.product.state.tip')" />
+                    </span>
                     <select v-model="form.state" class="vc-select">
                         <option value="active">{{ t('common.active') }}</option>
                         <option value="inactive">{{ t('common.inactive') }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.product.state.hint') }}</small>
                 </label>
             </form>
 

@@ -11,6 +11,7 @@ import { buildPaymentPlan, settleInstallment } from '@/credit/domain/services/pa
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
+import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -209,11 +210,14 @@ onMounted(() => {
 
         <div class="vc-toolbar">
             <label class="vc-field plan-picker">
-                <span class="vc-field__label">{{ t('credit.field.customer') }}</span>
+                <span class="vc-field__label">{{ t('credit.field.customer') }}
+                    <FieldHelp :tip="t('help.plan.customer.tip')" />
+                </span>
                 <select v-model="selectedCustomerId" class="vc-select">
                     <option value="">{{ t('credit.selectCustomer') }}</option>
                     <option v-for="c in scopedCustomers" :key="c.id" :value="c.id">{{ c.fullName }}</option>
                 </select>
+                <small class="vc-field__hint">{{ t('help.plan.customer.hint') }}</small>
             </label>
         </div>
 
@@ -333,30 +337,47 @@ onMounted(() => {
         <VcModal :open="modalOpen" :title="t('credit.plan.newPurchase')" @close="closeModal">
             <form id="purchase-form" class="vc-form-grid" @submit.prevent="submit">
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('credit.plan.product') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.product') }}
+                        <FieldHelp :tip="t('help.purchase.product.tip')" />
+                    </span>
                     <select v-model="form.productId" class="vc-select" @change="onProductChange">
                         <option value="">{{ t('credit.plan.freeItem') }}</option>
                         <option v-for="p in activeProducts" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
+                    <small class="vc-field__hint">{{ t('help.purchase.product.hint') }}</small>
                 </label>
                 <label class="vc-field vc-field--full">
-                    <span class="vc-field__label">{{ t('credit.plan.description') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.description') }}
+                        <FieldHelp :tip="t('help.purchase.description.tip')" />
+                    </span>
                     <input v-model="form.description" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.purchase.description.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.plan.quantity') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.quantity') }}
+                        <FieldHelp :tip="t('help.purchase.quantity.tip')" />
+                    </span>
                     <input v-model="form.quantity" type="number" min="1" step="1" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.purchase.quantity.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.plan.unitPrice') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.unitPrice') }}
+                        <FieldHelp :tip="t('help.purchase.unitPrice.tip')" />
+                    </span>
                     <input v-model="form.unitPrice" type="number" min="0" step="0.01" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.purchase.unitPrice.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.plan.purchaseDate') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.purchaseDate') }}
+                        <FieldHelp :tip="t('help.purchase.purchaseDate.tip')" />
+                    </span>
                     <input v-model="form.purchaseDate" type="date" class="vc-input" required />
+                    <small class="vc-field__hint">{{ t('help.purchase.purchaseDate.hint') }}</small>
                 </label>
                 <label class="vc-field">
-                    <span class="vc-field__label">{{ t('credit.plan.months') }}</span>
+                    <span class="vc-field__label">{{ t('credit.plan.months') }}
+                        <FieldHelp :tip="t('help.purchase.months.tip')" />
+                    </span>
                     <input
                         v-model="form.months"
                         type="number"
@@ -365,6 +386,7 @@ onMounted(() => {
                         step="1"
                         class="vc-input"
                     />
+                    <small class="vc-field__hint">{{ t('help.purchase.months.hint') }}</small>
                 </label>
                 <p class="plan-form__amount">
                     {{ t('credit.plan.amount') }}: <strong>{{ formatCurrency(amount) }}</strong>
@@ -390,8 +412,11 @@ onMounted(() => {
                 </p>
                 <form id="pay-form" class="vc-form-grid" @submit.prevent="submitPay">
                     <label class="vc-field vc-field--full">
-                        <span class="vc-field__label">{{ t('credit.plan.paidDate') }}</span>
+                        <span class="vc-field__label">{{ t('credit.plan.paidDate') }}
+                            <FieldHelp :tip="t('help.payment.paidDate.tip')" />
+                        </span>
                         <input v-model="payDate" type="date" class="vc-input" required />
+                        <small class="vc-field__hint">{{ t('help.payment.paidDate.hint') }}</small>
                     </label>
                 </form>
 
