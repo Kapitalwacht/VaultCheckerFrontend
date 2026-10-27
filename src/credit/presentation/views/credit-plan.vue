@@ -15,7 +15,7 @@ import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 
 const { t } = useI18n()
-const { format: formatCurrency } = useCurrencyFormatter()
+const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
 const catalogStore = useCatalogStore()
@@ -57,7 +57,7 @@ const creditLimit = computed(() => {
 })
 
 const amount = computed(() =>
-    (Number(form.quantity) || 0) * (Number(form.unitPrice) || 0))
+    toBaseCurrency((Number(form.quantity) || 0) * (Number(form.unitPrice) || 0)))
 
 const activeProducts = computed(() => scope(products.value).filter(p => p.isActive))
 
@@ -82,7 +82,7 @@ function onProductChange() {
     const product = products.value.find(p => sameId(p.id, form.productId))
     if (product) {
         form.description = product.name
-        form.unitPrice = product.listPrice
+        form.unitPrice = fromBaseCurrency(product.listPrice)
     }
 }
 

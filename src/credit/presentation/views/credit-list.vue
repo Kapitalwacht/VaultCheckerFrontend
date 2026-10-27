@@ -13,7 +13,7 @@ import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 
 const { t } = useI18n()
-const { format: formatCurrency } = useCurrencyFormatter()
+const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
@@ -66,7 +66,7 @@ function openAccountModal() {
 
 function openPaymentModal(account) {
     activeAccount.value = account
-    paymentForm.amount = account.balance
+    paymentForm.amount = fromBaseCurrency(account.balance)
     paymentForm.date = new Date().toISOString().slice(0, 10)
     formError.value = ''
     paymentModalOpen.value = true
@@ -84,8 +84,8 @@ async function submitAccount() {
             ...accountForm,
             creditId: `CRD-${Date.now()}`,
             storeId: accountForm.storeId || scopeStoreId.value || null,
-            balance: Number(accountForm.balance) || 0,
-            creditLimit: Number(accountForm.creditLimit) || 0,
+            balance: toBaseCurrency(accountForm.balance),
+            creditLimit: toBaseCurrency(accountForm.creditLimit),
             dueDate: accountForm.dueDate || null
         })
         accountModalOpen.value = false
@@ -103,7 +103,7 @@ async function submitPayment() {
         await creditStore.registerPayment({
             creditAccountId: activeAccount.value.id,
             storeId: activeAccount.value.storeId,
-            amount: Number(paymentForm.amount) || 0,
+            amount: toBaseCurrency(paymentForm.amount),
             date: paymentForm.date
         })
         paymentModalOpen.value = false

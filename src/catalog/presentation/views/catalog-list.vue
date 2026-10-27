@@ -11,7 +11,7 @@ import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 
 const { t } = useI18n()
-const { format: formatCurrency } = useCurrencyFormatter()
+const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const catalogStore = useCatalogStore()
 const { products, loading, error } = storeToRefs(catalogStore)
@@ -61,8 +61,8 @@ function openEdit(product) {
         category: product.category,
         brand: product.brand ?? '',
         unit: product.unit,
-        cashPrice: product.cashPrice,
-        listPrice: product.listPrice,
+        cashPrice: fromBaseCurrency(product.cashPrice),
+        listPrice: fromBaseCurrency(product.listPrice),
         paymentMode: product.paymentMode ?? 'both',
         imageUrl: product.imageUrl ?? '',
         state: product.state
@@ -81,8 +81,8 @@ async function submit() {
         const payload = {
             ...form,
             storeId: form.storeId || scopeStoreId.value || null,
-            cashPrice: Number(form.cashPrice) || 0,
-            listPrice: Number(form.listPrice) || 0
+            cashPrice: toBaseCurrency(form.cashPrice),
+            listPrice: toBaseCurrency(form.listPrice)
         }
         if (editingId.value) await catalogStore.updateProduct(editingId.value, payload)
         else await catalogStore.createProduct(payload)
