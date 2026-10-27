@@ -9,7 +9,6 @@ import useSubscriptionsStore from '@/subscriptions/application/subscriptions.sto
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 
-const SIMULATED_PROCESSING_MS = 1800
 const PENDING_CHECKOUT_KEY = 'vc.pendingCheckout'
 
 const { t } = useI18n()
@@ -26,8 +25,6 @@ const actionMessage = ref('')
 const checkoutPlan = ref(null)
 const checkoutStep = ref('review')
 const checkoutError = ref('')
-
-const cardHolder = computed(() => (currentUser.value?.name || t('billing.checkout.cardHolder')).toUpperCase())
 
 const statusLabel = computed(() =>
     subscription.value ? t(`billing.status.${subscription.value.status}`, subscription.value.status) : '')
@@ -77,23 +74,16 @@ function stripeCheckoutUrl(plan) {
 
 function payCheckout() {
     const plan = checkoutPlan.value
-    if (plan.stripePaymentLink) {
-        checkoutStep.value = 'processing'
-        try {
-            sessionStorage.setItem(PENDING_CHECKOUT_KEY, plan.planId)
-        } catch {}
-        window.location.assign(stripeCheckoutUrl(plan))
+    checkoutError.value = ''
+    if (!plan.stripePaymentLink) {
+        checkoutError.value = t('billing.checkout.unavailable')
         return
     }
     checkoutStep.value = 'processing'
-    checkoutError.value = ''
-    new Promise(resolve => setTimeout(resolve, SIMULATED_PROCESSING_MS))
-        .then(() => applyPlan(plan))
-        .then(() => { checkoutStep.value = 'done' })
-        .catch(() => {
-            checkoutStep.value = 'review'
-            checkoutError.value = t('billing.changeError')
-        })
+    try {
+        sessionStorage.setItem(PENDING_CHECKOUT_KEY, plan.planId)
+    } catch {}
+    window.location.assign(stripeCheckoutUrl(plan))
 }
 
 function readPendingCheckout() {
@@ -232,19 +222,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="checkout-card" :class="{ 'checkout-card--processing': checkoutStep === 'processing' }" aria-hidden="true">
-                        <div class="checkout-card__top">
-                            <span class="checkout-card__chip" />
-                            <span class="checkout-card__brand">VISA</span>
-                        </div>
-                        <p class="checkout-card__number">4242&nbsp;&nbsp;4242&nbsp;&nbsp;4242&nbsp;&nbsp;4242</p>
-                        <div class="checkout-card__bottom">
-                            <span>{{ cardHolder }}</span>
-                            <span>12/30</span>
-                        </div>
-                    </div>
-
-                    <p class="checkout__note"><i class="pi pi-shield" /> {{ t(checkoutPlan.stripePaymentLink ? 'billing.checkout.stripeNote' : 'billing.checkout.note') }}</p>
+                    <p class="checkout__note"><i class="pi pi-shield" /> {{ t('billing.checkout.stripeNote') }}</p>
                     <p v-if="checkoutError" class="checkout__error"><i class="pi pi-exclamation-triangle" /> {{ checkoutError }}</p>
                 </template>
 
@@ -262,8 +240,8 @@ onMounted(async () => {
                     <button class="vc-btn vc-btn--primary" type="button" :disabled="checkoutStep === 'processing'" @click="payCheckout">
                         <i v-if="checkoutStep === 'processing'" class="pi pi-spin pi-spinner" />
                         {{ checkoutStep === 'processing'
-                            ? t(checkoutPlan?.stripePaymentLink ? 'billing.checkout.redirecting' : 'billing.checkout.processing')
-                            : t(checkoutPlan?.stripePaymentLink ? 'billing.checkout.payStripe' : 'billing.checkout.pay', { amount: formatMoney(checkoutPlan?.priceMonthly) }) }}
+                            ? t('billing.checkout.redirecting')
+                            : t('billing.checkout.payStripe', { amount: formatMoney(checkoutPlan?.priceMonthly) }) }}
                     </button>
                 </template>
                 <button v-else class="vc-btn vc-btn--primary" type="button" @click="closeCheckout">{{ t('billing.checkout.close') }}</button>
@@ -328,30 +306,6 @@ onMounted(async () => {
 .checkout__total { text-align: right; }
 .checkout__amount { margin: 0.15rem 0 0; font-size: 1.4rem; font-weight: 700; color: var(--vc-brand-600, var(--vc-brand-500)); }
 
-.checkout-card {
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between;
-    width: 100%; max-width: 340px; aspect-ratio: 1.586; margin: 0 auto;
-    padding: 1.2rem 1.4rem; border-radius: 16px; color: #fff;
-    background: linear-gradient(135deg, #14532d 0%, #16a34a 55%, #4ade80 100%);
-    box-shadow: 0 14px 30px rgba(20, 83, 45, 0.35);
-    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-}
-.checkout-card::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-    transform: translateX(-100%);
-}
-.checkout-card--processing::after { animation: checkout-shine 1.1s ease-in-out infinite; }
-.checkout-card__top { display: flex; justify-content: space-between; align-items: center; }
-.checkout-card__chip {
-    width: 42px; height: 30px; border-radius: 6px;
-    background: linear-gradient(135deg, #fde68a, #d97706);
-}
-.checkout-card__brand { font-family: inherit; font-style: italic; font-weight: 800; font-size: 1.3rem; letter-spacing: 0.04em; }
-.checkout-card__number { margin: 0; font-size: 1.15rem; letter-spacing: 0.08em; }
-.checkout-card__bottom { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.9; }
-
 .checkout__note { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.82rem; color: var(--vc-text-muted); }
 .checkout__error { margin: 0; color: var(--vc-danger-500); font-size: 0.9rem; }
 
@@ -364,10 +318,9 @@ onMounted(async () => {
 .checkout__done-title { margin: 0.5rem 0 0; font-size: 1.2rem; }
 .checkout__done-text { margin: 0; color: var(--vc-text-muted); }
 
-@keyframes checkout-shine { to { transform: translateX(100%); } }
 @keyframes checkout-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
-    .checkout-card--processing::after, .checkout__done-icon { animation: none; }
+    .checkout__done-icon { animation: none; }
 }
 </style>

@@ -401,16 +401,13 @@
             "title": "Confirm payment",
             "plan": "Plan",
             "totalToday": "Total today",
-            "cardHolder": "Cardholder",
-            "note": "Simulated payment: no real card is used or stored.",
-            "pay": "Pay {amount}",
-            "processing": "Processing payment…",
             "successTitle": "Payment approved!",
             "successText": "Your store is now on the {plan} plan. The invoice is in your history.",
             "close": "Done",
             "stripeNote": "You will be taken to the secure Stripe checkout in test mode. Use card 4242 4242 4242 4242.",
             "payStripe": "Pay {amount} with Stripe",
-            "redirecting": "Opening Stripe…"
+            "redirecting": "Opening Stripe…",
+            "unavailable": "This plan does not have a Stripe payment link yet. Please try again later."
         }
     },
     "recover": {

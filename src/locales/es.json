@@ -402,16 +402,13 @@
             "title": "Confirmar pago",
             "plan": "Plan",
             "totalToday": "Total hoy",
-            "cardHolder": "Titular",
-            "note": "Pago simulado: no se usa ni se guarda ninguna tarjeta real.",
-            "pay": "Pagar {amount}",
-            "processing": "Procesando pago…",
             "successTitle": "¡Pago aprobado!",
             "successText": "Tu tienda ya está en el plan {plan}. La factura aparece en tu historial.",
             "close": "Listo",
             "stripeNote": "Te llevaremos al checkout seguro de Stripe en modo de prueba. Usa la tarjeta 4242 4242 4242 4242.",
             "payStripe": "Pagar {amount} con Stripe",
-            "redirecting": "Abriendo Stripe…"
+            "redirecting": "Abriendo Stripe…",
+            "unavailable": "Este plan todavía no tiene un enlace de pago de Stripe. Inténtalo más tarde."
         }
     },
     "recover": {
