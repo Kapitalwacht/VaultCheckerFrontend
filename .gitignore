@@ -48,3 +48,6 @@ __screenshots__/
 *.timestamp-*-*.mjs
 # Claude Code session
 .claude/
+
+# Firebase hosting cache
+.firebase/
