@@ -2,29 +2,10 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { IamApi } from '@/iam/infrastructure/iam-api.js'
 import { AuthenticatedUser } from '@/iam/domain/model/authenticated-user-entity.js'
-import { sendRecoveryEmail, sendVerificationEmail } from '@/iam/infrastructure/email-service.js'
-import { sendLoginCodeSms } from '@/iam/infrastructure/sms-service.js'
-import { isFirebasePhoneConfigured, sendPhoneCode, confirmPhoneCode } from '@/iam/infrastructure/firebase-phone.js'
 import { StoresApi } from '@/stores/infrastructure/stores-api.js'
 import { StoreAssembler } from '@/stores/infrastructure/store.assembler.js'
 import { Store } from '@/stores/domain/model/store-entity.js'
 import useAuditStore from '@/audit/application/audit.store.js'
-
-const RECOVERY_TTL_MS = 15 * 60 * 1000
-const LOGIN_CODE_TTL_MS = 5 * 60 * 1000
-
-function generateCode() {
-    return String(Math.floor(100000 + Math.random() * 900000))
-}
-
-function generateToken() {
-    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`
-}
-
-function buildVerificationLink(token, email) {
-    const base = `${window.location.origin}/verify`
-    return `${base}?token=${token}&email=${encodeURIComponent(email)}`
-}
 
 const STORAGE_KEY = 'vaultchecker-auth'
 
@@ -42,7 +23,6 @@ function restoreSession() {
 
 const useIamStore = defineStore('iam', () => {
     const currentUser = ref(restoreSession())
-    const phoneCodeMode = ref('demo')
 
     const isAuthenticated = computed(() => currentUser.value?.isAuthenticated ?? false)
     const role = computed(() => currentUser.value?.role ?? null)
@@ -63,13 +43,6 @@ const useIamStore = defineStore('iam', () => {
             persist(user)
             return user
         })
-    }
-
-    function register(registration) {
-        return iamApi.signUp(registration).then(() => signIn({
-            email: registration.email,
-            password: registration.password
-        }))
     }
 
     function registerAccount({ businessName, category, ruc, ownerName, email, phone, password }) {
@@ -99,14 +72,7 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function verifyEmail(email, token) {
-        return iamApi.findByEmail(email).then(record => {
-            if (!record || !record.verificationToken) throw new Error('invalid-token')
-            if (String(record.verificationToken) !== String(token).trim()) throw new Error('invalid-token')
-            return iamApi.patchUser(record.id, {
-                emailVerified: true,
-                verificationToken: null
-            }).then(() => record.name || null)
-        })
+        return iamApi.verifyEmail(email, token.trim()).then(user => user.name || null)
     }
 
     function signInWithGoogle(profile) {
@@ -118,78 +84,23 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
-    function issueDemoLoginCode(record) {
-        const code = generateCode()
-        const expiresAt = Date.now() + LOGIN_CODE_TTL_MS
-        return iamApi.patchUser(record.id, { loginCode: code, loginCodeExpiresAt: expiresAt })
-            .then(() => sendLoginCodeSms({ phone: record.phone, name: record.name, code }))
-            .then(result => ({ smsSent: result.sent, code: result.sent ? null : code }))
-    }
-
     function requestLoginCode(phone) {
-        return iamApi.findByPhone(phone).then(record => {
-            if (!record) throw new Error('phone-not-found')
-            if (isFirebasePhoneConfigured()) {
-                return sendPhoneCode(record.phone)
-                    .then(() => {
-                        phoneCodeMode.value = 'firebase'
-                        return { smsSent: true, code: null }
-                    })
-                    .catch(() => {
-                        phoneCodeMode.value = 'demo'
-                        return issueDemoLoginCode(record)
-                    })
-            }
-            phoneCodeMode.value = 'demo'
-            return issueDemoLoginCode(record)
-        })
+        return iamApi.requestPhoneCode(phone).then(code => ({ smsSent: false, code }))
     }
 
     function signInWithPhone(phone, code) {
-        return iamApi.findByPhone(phone).then(record => {
-            if (!record) throw new Error('phone-not-found')
-            if (isFirebasePhoneConfigured() && phoneCodeMode.value === 'firebase') {
-                return confirmPhoneCode(code)
-                    .catch(() => { throw new Error('invalid-code') })
-                    .then(() => {
-                        const user = iamApi.signInWithGoogleRecord(record)
-                        persist(user)
-                        return user
-                    })
-            }
-            if (!record.loginCode) throw new Error('invalid-code')
-            if (String(record.loginCode) !== String(code).trim()) throw new Error('invalid-code')
-            if (record.loginCodeExpiresAt && Date.now() > record.loginCodeExpiresAt) throw new Error('code-expired')
-            return iamApi.patchUser(record.id, { loginCode: null, loginCodeExpiresAt: null }).then(() => {
-                const user = iamApi.signInWithGoogleRecord(record)
-                persist(user)
-                return user
-            })
+        return iamApi.signInWithPhone(phone, code.trim()).then(user => {
+            persist(user)
+            return user
         })
     }
 
     function requestRecovery(email) {
-        return iamApi.findByEmail(email).then(record => {
-            if (!record) throw new Error('email-not-found')
-            const code = generateCode()
-            const expiresAt = Date.now() + RECOVERY_TTL_MS
-            return iamApi.patchUser(record.id, { recoveryCode: code, recoveryExpiresAt: expiresAt })
-                .then(() => sendRecoveryEmail({ email: record.email, name: record.name, code }))
-                .then(result => ({ emailSent: result.sent, code: result.sent ? null : code }))
-        })
+        return iamApi.requestRecovery(email).then(() => ({ emailSent: true, code: null }))
     }
 
     function resetPassword(email, code, newPassword) {
-        return iamApi.findByEmail(email).then(record => {
-            if (!record || !record.recoveryCode) throw new Error('invalid-code')
-            if (String(record.recoveryCode) !== String(code).trim()) throw new Error('invalid-code')
-            if (record.recoveryExpiresAt && Date.now() > record.recoveryExpiresAt) throw new Error('code-expired')
-            return iamApi.patchUser(record.id, {
-                password: newPassword,
-                recoveryCode: null,
-                recoveryExpiresAt: null
-            }).then(() => true)
-        })
+        return iamApi.resetPassword(email, code.trim(), newPassword).then(() => true)
     }
 
     function rebuildSession(changes) {
@@ -211,39 +122,24 @@ const useIamStore = defineStore('iam', () => {
     function updateProfile({ name, phone }) {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
-        return iamApi.patchUser(id, { name, phone }).then(() => rebuildSession({ name, phone }))
+        return iamApi.updateProfile({ name, phone }).then(() => rebuildSession({ name, phone }))
     }
 
     function changeEmail(newEmail) {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
         const email = newEmail.trim()
-        return iamApi.findByEmail(email).then(existing => {
-            if (existing && existing.id !== id) throw new Error('email-taken')
-            const verificationToken = generateToken()
-            return iamApi.patchUser(id, {
-                email,
-                emailVerified: false,
-                verificationToken
-            }).then(() => {
-                rebuildSession({ email })
-                useAuditStore().recordAction('CHANGE_EMAIL', `Account email changed to ${email}`)
-                const link = buildVerificationLink(verificationToken, email)
-                return sendVerificationEmail({ email, name: currentUser.value.name, link })
-                    .then(result => ({ emailSent: result.sent, link: result.sent ? null : link }))
-            })
+        return iamApi.changeEmail(email).then(user => {
+            persist(user)
+            useAuditStore().recordAction('CHANGE_EMAIL', `Account email changed to ${email}`)
+            return { emailSent: true, link: null }
         })
     }
 
     function changePassword(currentPassword, newPassword) {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
-        return iamApi.findByEmail(currentUser.value.email).then(record => {
-            if (!record || record.password !== currentPassword) {
-                throw new Error('wrong-current-password')
-            }
-            return iamApi.patchUser(id, { password: newPassword }).then(() => true)
-        })
+        return iamApi.changePassword(currentPassword, newPassword).then(() => true)
     }
 
     function logout() {
@@ -255,7 +151,7 @@ const useIamStore = defineStore('iam', () => {
 
     return {
         currentUser, isAuthenticated, role, storeId, customerId, token, isSystemAdmin,
-        signIn, signInWithGoogle, requestLoginCode, signInWithPhone, register, registerAccount, verifyEmail,
+        signIn, signInWithGoogle, requestLoginCode, signInWithPhone, registerAccount, verifyEmail,
         requestRecovery, resetPassword, updateProfile, changeEmail, changePassword, logout
     }
 })

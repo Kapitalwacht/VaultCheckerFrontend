@@ -415,6 +415,7 @@
             "passwordRequired": "Password is required.",
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
+            "email-unavailable": "We could not send the email right now. Please try again later.",
             "generic": "Could not complete the recovery."
         }
     },
@@ -464,6 +465,7 @@
             "passwordRequired": "Password is required.",
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
+            "email-unavailable": "We could not send the verification email. Your email was not changed; please try again later.",
             "generic": "Could not save the changes."
         }
     },

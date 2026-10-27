@@ -416,6 +416,7 @@
             "passwordRequired": "La contraseña es obligatoria.",
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
+            "email-unavailable": "No pudimos enviar el correo en este momento. Inténtalo más tarde.",
             "generic": "No se pudo completar la recuperación."
         }
     },
@@ -465,6 +466,7 @@
             "passwordRequired": "La contraseña es obligatoria.",
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
+            "email-unavailable": "No pudimos enviar el correo de verificación. Tu correo no se cambió; inténtalo más tarde.",
             "generic": "No se pudieron guardar los cambios."
         }
     },
