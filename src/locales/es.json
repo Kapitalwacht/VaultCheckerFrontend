@@ -48,7 +48,8 @@
         "error": "Ocurrió un error",
         "retry": "Reintentar",
         "toggleLanguage": "Cambiar idioma",
-        "help": "Ayuda"
+        "help": "Ayuda",
+        "country": "País"
     },
     "stores": {
         "subtitle": "Gestiona las tiendas registradas en la plataforma.",
@@ -280,8 +281,7 @@
             "enter": "Ingresar",
             "usePhone": "Iniciar sesión con teléfono",
             "useEmail": "Iniciar sesión con correo",
-            "sentSms": "Te enviamos un código por SMS al {phone}.",
-            "sentDemo": "Por ahora te mostramos aquí tu código de acceso en vez de enviar un SMS. Usa este código:"
+            "sentSms": "Te enviamos un código por SMS al {phone}."
         },
         "error": {
             "invalid-credentials": "Correo o contraseña incorrectos.",
@@ -295,7 +295,9 @@
             "emailInvalid": "Ingresa un correo válido.",
             "passwordRequired": "La contraseña es obligatoria.",
             "phoneRequired": "El número de teléfono es obligatorio.",
+            "phoneInvalid": "Elige el país e ingresa el número completo (8 a 15 dígitos en total).",
             "codeRequired": "Ingresa el código que te enviamos.",
+            "codeInvalid": "El código debe tener 6 dígitos.",
             "generic": "No se pudo iniciar sesión. Inténtalo de nuevo."
         }
     },
@@ -330,11 +332,13 @@
             "emailRequired": "El correo es obligatorio.",
             "emailInvalid": "Ingresa un correo válido.",
             "phoneRequired": "El número de teléfono es obligatorio.",
+            "phoneInvalid": "Elige el país e ingresa el número completo (8 a 15 dígitos en total).",
             "passwordRequired": "La contraseña es obligatoria.",
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudo crear la cuenta. Inténtalo de nuevo."
-        }
+        },
+        "back": "Volver"
     },
     "verify": {
         "pendingTitle": "Verificando tu cuenta",
@@ -502,8 +506,8 @@
                 "hint": "Solo números, 8 dígitos."
             },
             "phone": {
-                "tip": "Teléfono o WhatsApp para coordinar cobros y avisos de vencimiento.",
-                "hint": "Ej.: +51 987 654 321"
+                "tip": "Elige el país con su bandera e ingresa el teléfono o WhatsApp para coordinar cobros y avisos de vencimiento.",
+                "hint": "País + número, ej.: +51 987 654 321"
             },
             "address": {
                 "tip": "Dirección del cliente dentro de la zona del negocio.",
@@ -686,8 +690,8 @@
                 "hint": "Rubro de la tienda."
             },
             "phone": {
-                "tip": "Teléfono de contacto de la tienda.",
-                "hint": "Ej.: +51 01 234 5678"
+                "tip": "Elige el país con su bandera e ingresa el teléfono de contacto de la tienda.",
+                "hint": "País + número, ej.: +51 01 234 5678"
             },
             "email": {
                 "tip": "Correo de contacto de la tienda.",

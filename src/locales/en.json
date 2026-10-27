@@ -48,7 +48,8 @@
         "error": "Something went wrong",
         "retry": "Retry",
         "toggleLanguage": "Switch language",
-        "help": "Help"
+        "help": "Help",
+        "country": "Country"
     },
     "stores": {
         "subtitle": "Manage the stores registered on the platform.",
@@ -279,8 +280,7 @@
             "enter": "Sign in",
             "usePhone": "Sign in with phone",
             "useEmail": "Sign in with email",
-            "sentSms": "We sent a code by SMS to {phone}.",
-            "sentDemo": "For now we show your sign-in code here instead of sending an SMS. Use this code:"
+            "sentSms": "We sent a code by SMS to {phone}."
         },
         "error": {
             "invalid-credentials": "Wrong email or password.",
@@ -294,7 +294,9 @@
             "emailInvalid": "Enter a valid email address.",
             "passwordRequired": "Password is required.",
             "phoneRequired": "Phone number is required.",
+            "phoneInvalid": "Choose the country and enter the full number (8 to 15 digits in total).",
             "codeRequired": "Enter the code we sent you.",
+            "codeInvalid": "The code must have 6 digits.",
             "generic": "Could not sign in. Please try again."
         }
     },
@@ -329,11 +331,13 @@
             "emailRequired": "Email is required.",
             "emailInvalid": "Enter a valid email address.",
             "phoneRequired": "Phone number is required.",
+            "phoneInvalid": "Choose the country and enter the full number (8 to 15 digits in total).",
             "passwordRequired": "Password is required.",
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
             "generic": "Could not create the account. Please try again."
-        }
+        },
+        "back": "Back"
     },
     "verify": {
         "pendingTitle": "Verifying your account",
@@ -501,8 +505,8 @@
                 "hint": "Numbers only, 8 digits."
             },
             "phone": {
-                "tip": "Phone or WhatsApp used for payment reminders.",
-                "hint": "E.g. +51 987 654 321"
+                "tip": "Choose the country by its flag and enter the phone or WhatsApp used for payment reminders.",
+                "hint": "Country + number, e.g. +51 987 654 321"
             },
             "address": {
                 "tip": "Customer's address within the store's area.",
@@ -685,8 +689,8 @@
                 "hint": "Business type."
             },
             "phone": {
-                "tip": "Store's contact phone.",
-                "hint": "E.g. +51 01 234 5678"
+                "tip": "Choose the country by its flag and enter the store contact phone.",
+                "hint": "Country + number, e.g. +51 01 234 5678"
             },
             "email": {
                 "tip": "Store's contact email.",

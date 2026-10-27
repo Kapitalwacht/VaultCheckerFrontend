@@ -1,12 +1,14 @@
 <script setup>
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
+import { isValidPhone, normalizePhone } from '@/iam/domain/model/phone-number.js'
 import { signInWithGoogle as googleSignIn, isGoogleConfigured } from '@/iam/infrastructure/google-identity.js'
+import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -26,8 +28,7 @@ const mode = ref('email')
 const phone = ref('')
 const phoneStep = ref('request')
 const phoneCode = ref('')
-const phoneDemoCode = ref('')
-const phoneMessage = ref('')
+const phoneSentTo = ref('')
 const phoneLoading = ref(false)
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -42,9 +43,11 @@ function checkField(field) {
         case 'password':
             return password.value ? '' : 'passwordRequired'
         case 'phone':
-            return phone.value.trim() ? '' : 'phoneRequired'
+            if (!phone.value.trim()) return 'phoneRequired'
+            return isValidPhone(phone.value) ? '' : 'phoneInvalid'
         case 'code':
-            return phoneCode.value.trim() ? '' : 'codeRequired'
+            if (!phoneCode.value.trim()) return 'codeRequired'
+            return /^\d{6}$/.test(phoneCode.value.trim()) ? '' : 'codeInvalid'
         default:
             return ''
     }
@@ -79,33 +82,56 @@ function phoneErrorKey(message) {
     return message
 }
 
-function switchMode(next) {
-    mode.value = next
+function resetPhoneFlow() {
     errorMessage.value = ''
-    phoneMessage.value = ''
-    phoneDemoCode.value = ''
+    phoneSentTo.value = ''
     phoneStep.value = 'request'
     phoneCode.value = ''
     fieldErrors.value = {}
     submitted.value = false
 }
 
+function applyRouteState(query) {
+    const nextMode = query.mode === 'phone' ? 'phone' : 'email'
+    if (nextMode !== mode.value) {
+        mode.value = nextMode
+        resetPhoneFlow()
+    }
+    if (nextMode === 'phone') {
+        const wantsCode = query.step === 'code' && phoneSentTo.value
+        if (!wantsCode && phoneStep.value === 'code') {
+            phoneStep.value = 'request'
+            phoneCode.value = ''
+            phoneSentTo.value = ''
+            errorMessage.value = ''
+            fieldErrors.value = {}
+            submitted.value = false
+        }
+    }
+}
+
+function switchMode(next) {
+    const query = { ...route.query, mode: next === 'phone' ? 'phone' : undefined, step: undefined }
+    router.push({ query })
+}
+
+watch(() => route.query, applyRouteState)
+applyRouteState(route.query)
+
 function requestPhoneCode() {
     submitted.value = true
     if (!validateFields(['phone'])) return
     phoneLoading.value = true
     errorMessage.value = ''
-    phoneMessage.value = ''
-    phoneDemoCode.value = ''
+    phoneSentTo.value = ''
+    phone.value = normalizePhone(phone.value)
     iamStore.requestLoginCode(phone.value)
-        .then(result => {
+        .then(() => {
             phoneStep.value = 'code'
-            if (result.smsSent) {
-                phoneMessage.value = t('login.phone.sentSms', { phone: phone.value })
-            } else {
-                phoneDemoCode.value = result.code
-                phoneMessage.value = t('login.phone.sentDemo')
-            }
+            submitted.value = false
+            fieldErrors.value = {}
+            phoneSentTo.value = phone.value
+            router.push({ query: { ...route.query, mode: 'phone', step: 'code' } })
         })
         .catch(e => {
             errorMessage.value = t(`login.error.${phoneErrorKey(e.message)}`, t('login.error.generic'))
@@ -232,22 +258,13 @@ async function handleGoogle() {
             </form>
 
             <form v-else class="login__form" novalidate @submit.prevent="phoneStep === 'request' ? requestPhoneCode() : submitPhoneCode()">
-                <label class="field">
+                <div class="field">
                     <span class="field__label">{{ t('login.phone.label') }}</span>
-                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.phone }">
-                        <i class="pi pi-phone field__icon" />
-                        <input
-                            v-model="phone"
-                            type="tel"
-                            class="field__input"
-                            :placeholder="t('register.phonePlaceholder')"
-                            autocomplete="tel"
-                            :disabled="phoneStep === 'code'"
-                            @input="revalidate('phone')"
-                        />
+                    <span class="field__control field__control--phone" :class="{ 'field__control--error': fieldErrors.phone }">
+                        <PhoneInput v-model="phone" :boxed="false" :disabled="phoneStep === 'code'" @input="revalidate('phone')" />
                     </span>
                     <span v-if="fieldErrors.phone" class="field__error">{{ t(`login.error.${fieldErrors.phone}`) }}</span>
-                </label>
+                </div>
 
                 <label v-if="phoneStep === 'code'" class="field">
                     <span class="field__label">{{ t('login.phone.code') }}</span>
@@ -257,6 +274,8 @@ async function handleGoogle() {
                             v-model="phoneCode"
                             type="text"
                             inputmode="numeric"
+                            maxlength="6"
+                            autocomplete="one-time-code"
                             class="field__input"
                             :placeholder="t('login.phone.codePlaceholder')"
                             @input="revalidate('code')"
@@ -265,9 +284,9 @@ async function handleGoogle() {
                     <span v-if="fieldErrors.code" class="field__error">{{ t(`login.error.${fieldErrors.code}`) }}</span>
                 </label>
 
-                <p v-if="phoneMessage" class="login__phone-note">
-                    <i class="pi pi-info-circle" /> {{ phoneMessage }}
-                    <strong v-if="phoneDemoCode"> {{ phoneDemoCode }}</strong>
+                <p v-if="phoneSentTo" class="login__phone-note">
+                    <i class="pi pi-info-circle" />
+                    <span>{{ t('login.phone.sentSms', { phone: phoneSentTo }) }}</span>
                 </p>
 
                 <p v-if="errorMessage" class="login__error">
@@ -346,6 +365,7 @@ async function handleGoogle() {
     padding: 0 0.75rem;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.field__control--phone { padding: 0 0.6rem 0 0.35rem; }
 .field__control:focus-within {
     border-color: var(--vc-brand-500);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
@@ -439,9 +459,10 @@ async function handleGoogle() {
 }
 .login__alt-btn:hover { background: var(--vc-surface-2); border-color: var(--vc-text-muted); }
 .login__phone-note {
-    display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+    display: flex; align-items: flex-start; gap: 0.5rem;
     margin: 0; padding: 0.6rem 0.8rem; border-radius: 10px;
     background: rgba(22, 163, 74, 0.1); color: var(--vc-text); font-size: 0.85rem;
 }
-.login__phone-note strong { font-size: 1.1rem; letter-spacing: 2px; color: var(--vc-brand-700, var(--vc-brand-600)); }
+.login__phone-note .pi { flex-shrink: 0; margin-top: 0.15rem; }
+.login__phone-note span { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
 </style>

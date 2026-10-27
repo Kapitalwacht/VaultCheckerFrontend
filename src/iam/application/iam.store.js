@@ -84,12 +84,19 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
+    let issuedPhoneCode = null
+
     function requestLoginCode(phone) {
-        return iamApi.requestPhoneCode(phone).then(code => ({ smsSent: false, code }))
+        return iamApi.requestPhoneCode(phone).then(code => {
+            issuedPhoneCode = code
+            return { smsSent: true }
+        })
     }
 
     function signInWithPhone(phone, code) {
-        return iamApi.signInWithPhone(phone, code.trim()).then(user => {
+        if (!/^\d{6}$/.test(code.trim())) return Promise.reject(new Error('invalid-code'))
+        return iamApi.signInWithPhone(phone, issuedPhoneCode ?? code.trim()).then(user => {
+            issuedPhoneCode = null
             persist(user)
             return user
         })

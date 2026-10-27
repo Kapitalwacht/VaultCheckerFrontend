@@ -9,9 +9,10 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
+import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
-const { format: formatCurrency } = useCurrencyFormatter()
+const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const customersStore = useCustomersStore()
 const { customers, loading, error } = storeToRefs(customersStore)
@@ -82,7 +83,7 @@ function openEdit(customer) {
         dni: customer.dni,
         phone: customer.phone,
         address: customer.address,
-        creditLimit: customer.creditLimit,
+        creditLimit: fromBaseCurrency(customer.creditLimit),
         currency: customer.currency ?? 'PEN',
         rateType: customer.rateType ?? 'effective',
         ratePercent: (Number(customer.rateValue) || 0) * 100,
@@ -114,7 +115,7 @@ async function submit() {
             phone: form.phone,
             address: form.address,
             state: form.state,
-            creditLimit: Number(form.creditLimit) || 0,
+            creditLimit: toBaseCurrency(form.creditLimit),
             currency: form.currency,
             rateType: form.rateType,
             rateValue: (Number(form.ratePercent) || 0) / 100,
@@ -245,13 +246,13 @@ onMounted(() => customersStore.fetchCustomers())
                     <input v-model="form.dni" class="vc-input" />
                     <small class="vc-field__hint">{{ t('help.customer.dni.hint') }}</small>
                 </label>
-                <label class="vc-field">
+                <div class="vc-field">
                     <span class="vc-field__label">{{ t('customers.field.phone') }}
                         <FieldHelp :tip="t('help.customer.phone.tip')" />
                     </span>
-                    <input v-model="form.phone" class="vc-input" />
+                    <PhoneInput v-model="form.phone" />
                     <small class="vc-field__hint">{{ t('help.customer.phone.hint') }}</small>
-                </label>
+                </div>
                 <label class="vc-field vc-field--full">
                     <span class="vc-field__label">{{ t('customers.field.address') }}
                         <FieldHelp :tip="t('help.customer.address.tip')" />

@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useIamStore from '@/iam/application/iam.store.js'
 import { useCurrencyFormatter, setCurrency } from '@/shared/infrastructure/currency-formatter.js'
+import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
 const iamStore = useIamStore()
@@ -192,10 +193,10 @@ onMounted(loadProfile)
                         <span class="vc-field__label">{{ t('profile.name') }}</span>
                         <input v-model="profileForm.name" class="vc-input" required />
                     </label>
-                    <label class="vc-field vc-field--full">
+                    <div class="vc-field vc-field--full">
                         <span class="vc-field__label">{{ t('profile.phone') }}</span>
-                        <input v-model="profileForm.phone" class="vc-input" type="tel" :placeholder="t('register.phonePlaceholder')" />
-                    </label>
+                        <PhoneInput v-model="profileForm.phone" />
+                    </div>
                     <p v-if="profileError" class="profile-msg profile-msg--error"><i class="pi pi-exclamation-triangle" /> {{ profileError }}</p>
                     <p v-if="profileMessage" class="profile-msg profile-msg--ok"><i class="pi pi-check-circle" /> {{ profileMessage }}</p>
                     <div class="profile-actions">

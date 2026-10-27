@@ -1,14 +1,15 @@
 <script setup>
 
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const iamStore = useIamStore()
 
 const step = ref(1)
@@ -25,6 +26,18 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 8
 const fieldErrors = ref({})
 const submitted = ref(false)
+
+watch(() => route.query.step, value => {
+    if (value === '2' || step.value !== 2) return
+    step.value = 1
+    code.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+    infoMessage.value = ''
+    errorMessage.value = ''
+    fieldErrors.value = {}
+    submitted.value = false
+})
 
 function checkField(field) {
     switch (field) {
@@ -78,6 +91,7 @@ function requestCode() {
     iamStore.requestRecovery(email.value)
         .then(result => {
             step.value = 2
+            router.push({ query: { ...route.query, step: '2' } })
             submitted.value = false
             fieldErrors.value = {}
             if (result.emailSent) {

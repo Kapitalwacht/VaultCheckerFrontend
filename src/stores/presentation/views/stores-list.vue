@@ -7,6 +7,7 @@ import useStoresStore from '@/stores/application/stores.store.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
+import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
 const storesStore = useStoresStore()
@@ -191,13 +192,13 @@ onMounted(() => storesStore.fetchStores())
                     <input v-model="form.category" class="vc-input" :placeholder="t('stores.categoryHint')" />
                     <small class="vc-field__hint">{{ t('help.store.category.hint') }}</small>
                 </label>
-                <label class="vc-field">
+                <div class="vc-field">
                     <span class="vc-field__label">{{ t('stores.field.phone') }}
                         <FieldHelp :tip="t('help.store.phone.tip')" />
                     </span>
-                    <input v-model="form.phone" class="vc-input" />
+                    <PhoneInput v-model="form.phone" />
                     <small class="vc-field__hint">{{ t('help.store.phone.hint') }}</small>
-                </label>
+                </div>
                 <label class="vc-field">
                     <span class="vc-field__label">{{ t('stores.field.email') }}
                         <FieldHelp :tip="t('help.store.email.tip')" />

@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
+import { isValidPhone, normalizePhone } from '@/iam/domain/model/phone-number.js'
+import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -42,7 +44,8 @@ function checkField(field) {
             if (!email.value.trim()) return 'emailRequired'
             return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
         case 'phone':
-            return phone.value.trim() ? '' : 'phoneRequired'
+            if (!phone.value.trim()) return 'phoneRequired'
+            return isValidPhone(phone.value) ? '' : 'phoneInvalid'
         case 'password':
             if (!password.value) return 'passwordRequired'
             return password.value.length < MIN_PASSWORD_LENGTH ? 'passwordShort' : ''
@@ -91,7 +94,7 @@ function submit() {
         category: category.value,
         ownerName: ownerName.value,
         email: email.value,
-        phone: phone.value,
+        phone: normalizePhone(phone.value),
         password: password.value
     })
         .then(result => {
@@ -117,6 +120,10 @@ function submit() {
     <div class="login">
         <div class="login__panel vc-card">
             <LocaleToggle class="login__locale" />
+            <RouterLink class="login__back" :to="{ name: 'login' }" :aria-label="t('register.back')">
+                <i class="pi pi-arrow-left" />
+                <span>{{ t('register.back') }}</span>
+            </RouterLink>
             <BrandLogo :size="34" class="login__brand" />
 
             <template v-if="done">
@@ -183,14 +190,13 @@ function submit() {
                     <span v-if="fieldErrors.email" class="field__error">{{ t(`register.error.${fieldErrors.email}`) }}</span>
                 </label>
 
-                <label class="field">
+                <div class="field">
                     <span class="field__label">{{ t('register.phone') }}</span>
-                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.phone }">
-                        <i class="pi pi-phone field__icon" />
-                        <input v-model="phone" type="tel" class="field__input" :placeholder="t('register.phonePlaceholder')" autocomplete="tel" @input="revalidate('phone')" />
+                    <span class="field__control field__control--phone" :class="{ 'field__control--error': fieldErrors.phone }">
+                        <PhoneInput v-model="phone" :boxed="false" @input="revalidate('phone')" />
                     </span>
                     <span v-if="fieldErrors.phone" class="field__error">{{ t(`register.error.${fieldErrors.phone}`) }}</span>
-                </label>
+                </div>
 
                 <label class="field">
                     <span class="field__label">{{ t('login.password') }}</span>
@@ -274,6 +280,22 @@ function submit() {
     box-sizing: border-box;
 }
 .login__locale { position: absolute; top: 1rem; right: 1rem; }
+.login__back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: -0.75rem 0 1rem -0.4rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 8px;
+    color: var(--vc-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.login__back .pi { font-size: 0.8rem; }
+.login__back:hover { background: var(--vc-surface-2); color: var(--vc-text); }
 .login__brand { color: var(--vc-brand-500); margin-bottom: 1.25rem; }
 .login__title { font-size: 1.4rem; font-weight: 700; margin: 0; color: var(--vc-text); }
 .login__subtitle { color: var(--vc-text-muted); margin: 0.25rem 0 1.5rem; }
@@ -292,6 +314,7 @@ function submit() {
     padding: 0 0.75rem;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.field__control--phone { padding: 0 0.6rem 0 0.35rem; }
 .field__control:focus-within {
     border-color: var(--vc-brand-500);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
