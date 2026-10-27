@@ -95,6 +95,10 @@ function submit() {
         password: password.value
     })
         .then(result => {
+            if (result.signedIn) {
+                router.push('/home')
+                return
+            }
             emailSent.value = result.emailSent
             verificationLink.value = result.link || ''
             done.value = true

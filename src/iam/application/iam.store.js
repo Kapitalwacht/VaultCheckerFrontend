@@ -26,15 +26,6 @@ function buildVerificationLink(token, email) {
     return `${base}?token=${token}&email=${encodeURIComponent(email)}`
 }
 
-function nextCode(items, prefix, field) {
-    const highest = items.reduce((acc, item) => {
-        const match = String(item?.[field] ?? '').match(/(\d+)$/)
-        const value = match ? Number(match[1]) : 0
-        return value > acc ? value : acc
-    }, 0)
-    return `${prefix}-${String(highest + 1).padStart(3, '0')}`
-}
-
 const STORAGE_KEY = 'vaultchecker-auth'
 
 const iamApi = new IamApi()
@@ -82,43 +73,29 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function registerAccount({ businessName, category, ruc, ownerName, email, phone, password }) {
-        return iamApi.findByEmail(email).then(existing => {
-            if (existing) throw new Error('email-taken')
-            return Promise.all([storesApi.getAllStores(), iamApi.listUsers()])
-        }).then(([storesResponse, usersResponse]) => {
-            const storeCode = nextCode(storesResponse.data || [], 'ST', 'storeId')
-            const userCode = nextCode(usersResponse.data || [], 'US', 'userId')
-            const verificationToken = generateToken()
-            const storeResource = StoreAssembler.toResourceFromEntity(new Store({
-                storeId: storeCode,
-                ruc,
-                businessName,
-                category,
-                phone,
-                email
-            }))
-            return storesApi.createStore(storeResource).then(() => {
-                useAuditStore().recordAction('CREATE_STORE', `Store ${businessName} registered`)
-                return iamApi.signUp({
-                    userId: userCode,
-                    email,
-                    password,
-                    name: ownerName,
-                    phone,
-                    role: 'store-admin',
-                    storeId: storeCode,
-                    emailVerified: false,
-                    verificationToken,
-                    recoveryCode: null,
-                    recoveryExpiresAt: null
-                })
-            }).then(() => {
-                useAuditStore().recordAction('REGISTER_ACCOUNT', `Account ${email} created for ${businessName}`)
-                const link = buildVerificationLink(verificationToken, email)
-                return sendVerificationEmail({ email, name: ownerName, link })
-                    .then(result => ({ emailSent: result.sent, link: result.sent ? null : link }))
-            })
+        const storeCode = `ST-${Date.now().toString(36).toUpperCase()}`
+        const storeResource = StoreAssembler.toResourceFromEntity(new Store({
+            storeId: storeCode,
+            ruc,
+            businessName,
+            category,
+            phone,
+            email
+        }))
+        return iamApi.signUp({
+            email,
+            password,
+            name: ownerName,
+            phone,
+            role: 'store-admin',
+            storeId: storeCode
         })
+            .then(() => signIn({ email, password }))
+            .then(() => storesApi.createStore(storeResource))
+            .then(() => {
+                useAuditStore().recordAction('REGISTER_ACCOUNT', `Account ${email} created for ${businessName}`)
+                return { signedIn: true }
+            })
     }
 
     function verifyEmail(email, token) {

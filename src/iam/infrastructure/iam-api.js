@@ -3,6 +3,7 @@ import { BaseEndpoint } from '@/shared/infrastructure/base-endpoint.js'
 import { AuthenticatedUserAssembler } from '@/iam/infrastructure/authenticated-user.assembler.js'
 
 const usersPath = '/users'
+const authenticationPath = import.meta.env.VITE_AUTH_ENDPOINT_PATH ?? '/authentication'
 
 function normalizePhone(phone) {
     return String(phone ?? '').replace(/\D/g, '')
@@ -52,15 +53,16 @@ export class IamApi extends BaseApi {
     }
 
     signIn(credentials) {
-        return this.findByEmail(credentials.email).then(record => {
-            if (!record || record.password !== credentials.password) {
-                throw new Error('invalid-credentials')
-            }
-            if (record.emailVerified === false) {
-                throw new Error('email-not-verified')
-            }
-            return toAuthenticatedUser(record)
-        })
+        return this.http
+            .post(`${authenticationPath}/sign-in`, {
+                email: credentials.email,
+                password: credentials.password
+            })
+            .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
+            .catch(error => {
+                const status = error.response?.status
+                throw new Error(status && status < 500 ? 'invalid-credentials' : 'generic')
+            })
     }
 
     signInWithGoogleRecord(record) {
@@ -68,6 +70,19 @@ export class IamApi extends BaseApi {
     }
 
     signUp(registration) {
-        return this.#usersEndpoint.create(registration).then(response => response.data)
+        return this.http
+            .post(`${authenticationPath}/sign-up`, {
+                email: registration.email,
+                password: registration.password,
+                role: registration.role,
+                name: registration.name,
+                phone: registration.phone,
+                storeId: registration.storeId
+            })
+            .then(response => response.data)
+            .catch(error => {
+                if (error.response?.status === 409) throw new Error('email-taken')
+                throw error
+            })
     }
 }
