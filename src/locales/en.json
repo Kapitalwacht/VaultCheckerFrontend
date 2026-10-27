@@ -224,6 +224,11 @@
             "lineTotal": "Total",
             "overdue": "Overdue",
             "total": "Total to pay"
+        },
+        "error": {
+            "account-exists": "This customer already has a credit account.",
+            "partial-payment": "Partial payments are not allowed: enter the full balance.",
+            "credit-limit-exceeded": "The amount exceeds the customer's available credit."
         }
     },
     "audit": {
@@ -387,7 +392,19 @@
         },
         "changed": "You switched to the {plan} plan.",
         "changeError": "Could not change the plan.",
-        "stripeNote": "Demo mode: connect Stripe (VITE_STRIPE_PUBLISHABLE_KEY and per-plan Payment Links) to charge for real."
+        "demoNote": "Demo mode: payments are simulated and no real charge is made.",
+        "checkout": {
+            "title": "Confirm payment",
+            "plan": "Plan",
+            "totalToday": "Total today",
+            "cardHolder": "Cardholder",
+            "note": "Simulated payment: no real card is used or stored.",
+            "pay": "Pay {amount}",
+            "processing": "Processing payment…",
+            "successTitle": "Payment approved!",
+            "successText": "Your store is now on the {plan} plan. The invoice is in your history.",
+            "close": "Done"
+        }
     },
     "recover": {
         "title": "Recover password",

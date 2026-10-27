@@ -12,6 +12,7 @@ import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
+import { sameId } from '@/shared/domain/same-id.js'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -46,10 +47,14 @@ const blankForm = () => ({
 const form = reactive(blankForm())
 
 const selectedCustomer = computed(() =>
-    customers.value.find(c => c.id === selectedCustomerId.value) || null)
+    customers.value.find(c => sameId(c.id, selectedCustomerId.value)) || null)
 
 const availableCredit = computed(() =>
     selectedCustomer.value ? creditStore.availableCreditFor(selectedCustomer.value) : 0)
+const creditLimit = computed(() => {
+    if (!selectedCustomer.value) return 0
+    return creditStore.accountFor(selectedCustomer.value)?.creditLimit ?? selectedCustomer.value.creditLimit
+})
 
 const amount = computed(() =>
     (Number(form.quantity) || 0) * (Number(form.unitPrice) || 0))
@@ -74,7 +79,7 @@ const plans = computed(() => {
 })
 
 function onProductChange() {
-    const product = products.value.find(p => p.id === form.productId)
+    const product = products.value.find(p => sameId(p.id, form.productId))
     if (product) {
         form.description = product.name
         form.unitPrice = product.listPrice
@@ -190,6 +195,7 @@ watch(selectedCustomer, customer => {
 onMounted(() => {
     customersStore.fetchCustomers()
     catalogStore.fetchProducts()
+    creditStore.fetchAccounts()
     creditStore.fetchPurchases()
     creditStore.fetchInstallmentPayments()
 })
@@ -224,7 +230,7 @@ onMounted(() => {
         <div v-if="selectedCustomer" class="plan-kpis">
             <article class="vc-card plan-kpi">
                 <span class="plan-kpi__label">{{ t('customers.field.creditLimit') }}</span>
-                <span class="plan-kpi__value">{{ formatCurrency(selectedCustomer.creditLimit) }}</span>
+                <span class="plan-kpi__value">{{ formatCurrency(creditLimit) }}</span>
             </article>
             <article class="vc-card plan-kpi">
                 <span class="plan-kpi__label">{{ t('credit.plan.available') }}</span>

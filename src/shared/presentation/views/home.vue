@@ -1,20 +1,47 @@
 <script setup>
 
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import useCreditStore from '@/credit/application/credit.store.js'
+import useCustomersStore from '@/customers/application/customers.store.js'
+import { useStoreScope } from '@/iam/application/use-store-scope.js'
 
 const { t } = useI18n()
 const router = useRouter()
 const { format } = useCurrencyFormatter()
+const { scope } = useStoreScope()
+const creditStore = useCreditStore()
+const customersStore = useCustomersStore()
+const { accounts, installmentPayments } = storeToRefs(creditStore)
+const { activeCustomers } = storeToRefs(customersStore)
+
+const today = new Date().toISOString().slice(0, 10)
+
+const scopedAccounts = computed(() => scope(accounts.value))
+const outstanding = computed(() =>
+    scopedAccounts.value.reduce((sum, account) => sum + Number(account.balance || 0), 0))
+const overdue = computed(() => scopedAccounts.value
+    .filter(account => account.isOverdue)
+    .reduce((sum, account) => sum + Number(account.balance || 0), 0))
+const upcomingInstallments = computed(() => scope(installmentPayments.value)
+    .filter(payment => payment.state === 'pending' && String(payment.scheduledDate || '') >= today)
+    .length)
 
 const kpis = computed(() => [
-    { key: 'outstanding', icon: 'pi-wallet',      value: format(0), tone: 'brand' },
-    { key: 'customers',   icon: 'pi-users',        value: '0',       tone: 'info' },
-    { key: 'dueSoon',     icon: 'pi-calendar',     value: '0',       tone: 'accent' },
-    { key: 'overdue',     icon: 'pi-exclamation-triangle', value: format(0), tone: 'danger' }
+    { key: 'outstanding', icon: 'pi-wallet',      value: format(outstanding.value), tone: 'brand' },
+    { key: 'customers',   icon: 'pi-users',        value: String(scope(activeCustomers.value).length), tone: 'info' },
+    { key: 'dueSoon',     icon: 'pi-calendar',     value: String(upcomingInstallments.value), tone: 'accent' },
+    { key: 'overdue',     icon: 'pi-exclamation-triangle', value: format(overdue.value), tone: 'danger' }
 ])
+
+onMounted(() => {
+    creditStore.fetchAccounts()
+    creditStore.fetchInstallmentPayments()
+    customersStore.fetchCustomers()
+})
 
 const shortcuts = [
     { key: 'stores',    icon: 'pi-building',    to: '/stores' },

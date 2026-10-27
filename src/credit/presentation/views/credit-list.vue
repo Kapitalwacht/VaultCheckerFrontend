@@ -10,6 +10,7 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
+import { sameId } from '@/shared/domain/same-id.js'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -24,10 +25,13 @@ const totalOutstanding = computed(() =>
     scopedAccounts.value.reduce((sum, account) => sum + Number(account.balance || 0), 0))
 const overdueAccounts = computed(() => scopedAccounts.value.filter(account => account.isOverdue))
 const scopedCustomers = computed(() => scope(customers.value))
+const customersWithoutAccount = computed(() =>
+    scopedCustomers.value.filter(customer => !creditStore.accountFor(customer)))
 
 const accountModalOpen = ref(false)
 const paymentModalOpen = ref(false)
 const saving = ref(false)
+const formError = ref('')
 const activeAccount = ref(null)
 
 const blankAccount = () => ({
@@ -42,7 +46,7 @@ const accountForm = reactive(blankAccount())
 const paymentForm = reactive({ amount: 0, date: new Date().toISOString().slice(0, 10) })
 
 function customerName(id) {
-    const c = customers.value.find(item => item.id === id || item.customerId === id)
+    const c = customers.value.find(item => sameId(item.id, id) || sameId(item.customerId, id))
     return c ? c.fullName : `#${id ?? '—'}`
 }
 
@@ -56,6 +60,7 @@ function fmtDate(value) {
 
 function openAccountModal() {
     Object.assign(accountForm, blankAccount())
+    formError.value = ''
     accountModalOpen.value = true
 }
 
@@ -63,14 +68,21 @@ function openPaymentModal(account) {
     activeAccount.value = account
     paymentForm.amount = account.balance
     paymentForm.date = new Date().toISOString().slice(0, 10)
+    formError.value = ''
     paymentModalOpen.value = true
+}
+
+function errorText(e) {
+    return t(`credit.error.${e.message}`, t('common.error'))
 }
 
 async function submitAccount() {
     saving.value = true
+    formError.value = ''
     try {
         await creditStore.openAccount({
             ...accountForm,
+            creditId: `CRD-${Date.now()}`,
             storeId: accountForm.storeId || scopeStoreId.value || null,
             balance: Number(accountForm.balance) || 0,
             creditLimit: Number(accountForm.creditLimit) || 0,
@@ -78,7 +90,7 @@ async function submitAccount() {
         })
         accountModalOpen.value = false
     } catch (e) {
-        error.value = e.message
+        formError.value = errorText(e)
     } finally {
         saving.value = false
     }
@@ -86,16 +98,17 @@ async function submitAccount() {
 
 async function submitPayment() {
     saving.value = true
+    formError.value = ''
     try {
         await creditStore.registerPayment({
-            creditId: activeAccount.value.creditId ?? activeAccount.value.id,
-            customerId: activeAccount.value.customerId,
+            creditAccountId: activeAccount.value.id,
+            storeId: activeAccount.value.storeId,
             amount: Number(paymentForm.amount) || 0,
             date: paymentForm.date
         })
         paymentModalOpen.value = false
     } catch (e) {
-        error.value = e.message
+        formError.value = errorText(e)
     } finally {
         saving.value = false
     }
@@ -198,7 +211,7 @@ onMounted(() => {
                     </span>
                     <select v-model="accountForm.customerId" class="vc-select" required>
                         <option value="" disabled>{{ t('credit.selectCustomer') }}</option>
-                        <option v-for="c in scopedCustomers" :key="c.id" :value="c.id">{{ c.fullName }}</option>
+                        <option v-for="c in customersWithoutAccount" :key="c.id" :value="c.id">{{ c.fullName }}</option>
                     </select>
                     <small class="vc-field__hint">{{ t('help.account.customer.hint') }}</small>
                 </label>
@@ -234,6 +247,7 @@ onMounted(() => {
                     </select>
                     <small class="vc-field__hint">{{ t('help.account.state.hint') }}</small>
                 </label>
+                <p v-if="formError" class="credit-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>
             <template #footer>
                 <button class="vc-btn vc-btn--ghost" type="button" @click="accountModalOpen = false">{{ t('common.cancel') }}</button>
@@ -265,6 +279,7 @@ onMounted(() => {
                     <input v-model="paymentForm.date" type="date" class="vc-input" required />
                     <small class="vc-field__hint">{{ t('help.accountPayment.date.hint') }}</small>
                 </label>
+                <p v-if="formError" class="credit-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>
             <template #footer>
                 <button class="vc-btn vc-btn--ghost" type="button" @click="paymentModalOpen = false">{{ t('common.cancel') }}</button>
@@ -288,6 +303,12 @@ onMounted(() => {
 .credit-kpi__label { font-size: 0.82rem; color: var(--vc-text-muted); }
 .credit-kpi__value { font-size: 1.5rem; font-weight: 700; color: var(--vc-text); }
 .credit-kpi__value--danger { color: var(--vc-danger-500); }
+.credit-form__error {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--vc-danger-500);
+    font-size: 0.9rem;
+}
 .credit-payment__ctx {
     margin: 0 0 1rem;
     padding: 0.7rem 0.9rem;

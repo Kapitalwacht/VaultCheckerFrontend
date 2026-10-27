@@ -224,6 +224,11 @@
             "lineTotal": "Total",
             "overdue": "En mora",
             "total": "Total a pagar"
+        },
+        "error": {
+            "account-exists": "Este cliente ya tiene una cuenta de crédito.",
+            "partial-payment": "No se aceptan pagos parciales: ingresa el saldo completo.",
+            "credit-limit-exceeded": "El monto supera el crédito disponible del cliente."
         }
     },
     "audit": {
@@ -388,7 +393,19 @@
         },
         "changed": "Cambiaste al plan {plan}.",
         "changeError": "No se pudo cambiar el plan.",
-        "stripeNote": "Modo demo: conecta Stripe (VITE_STRIPE_PUBLISHABLE_KEY y Payment Links por plan) para cobrar de verdad."
+        "demoNote": "Modo demo: los pagos son simulados y no se realiza ningún cobro real.",
+        "checkout": {
+            "title": "Confirmar pago",
+            "plan": "Plan",
+            "totalToday": "Total hoy",
+            "cardHolder": "Titular",
+            "note": "Pago simulado: no se usa ni se guarda ninguna tarjeta real.",
+            "pay": "Pagar {amount}",
+            "processing": "Procesando pago…",
+            "successTitle": "¡Pago aprobado!",
+            "successText": "Tu tienda ya está en el plan {plan}. La factura aparece en tu historial.",
+            "close": "Listo"
+        }
     },
     "recover": {
         "title": "Recuperar contraseña",

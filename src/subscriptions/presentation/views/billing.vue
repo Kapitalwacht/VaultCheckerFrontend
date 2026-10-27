@@ -5,19 +5,25 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useIamStore from '@/iam/application/iam.store.js'
 import useSubscriptionsStore from '@/subscriptions/application/subscriptions.store.js'
-import { isStripeConfigured } from '@/subscriptions/infrastructure/stripe-checkout.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import VcModal from '@/shared/presentation/components/vc-modal.vue'
+
+const SIMULATED_PROCESSING_MS = 1800
 
 const { t } = useI18n()
 const iamStore = useIamStore()
 const subscriptionsStore = useSubscriptionsStore()
-const { storeId } = storeToRefs(iamStore)
+const { storeId, currentUser } = storeToRefs(iamStore)
 const { plans, subscription, invoices, loading, currentPlan } = storeToRefs(subscriptionsStore)
 const { format: formatMoney } = useCurrencyFormatter()
 
 const processingPlanId = ref('')
 const actionMessage = ref('')
-const stripeReady = isStripeConfigured()
+const checkoutPlan = ref(null)
+const checkoutStep = ref('review')
+const checkoutError = ref('')
+
+const cardHolder = computed(() => (currentUser.value?.name || t('billing.checkout.cardHolder')).toUpperCase())
 
 const statusLabel = computed(() =>
     subscription.value ? t(`billing.status.${subscription.value.status}`, subscription.value.status) : '')
@@ -30,21 +36,44 @@ function isCurrent(plan) {
     return plan.planId === subscription.value?.planId
 }
 
-function choosePlan(plan) {
-    if (isCurrent(plan)) return
+function applyPlan(plan) {
     processingPlanId.value = plan.planId
     actionMessage.value = ''
-    subscriptionsStore.subscribe(storeId.value, plan)
-        .then(result => {
-            if (!result.redirected) {
-                actionMessage.value = t('billing.changed', { plan: planName(plan) })
-            }
-        })
-        .catch(() => {
-            actionMessage.value = t('billing.changeError')
+    return subscriptionsStore.subscribe(storeId.value, plan)
+        .then(() => {
+            actionMessage.value = t('billing.changed', { plan: planName(plan) })
         })
         .finally(() => {
             processingPlanId.value = ''
+        })
+}
+
+function choosePlan(plan) {
+    if (isCurrent(plan)) return
+    if (plan.isFree) {
+        applyPlan(plan).catch(() => { actionMessage.value = t('billing.changeError') })
+        return
+    }
+    checkoutPlan.value = plan
+    checkoutStep.value = 'review'
+    checkoutError.value = ''
+}
+
+function closeCheckout() {
+    if (checkoutStep.value === 'processing') return
+    checkoutPlan.value = null
+}
+
+function payCheckout() {
+    const plan = checkoutPlan.value
+    checkoutStep.value = 'processing'
+    checkoutError.value = ''
+    new Promise(resolve => setTimeout(resolve, SIMULATED_PROCESSING_MS))
+        .then(() => applyPlan(plan))
+        .then(() => { checkoutStep.value = 'done' })
+        .catch(() => {
+            checkoutStep.value = 'review'
+            checkoutError.value = t('billing.changeError')
         })
 }
 
@@ -83,7 +112,7 @@ onMounted(() => {
             </section>
 
             <p v-if="actionMessage" class="billing-action-msg"><i class="pi pi-check-circle" /> {{ actionMessage }}</p>
-            <p v-if="!stripeReady" class="billing-stripe-note"><i class="pi pi-info-circle" /> {{ t('billing.stripeNote') }}</p>
+            <p class="billing-stripe-note"><i class="pi pi-info-circle" /> {{ t('billing.demoNote') }}</p>
 
             <h3 class="billing-section-title">{{ t('billing.availablePlans') }}</h3>
             <div class="billing-plans">
@@ -141,6 +170,58 @@ onMounted(() => {
                 </table>
             </section>
         </template>
+
+        <VcModal :open="Boolean(checkoutPlan)" :title="t('billing.checkout.title')" @close="closeCheckout">
+            <div v-if="checkoutPlan" class="checkout">
+                <template v-if="checkoutStep !== 'done'">
+                    <div class="checkout__summary">
+                        <div>
+                            <p class="checkout__label">{{ t('billing.checkout.plan') }}</p>
+                            <p class="checkout__plan">{{ planName(checkoutPlan) }}</p>
+                        </div>
+                        <div class="checkout__total">
+                            <p class="checkout__label">{{ t('billing.checkout.totalToday') }}</p>
+                            <p class="checkout__amount">{{ formatMoney(checkoutPlan.priceMonthly) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-card" :class="{ 'checkout-card--processing': checkoutStep === 'processing' }" aria-hidden="true">
+                        <div class="checkout-card__top">
+                            <span class="checkout-card__chip" />
+                            <span class="checkout-card__brand">VISA</span>
+                        </div>
+                        <p class="checkout-card__number">4242&nbsp;&nbsp;4242&nbsp;&nbsp;4242&nbsp;&nbsp;4242</p>
+                        <div class="checkout-card__bottom">
+                            <span>{{ cardHolder }}</span>
+                            <span>12/30</span>
+                        </div>
+                    </div>
+
+                    <p class="checkout__note"><i class="pi pi-shield" /> {{ t('billing.checkout.note') }}</p>
+                    <p v-if="checkoutError" class="checkout__error"><i class="pi pi-exclamation-triangle" /> {{ checkoutError }}</p>
+                </template>
+
+                <div v-else class="checkout__done">
+                    <span class="checkout__done-icon"><i class="pi pi-check" /></span>
+                    <h3 class="checkout__done-title">{{ t('billing.checkout.successTitle') }}</h3>
+                    <p class="checkout__done-text">{{ t('billing.checkout.successText', { plan: planName(checkoutPlan) }) }}</p>
+                </div>
+            </div>
+            <template #footer>
+                <template v-if="checkoutStep !== 'done'">
+                    <button class="vc-btn vc-btn--ghost" type="button" :disabled="checkoutStep === 'processing'" @click="closeCheckout">
+                        {{ t('common.cancel') }}
+                    </button>
+                    <button class="vc-btn vc-btn--primary" type="button" :disabled="checkoutStep === 'processing'" @click="payCheckout">
+                        <i v-if="checkoutStep === 'processing'" class="pi pi-spin pi-spinner" />
+                        {{ checkoutStep === 'processing'
+                            ? t('billing.checkout.processing')
+                            : t('billing.checkout.pay', { amount: formatMoney(checkoutPlan?.priceMonthly) }) }}
+                    </button>
+                </template>
+                <button v-else class="vc-btn vc-btn--primary" type="button" @click="closeCheckout">{{ t('billing.checkout.close') }}</button>
+            </template>
+        </VcModal>
     </div>
 </template>
 
@@ -189,4 +270,57 @@ onMounted(() => {
 .billing-table th { color: var(--vc-text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
 .billing-table tbody tr:last-child td { border-bottom: none; }
 .billing-table__right { text-align: right; }
+
+.checkout { display: flex; flex-direction: column; gap: 1.1rem; }
+.checkout__summary {
+    display: flex; justify-content: space-between; gap: 1rem; align-items: flex-end;
+    padding: 0.9rem 1rem; border-radius: 12px; background: var(--vc-surface-2);
+}
+.checkout__label { margin: 0; font-size: 0.75rem; color: var(--vc-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.checkout__plan { margin: 0.15rem 0 0; font-size: 1.1rem; font-weight: 700; }
+.checkout__total { text-align: right; }
+.checkout__amount { margin: 0.15rem 0 0; font-size: 1.4rem; font-weight: 700; color: var(--vc-brand-600, var(--vc-brand-500)); }
+
+.checkout-card {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between;
+    width: 100%; max-width: 340px; aspect-ratio: 1.586; margin: 0 auto;
+    padding: 1.2rem 1.4rem; border-radius: 16px; color: #fff;
+    background: linear-gradient(135deg, #14532d 0%, #16a34a 55%, #4ade80 100%);
+    box-shadow: 0 14px 30px rgba(20, 83, 45, 0.35);
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+.checkout-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-100%);
+}
+.checkout-card--processing::after { animation: checkout-shine 1.1s ease-in-out infinite; }
+.checkout-card__top { display: flex; justify-content: space-between; align-items: center; }
+.checkout-card__chip {
+    width: 42px; height: 30px; border-radius: 6px;
+    background: linear-gradient(135deg, #fde68a, #d97706);
+}
+.checkout-card__brand { font-family: inherit; font-style: italic; font-weight: 800; font-size: 1.3rem; letter-spacing: 0.04em; }
+.checkout-card__number { margin: 0; font-size: 1.15rem; letter-spacing: 0.08em; }
+.checkout-card__bottom { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.9; }
+
+.checkout__note { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.82rem; color: var(--vc-text-muted); }
+.checkout__error { margin: 0; color: var(--vc-danger-500); font-size: 0.9rem; }
+
+.checkout__done { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding: 1rem 0; }
+.checkout__done-icon {
+    display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+    background: var(--vc-brand-500); color: #fff; font-size: 1.8rem;
+    animation: checkout-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.checkout__done-title { margin: 0.5rem 0 0; font-size: 1.2rem; }
+.checkout__done-text { margin: 0; color: var(--vc-text-muted); }
+
+@keyframes checkout-shine { to { transform: translateX(100%); } }
+@keyframes checkout-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .checkout-card--processing::after, .checkout__done-icon { animation: none; }
+}
 </style>

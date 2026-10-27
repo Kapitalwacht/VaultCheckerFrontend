@@ -10,6 +10,7 @@ import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import { buildPaymentPlan, buildStatement } from '@/credit/domain/services/payment-plan.js'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
+import { sameId } from '@/shared/domain/same-id.js'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -28,7 +29,7 @@ const referenceDate = ref(new Date().toISOString().slice(0, 10))
 
 const selectedCustomer = computed(() => {
     const id = isCustomerView.value ? customerId.value : selectedCustomerId.value
-    return customers.value.find(c => c.id === id) || null
+    return customers.value.find(c => sameId(c.id, id)) || null
 })
 
 const statement = computed(() => {

@@ -7,14 +7,10 @@ const invoicesPath = '/invoices'
 
 export class SubscriptionsApi extends BaseApi {
     #plansEndpoint
-    #subscriptionsEndpoint
-    #invoicesEndpoint
 
     constructor() {
         super()
         this.#plansEndpoint = new BaseEndpoint(this, plansPath)
-        this.#subscriptionsEndpoint = new BaseEndpoint(this, subscriptionsPath)
-        this.#invoicesEndpoint = new BaseEndpoint(this, invoicesPath)
     }
 
     getPlans() {
@@ -26,18 +22,10 @@ export class SubscriptionsApi extends BaseApi {
     }
 
     getInvoicesByStore(storeId) {
-        return this.http.get(`${invoicesPath}?storeId=${encodeURIComponent(storeId)}&_sort=date&_order=desc`)
+        return this.http.get(`${invoicesPath}?storeId=${encodeURIComponent(storeId)}`)
     }
 
-    createSubscription(resource) {
-        return this.#subscriptionsEndpoint.create(resource)
-    }
-
-    updateSubscription(id, resource) {
-        return this.#subscriptionsEndpoint.update(id, resource)
-    }
-
-    createInvoice(resource) {
-        return this.#invoicesEndpoint.create(resource)
+    changePlan(storeId, planId) {
+        return this.http.post(subscriptionsPath, { storeId, planId })
     }
 }
