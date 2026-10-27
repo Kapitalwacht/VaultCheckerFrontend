@@ -397,7 +397,7 @@
         },
         "changed": "Cambiaste al plan {plan}.",
         "changeError": "No se pudo cambiar el plan.",
-        "demoNote": "Modo demo: los pagos son simulados y no se realiza ningún cobro real.",
+        "demoNote": "Modo de prueba de Stripe: paga con la tarjeta 4242 4242 4242 4242, cualquier fecha futura y cualquier CVC. No se realiza ningún cobro real.",
         "checkout": {
             "title": "Confirmar pago",
             "plan": "Plan",
@@ -408,7 +408,10 @@
             "processing": "Procesando pago…",
             "successTitle": "¡Pago aprobado!",
             "successText": "Tu tienda ya está en el plan {plan}. La factura aparece en tu historial.",
-            "close": "Listo"
+            "close": "Listo",
+            "stripeNote": "Te llevaremos al checkout seguro de Stripe en modo de prueba. Usa la tarjeta 4242 4242 4242 4242.",
+            "payStripe": "Pagar {amount} con Stripe",
+            "redirecting": "Abriendo Stripe…"
         }
     },
     "recover": {

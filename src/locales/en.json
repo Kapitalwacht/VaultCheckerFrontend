@@ -396,7 +396,7 @@
         },
         "changed": "You switched to the {plan} plan.",
         "changeError": "Could not change the plan.",
-        "demoNote": "Demo mode: payments are simulated and no real charge is made.",
+        "demoNote": "Stripe test mode: pay with card 4242 4242 4242 4242, any future date and any CVC. No real charge is made.",
         "checkout": {
             "title": "Confirm payment",
             "plan": "Plan",
@@ -407,7 +407,10 @@
             "processing": "Processing payment…",
             "successTitle": "Payment approved!",
             "successText": "Your store is now on the {plan} plan. The invoice is in your history.",
-            "close": "Done"
+            "close": "Done",
+            "stripeNote": "You will be taken to the secure Stripe checkout in test mode. Use card 4242 4242 4242 4242.",
+            "payStripe": "Pay {amount} with Stripe",
+            "redirecting": "Opening Stripe…"
         }
     },
     "recover": {

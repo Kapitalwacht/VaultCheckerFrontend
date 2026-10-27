@@ -1,6 +1,7 @@
 <script setup>
 
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useIamStore from '@/iam/application/iam.store.js'
@@ -9,8 +10,11 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 
 const SIMULATED_PROCESSING_MS = 1800
+const PENDING_CHECKOUT_KEY = 'vc.pendingCheckout'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const iamStore = useIamStore()
 const subscriptionsStore = useSubscriptionsStore()
 const { storeId, currentUser } = storeToRefs(iamStore)
@@ -64,8 +68,23 @@ function closeCheckout() {
     checkoutPlan.value = null
 }
 
+function stripeCheckoutUrl(plan) {
+    const url = new URL(plan.stripePaymentLink)
+    if (storeId.value) url.searchParams.set('client_reference_id', storeId.value)
+    if (currentUser.value?.email) url.searchParams.set('prefilled_email', currentUser.value.email)
+    return url.toString()
+}
+
 function payCheckout() {
     const plan = checkoutPlan.value
+    if (plan.stripePaymentLink) {
+        checkoutStep.value = 'processing'
+        try {
+            sessionStorage.setItem(PENDING_CHECKOUT_KEY, plan.planId)
+        } catch {}
+        window.location.assign(stripeCheckoutUrl(plan))
+        return
+    }
     checkoutStep.value = 'processing'
     checkoutError.value = ''
     new Promise(resolve => setTimeout(resolve, SIMULATED_PROCESSING_MS))
@@ -77,8 +96,36 @@ function payCheckout() {
         })
 }
 
-onMounted(() => {
-    if (storeId.value) subscriptionsStore.fetchBilling(storeId.value)
+function readPendingCheckout() {
+    try {
+        const planId = sessionStorage.getItem(PENDING_CHECKOUT_KEY)
+        sessionStorage.removeItem(PENDING_CHECKOUT_KEY)
+        return planId
+    } catch {
+        return null
+    }
+}
+
+async function completeStripeCheckout() {
+    const planId = readPendingCheckout()
+    router.replace({ query: { ...route.query, checkout: undefined } })
+    const plan = plans.value.find(p => p.planId === planId)
+    if (!plan || isCurrent(plan)) return
+    checkoutPlan.value = plan
+    checkoutStep.value = 'processing'
+    try {
+        await applyPlan(plan)
+        checkoutStep.value = 'done'
+    } catch {
+        checkoutStep.value = 'review'
+        checkoutError.value = t('billing.changeError')
+    }
+}
+
+onMounted(async () => {
+    if (!storeId.value) return
+    await subscriptionsStore.fetchBilling(storeId.value)
+    if (route.query.checkout === 'success') await completeStripeCheckout()
 })
 
 </script>
@@ -197,7 +244,7 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <p class="checkout__note"><i class="pi pi-shield" /> {{ t('billing.checkout.note') }}</p>
+                    <p class="checkout__note"><i class="pi pi-shield" /> {{ t(checkoutPlan.stripePaymentLink ? 'billing.checkout.stripeNote' : 'billing.checkout.note') }}</p>
                     <p v-if="checkoutError" class="checkout__error"><i class="pi pi-exclamation-triangle" /> {{ checkoutError }}</p>
                 </template>
 
@@ -215,8 +262,8 @@ onMounted(() => {
                     <button class="vc-btn vc-btn--primary" type="button" :disabled="checkoutStep === 'processing'" @click="payCheckout">
                         <i v-if="checkoutStep === 'processing'" class="pi pi-spin pi-spinner" />
                         {{ checkoutStep === 'processing'
-                            ? t('billing.checkout.processing')
-                            : t('billing.checkout.pay', { amount: formatMoney(checkoutPlan?.priceMonthly) }) }}
+                            ? t(checkoutPlan?.stripePaymentLink ? 'billing.checkout.redirecting' : 'billing.checkout.processing')
+                            : t(checkoutPlan?.stripePaymentLink ? 'billing.checkout.payStripe' : 'billing.checkout.pay', { amount: formatMoney(checkoutPlan?.priceMonthly) }) }}
                     </button>
                 </template>
                 <button v-else class="vc-btn vc-btn--primary" type="button" @click="closeCheckout">{{ t('billing.checkout.close') }}</button>
