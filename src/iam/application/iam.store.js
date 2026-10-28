@@ -104,6 +104,10 @@ const useIamStore = defineStore('iam', () => {
         return iamApi.requestRecovery(email).then(() => ({ emailSent: true, code: null }))
     }
 
+    function verifyRecoveryCode(email, code) {
+        return iamApi.verifyRecoveryCode(email, code.trim()).then(() => true)
+    }
+
     function resetPassword(email, code, newPassword) {
         return iamApi.resetPassword(email, code.trim(), newPassword).then(() => true)
     }
@@ -157,7 +161,7 @@ const useIamStore = defineStore('iam', () => {
     return {
         currentUser, isAuthenticated, role, storeId, customerId, token, isSystemAdmin,
         signIn, signInWithGoogle, requestLoginCode, signInWithPhone, registerAccount, verifyEmail,
-        requestRecovery, resetPassword, updateProfile, changeEmail, changePassword, logout
+        requestRecovery, verifyRecoveryCode, resetPassword, updateProfile, changeEmail, changePassword, logout
     }
 })
 

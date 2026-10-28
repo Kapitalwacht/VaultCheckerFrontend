@@ -56,6 +56,12 @@ export class IamApi extends BaseApi {
             .catch(failWith({ 404: 'email-not-found', 503: 'email-unavailable' }))
     }
 
+    verifyRecoveryCode(email, code) {
+        return this.http
+            .post(`${authenticationPath}/password-recovery/verify`, { email, code })
+            .catch(failWith({ 400: 'invalid-code', 422: 'code-expired' }))
+    }
+
     resetPassword(email, code, newPassword) {
         return this.http
             .post(`${authenticationPath}/password-reset`, { email, code, newPassword })

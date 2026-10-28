@@ -414,7 +414,9 @@
     "recover": {
         "title": "Recover password",
         "subtitleEmail": "Enter your email and we'll send you a recovery code.",
-        "subtitleCode": "Enter the code and your new password.",
+        "subtitleCode": "Enter the code we sent to your email.",
+        "subtitlePassword": "Code verified. Choose your new password.",
+        "verifyCode": "Verify code",
         "sendCode": "Send code",
         "sentEmail": "We sent a code to {email}.",
         "sentDemo": "Demo mode (no email configured): use the code shown below.",

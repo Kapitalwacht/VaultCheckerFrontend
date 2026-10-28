@@ -28,7 +28,18 @@ const fieldErrors = ref({})
 const submitted = ref(false)
 
 watch(() => route.query.step, value => {
-    if (value === '2' || step.value !== 2) return
+    if (value === '3') return
+    if (value === '2') {
+        if (step.value !== 3) return
+        step.value = 2
+        newPassword.value = ''
+        confirmPassword.value = ''
+        errorMessage.value = ''
+        fieldErrors.value = {}
+        submitted.value = false
+        return
+    }
+    if (step.value === 1) return
     step.value = 1
     code.value = ''
     newPassword.value = ''
@@ -107,10 +118,28 @@ function requestCode() {
         .finally(() => { submitting.value = false })
 }
 
+function verifyCode() {
+    submitted.value = true
+    errorMessage.value = ''
+    if (!validateFields(['code'])) return
+    submitting.value = true
+    iamStore.verifyRecoveryCode(email.value, code.value)
+        .then(() => {
+            step.value = 3
+            router.push({ query: { ...route.query, step: '3' } })
+            submitted.value = false
+            fieldErrors.value = {}
+        })
+        .catch(e => {
+            errorMessage.value = t(`recover.error.${e.message}`, t('recover.error.generic'))
+        })
+        .finally(() => { submitting.value = false })
+}
+
 function resetPassword() {
     submitted.value = true
     errorMessage.value = ''
-    if (!validateFields(['code', 'newPassword', 'confirmPassword'])) return
+    if (!validateFields(['newPassword', 'confirmPassword'])) return
     submitting.value = true
     iamStore.resetPassword(email.value, code.value, newPassword.value)
         .then(() => router.push({ name: 'login', query: { recovered: '1' } }))
@@ -129,7 +158,7 @@ function resetPassword() {
             <BrandLogo :size="34" class="login__brand" />
             <h1 class="login__title">{{ t('recover.title') }}</h1>
             <p class="login__subtitle">
-                {{ step === 1 ? t('recover.subtitleEmail') : t('recover.subtitleCode') }}
+                {{ step === 1 ? t('recover.subtitleEmail') : step === 2 ? t('recover.subtitleCode') : t('recover.subtitlePassword') }}
             </p>
 
             <form v-if="step === 1" class="login__form" novalidate @submit.prevent="requestCode">
@@ -148,7 +177,7 @@ function resetPassword() {
                 </button>
             </form>
 
-            <form v-else class="login__form" novalidate @submit.prevent="resetPassword">
+            <form v-else-if="step === 2" class="login__form" novalidate @submit.prevent="verifyCode">
                 <p v-if="infoMessage" class="login__info"><i class="pi pi-info-circle" /> {{ infoMessage }}</p>
                 <p v-if="demoCode" class="login__code">{{ t('recover.yourCode') }}: <strong>{{ demoCode }}</strong></p>
                 <label class="field">
@@ -159,6 +188,14 @@ function resetPassword() {
                     </span>
                     <span v-if="fieldErrors.code" class="field__error">{{ t(`recover.error.${fieldErrors.code}`) }}</span>
                 </label>
+                <p v-if="errorMessage" class="login__error"><i class="pi pi-exclamation-triangle" /> {{ errorMessage }}</p>
+                <button class="login__submit" type="submit" :disabled="submitting">
+                    <i v-if="submitting" class="pi pi-spin pi-spinner" />
+                    <span>{{ t('recover.verifyCode') }}</span>
+                </button>
+            </form>
+
+            <form v-else class="login__form" novalidate @submit.prevent="resetPassword">
                 <label class="field">
                     <span class="field__label">{{ t('recover.newPassword') }}</span>
                     <span class="field__control" :class="{ 'field__control--error': fieldErrors.newPassword }">
