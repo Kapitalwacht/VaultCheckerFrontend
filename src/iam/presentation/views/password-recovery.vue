@@ -18,7 +18,7 @@ const code = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
 const demoCode = ref('')
-const infoMessage = ref('')
+const infoMessage = ref(null)
 const errorMessage = ref('')
 const submitting = ref(false)
 
@@ -44,7 +44,7 @@ watch(() => route.query.step, value => {
     code.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
-    infoMessage.value = ''
+    infoMessage.value = null
     errorMessage.value = ''
     fieldErrors.value = {}
     submitted.value = false
@@ -97,7 +97,7 @@ function requestCode() {
     if (!validateFields(['email'])) return
     submitting.value = true
     errorMessage.value = ''
-    infoMessage.value = ''
+    infoMessage.value = null
     demoCode.value = ''
     iamStore.requestRecovery(email.value)
         .then(result => {
@@ -106,10 +106,10 @@ function requestCode() {
             submitted.value = false
             fieldErrors.value = {}
             if (result.emailSent) {
-                infoMessage.value = t('recover.sentEmail', { email: email.value })
+                infoMessage.value = { key: 'recover.sentEmail', params: { email: email.value } }
             } else {
                 demoCode.value = result.code
-                infoMessage.value = t('recover.sentDemo')
+                infoMessage.value = { key: 'recover.sentDemo', params: {} }
             }
         })
         .catch(e => {
@@ -178,7 +178,7 @@ function resetPassword() {
             </form>
 
             <form v-else-if="step === 2" class="login__form" novalidate @submit.prevent="verifyCode">
-                <p v-if="infoMessage" class="login__info"><i class="pi pi-info-circle" /> {{ infoMessage }}</p>
+                <p v-if="infoMessage" class="login__info"><i class="pi pi-info-circle" /> {{ t(infoMessage.key, infoMessage.params) }}</p>
                 <p v-if="demoCode" class="login__code">{{ t('recover.yourCode') }}: <strong>{{ demoCode }}</strong></p>
                 <label class="field">
                     <span class="field__label">{{ t('recover.code') }}</span>
