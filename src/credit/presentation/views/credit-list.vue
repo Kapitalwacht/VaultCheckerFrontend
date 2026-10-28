@@ -39,8 +39,7 @@ const blankAccount = () => ({
     storeId: '',
     balance: 0,
     creditLimit: 0,
-    dueDate: '',
-    state: 'current'
+    dueDate: ''
 })
 const accountForm = reactive(blankAccount())
 const paymentForm = reactive({ amount: 0, date: new Date().toISOString().slice(0, 10) })
@@ -235,17 +234,6 @@ onMounted(() => {
                     </span>
                     <input v-model="accountForm.dueDate" type="date" class="vc-input" />
                     <small class="vc-field__hint">{{ t('help.account.dueDate.hint') }}</small>
-                </label>
-                <label class="vc-field">
-                    <span class="vc-field__label">{{ t('common.state') }}
-                        <FieldHelp :tip="t('help.account.state.tip')" />
-                    </span>
-                    <select v-model="accountForm.state" class="vc-select">
-                        <option value="current">{{ t('credit.state.current') }}</option>
-                        <option value="overdue">{{ t('credit.state.overdue') }}</option>
-                        <option value="paid">{{ t('credit.state.paid') }}</option>
-                    </select>
-                    <small class="vc-field__hint">{{ t('help.account.state.hint') }}</small>
                 </label>
                 <p v-if="formError" class="credit-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>

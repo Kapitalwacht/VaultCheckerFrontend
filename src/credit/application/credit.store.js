@@ -109,7 +109,7 @@ const useCreditStore = defineStore('credit', () => {
 
     function openAccount(account) {
         return creditApi.createCreditAccount(CreditAccountAssembler.toResourceFromEntity(account))
-            .catch(failWith({ 409: 'account-exists' }))
+            .catch(failWith({ 400: 'balance-over-limit', 409: 'account-exists' }))
             .then(response => {
                 const created = CreditAccountAssembler.toEntityFromResource(response.data)
                 accounts.value.push(created)

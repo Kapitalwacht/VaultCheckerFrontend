@@ -227,6 +227,7 @@
             "total": "Total to pay"
         },
         "error": {
+            "balance-over-limit": "The balance cannot exceed the credit limit.",
             "account-exists": "This customer already has a credit account.",
             "partial-payment": "Partial payments are not allowed: enter the full balance.",
             "credit-limit-exceeded": "The amount exceeds the customer's available credit."
@@ -650,12 +651,8 @@
                 "hint": "Usually 0 when opening."
             },
             "dueDate": {
-                "tip": "Next date the customer must pay the balance.",
-                "hint": "Next due date."
-            },
-            "state": {
-                "tip": "Current, overdue or paid. An overdue account accrues late interest.",
-                "hint": "Current account status."
+                "tip": "Next date the customer must pay the balance. Once it passes with an unpaid balance, the account is marked overdue automatically.",
+                "hint": "If it passes with an unpaid balance, the account becomes overdue."
             }
         },
         "accountPayment": {

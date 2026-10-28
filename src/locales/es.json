@@ -227,6 +227,7 @@
             "total": "Total a pagar"
         },
         "error": {
+            "balance-over-limit": "El saldo no puede superar el límite de crédito.",
             "account-exists": "Este cliente ya tiene una cuenta de crédito.",
             "partial-payment": "No se aceptan pagos parciales: ingresa el saldo completo.",
             "credit-limit-exceeded": "El monto supera el crédito disponible del cliente."
@@ -651,12 +652,8 @@
                 "hint": "Normalmente 0 al abrir."
             },
             "dueDate": {
-                "tip": "Próxima fecha en que el cliente debe pagar su saldo.",
-                "hint": "Fecha del próximo vencimiento."
-            },
-            "state": {
-                "tip": "Al día, vencida o pagada. Una cuenta vencida genera mora.",
-                "hint": "Estado actual de la cuenta."
+                "tip": "Próxima fecha en que el cliente debe pagar su saldo. Si pasa con saldo pendiente, la cuenta se marca como vencida automáticamente.",
+                "hint": "Si pasa con saldo pendiente, la cuenta queda vencida."
             }
         },
         "accountPayment": {
