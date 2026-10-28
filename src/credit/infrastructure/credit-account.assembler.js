@@ -1,14 +1,5 @@
 import { CreditAccount } from '@/credit/domain/model/credit-account-entity.js'
-
-function toLocalDate(value) {
-    return new Date(`${String(value).slice(0, 10)}T00:00:00`)
-}
-
-function toIsoDate(date) {
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${date.getFullYear()}-${month}-${day}`
-}
+import { fromIsoDate, toIsoDate } from '@/shared/domain/local-date.js'
 
 export class CreditAccountAssembler {
     static toEntityFromResource(resource) {
@@ -19,7 +10,7 @@ export class CreditAccountAssembler {
             customerId: resource.customerId,
             balance: resource.balance,
             creditLimit: resource.creditLimit,
-            dueDate: resource.dueDate ? toLocalDate(resource.dueDate) : null,
+            dueDate: resource.dueDate ? fromIsoDate(resource.dueDate) : null,
             state: resource.state
         })
     }

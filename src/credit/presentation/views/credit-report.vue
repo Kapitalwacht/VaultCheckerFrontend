@@ -11,6 +11,7 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import { buildPaymentPlan, buildStatement } from '@/credit/domain/services/payment-plan.js'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
+import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
 const { format: formatCurrency } = useCurrencyFormatter()
@@ -25,7 +26,7 @@ const isCustomerView = computed(() => role.value === 'customer')
 const scopedCustomers = computed(() => scope(customers.value))
 
 const selectedCustomerId = ref('')
-const referenceDate = ref(new Date().toISOString().slice(0, 10))
+const referenceDate = ref(todayIsoDate())
 
 const selectedCustomer = computed(() => {
     const id = isCustomerView.value ? customerId.value : selectedCustomerId.value

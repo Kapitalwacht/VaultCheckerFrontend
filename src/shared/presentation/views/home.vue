@@ -8,6 +8,7 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
+import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -18,7 +19,7 @@ const customersStore = useCustomersStore()
 const { accounts, installmentPayments } = storeToRefs(creditStore)
 const { activeCustomers } = storeToRefs(customersStore)
 
-const today = new Date().toISOString().slice(0, 10)
+const today = todayIsoDate()
 
 const scopedAccounts = computed(() => scope(accounts.value))
 const outstanding = computed(() =>

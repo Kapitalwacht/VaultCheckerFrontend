@@ -1,4 +1,5 @@
 import { Purchase } from '@/credit/domain/model/purchase-entity.js'
+import { toIsoDate } from '@/shared/domain/local-date.js'
 
 export class PurchaseAssembler {
     static toEntityFromResource(resource) {
@@ -27,7 +28,7 @@ export class PurchaseAssembler {
             quantity: purchase.quantity,
             amount: purchase.amount,
             purchaseDate: purchase.purchaseDate instanceof Date
-                ? purchase.purchaseDate.toISOString().slice(0, 10)
+                ? toIsoDate(purchase.purchaseDate)
                 : purchase.purchaseDate,
             months: purchase.months,
             state: purchase.state

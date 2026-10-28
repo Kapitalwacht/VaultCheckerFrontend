@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { AuditApi } from '@/audit/infrastructure/audit-api.js'
 import { AuditLogAssembler } from '@/audit/infrastructure/audit-log.assembler.js'
+import { toIsoDate } from '@/shared/domain/local-date.js'
 import useIamStore from '@/iam/application/iam.store.js'
 
 const auditApi = new AuditApi()
@@ -34,7 +35,7 @@ const useAuditStore = defineStore('audit', () => {
             auditId: `AU-${now.getTime()}`,
             userRole: iam.role ?? 'store-admin',
             action,
-            date: now.toISOString().slice(0, 10),
+            date: toIsoDate(now),
             time: now.toTimeString().slice(0, 5),
             details
         }

@@ -13,6 +13,7 @@ import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
+import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
 const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
@@ -34,14 +35,14 @@ const payModalOpen = ref(false)
 const paying = ref(false)
 const payRow = ref(null)
 const payPurchase = ref(null)
-const payDate = ref(new Date().toISOString().slice(0, 10))
+const payDate = ref(todayIsoDate())
 
 const blankForm = () => ({
     productId: '',
     description: '',
     quantity: 1,
     unitPrice: 0,
-    purchaseDate: new Date().toISOString().slice(0, 10),
+    purchaseDate: todayIsoDate(),
     months: 1
 })
 const form = reactive(blankForm())
@@ -150,7 +151,7 @@ const settlement = computed(() => {
 function openPay(row, purchase) {
     payRow.value = row
     payPurchase.value = purchase
-    payDate.value = new Date().toISOString().slice(0, 10)
+    payDate.value = todayIsoDate()
     error.value = null
     payModalOpen.value = true
 }

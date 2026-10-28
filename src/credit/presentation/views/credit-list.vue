@@ -11,6 +11,7 @@ import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
+import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
 const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
@@ -42,7 +43,7 @@ const blankAccount = () => ({
     dueDate: ''
 })
 const accountForm = reactive(blankAccount())
-const paymentForm = reactive({ amount: 0, date: new Date().toISOString().slice(0, 10) })
+const paymentForm = reactive({ amount: 0, date: todayIsoDate() })
 
 function customerName(id) {
     const c = customers.value.find(item => sameId(item.id, id) || sameId(item.customerId, id))
@@ -66,7 +67,7 @@ function openAccountModal() {
 function openPaymentModal(account) {
     activeAccount.value = account
     paymentForm.amount = fromBaseCurrency(account.balance)
-    paymentForm.date = new Date().toISOString().slice(0, 10)
+    paymentForm.date = todayIsoDate()
     formError.value = ''
     paymentModalOpen.value = true
 }
