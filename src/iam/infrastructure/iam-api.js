@@ -5,20 +5,6 @@ const usersPath = '/users'
 const currentUserPath = `${usersPath}/me`
 const authenticationPath = import.meta.env.VITE_AUTH_ENDPOINT_PATH ?? '/authentication'
 
-function toAuthenticatedUser(record) {
-    return AuthenticatedUserAssembler.toEntityFromResource({
-        id: record.id,
-        userId: record.userId,
-        email: record.email,
-        name: record.name,
-        phone: record.phone,
-        role: record.role,
-        storeId: record.storeId,
-        customerId: record.customerId,
-        token: `token-${record.id}`
-    })
-}
-
 function failWith(errorsByStatus) {
     return error => {
         throw new Error(errorsByStatus[error.response?.status] ?? 'generic')
@@ -26,12 +12,6 @@ function failWith(errorsByStatus) {
 }
 
 export class IamApi extends BaseApi {
-    findByEmail(email) {
-        return this.http
-            .get(`${usersPath}?email=${encodeURIComponent(email)}`)
-            .then(response => (response.data || [])[0] || null)
-    }
-
     signIn(credentials) {
         return this.http
             .post(`${authenticationPath}/sign-in`, {
@@ -42,8 +22,11 @@ export class IamApi extends BaseApi {
             .catch(failWith({ 400: 'invalid-credentials', 404: 'invalid-credentials' }))
     }
 
-    signInWithGoogleRecord(record) {
-        return toAuthenticatedUser(record)
+    signInWithGoogle(accessToken) {
+        return this.http
+            .post(`${authenticationPath}/google-sign-in`, { accessToken })
+            .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
+            .catch(failWith({ 400: 'google-invalid', 404: 'google-no-account' }))
     }
 
     signUp(registration) {

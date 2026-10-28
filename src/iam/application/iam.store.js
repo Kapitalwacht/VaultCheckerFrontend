@@ -76,9 +76,7 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function signInWithGoogle(profile) {
-        return iamApi.findByEmail(profile.email).then(record => {
-            if (!record) throw new Error('google-no-account')
-            const user = iamApi.signInWithGoogleRecord(record)
+        return iamApi.signInWithGoogle(profile.accessToken).then(user => {
             persist(user)
             return user
         })

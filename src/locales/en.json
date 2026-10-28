@@ -297,7 +297,8 @@
             "phoneInvalid": "Choose the country and enter the full number (8 to 15 digits in total).",
             "codeRequired": "Enter the code we sent you.",
             "codeInvalid": "The code must have 6 digits.",
-            "generic": "Could not sign in. Please try again."
+            "generic": "Could not sign in. Please try again.",
+            "google-invalid": "Your Google account could not be verified. Please try again."
         }
     },
     "register": {

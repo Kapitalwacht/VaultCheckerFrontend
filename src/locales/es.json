@@ -298,7 +298,8 @@
             "phoneInvalid": "Elige el país e ingresa el número completo (8 a 15 dígitos en total).",
             "codeRequired": "Ingresa el código que te enviamos.",
             "codeInvalid": "El código debe tener 6 dígitos.",
-            "generic": "No se pudo iniciar sesión. Inténtalo de nuevo."
+            "generic": "No se pudo iniciar sesión. Inténtalo de nuevo.",
+            "google-invalid": "No se pudo validar tu cuenta de Google. Inténtalo de nuevo."
         }
     },
     "register": {

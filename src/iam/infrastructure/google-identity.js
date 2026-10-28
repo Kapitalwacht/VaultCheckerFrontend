@@ -36,8 +36,5 @@ export async function signInWithGoogle() {
         })
         client.requestAccessToken()
     })
-    const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` }
-    }).then(response => response.json())
-    return { email: info.email, name: info.name, sub: info.sub }
+    return { accessToken }
 }
