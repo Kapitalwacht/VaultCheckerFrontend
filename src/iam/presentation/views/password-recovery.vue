@@ -145,6 +145,13 @@ function resetPassword() {
         .then(() => router.push({ name: 'login', query: { recovered: '1' } }))
         .catch(e => {
             errorMessage.value = t(`recover.error.${e.message}`, t('recover.error.generic'))
+            if (e.message !== 'code-expired') return
+            step.value = 1
+            code.value = ''
+            newPassword.value = ''
+            confirmPassword.value = ''
+            infoMessage.value = null
+            router.push({ query: { ...route.query, step: undefined } })
         })
         .finally(() => { submitting.value = false })
 }
