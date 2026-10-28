@@ -15,6 +15,16 @@ import router from '@/router'
 import pinia from '@/pinia.js'
 import i18n from '@/i18n.js'
 
+const CHUNK_RELOAD_KEY = 'vaultchecker-chunk-reload'
+
+window.addEventListener('vite:preloadError', event => {
+    if (sessionStorage.getItem(CHUNK_RELOAD_KEY)) return
+    event.preventDefault()
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, '1')
+    window.location.reload()
+})
+router.afterEach(() => sessionStorage.removeItem(CHUNK_RELOAD_KEY))
+
 const app = createApp(App)
 
 app.use(pinia)
