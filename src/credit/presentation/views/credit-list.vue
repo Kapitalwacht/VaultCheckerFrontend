@@ -12,7 +12,7 @@ import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate, fromIsoDate } from '@/shared/domain/local-date.js'
-import { daysBetween, moratoriumInterest, roundMoney } from '@/credit/domain/services/finance.js'
+import { daysBetween, formatRate, moratoriumInterest, roundMoney } from '@/credit/domain/services/finance.js'
 
 const { t } = useI18n()
 const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
@@ -294,7 +294,7 @@ onMounted(() => {
                 <p v-if="paymentLateFee.overdueDays > 0" class="credit-payment__late vc-field--full">
                     {{ t('credit.lateFeeInfo', {
                         days: paymentLateFee.overdueDays,
-                        rate: (paymentLateFee.rate * 100).toFixed(7),
+                        rate: formatRate(paymentLateFee.rate),
                         amount: formatCurrency(paymentLateFee.interest)
                     }) }}
                     · {{ t('credit.totalDue') }}: <strong>{{ formatCurrency(paymentTotalDue) }}</strong>

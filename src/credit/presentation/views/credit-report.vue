@@ -7,7 +7,9 @@ import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import useIamStore from '@/iam/application/iam.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { formatRate } from '@/credit/domain/services/finance.js'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
@@ -21,7 +23,7 @@ const iamStore = useIamStore()
 const { customers } = storeToRefs(customersStore)
 const { role, customerId } = storeToRefs(iamStore)
 
-const isCustomerView = computed(() => role.value === 'customer')
+const isCustomerView = computed(() => role.value === Roles.CUSTOMER)
 const scopedCustomers = computed(() => scope(customers.value))
 
 const selectedCustomerId = ref('')
@@ -53,10 +55,6 @@ function concept(line) {
     return line.months > 1
         ? t('credit.report.installmentOf', { description: line.description, period: line.period, months: line.months })
         : t('credit.report.singlePayment', { description: line.description })
-}
-
-function percent(rate) {
-    return `${(Number(rate) * 100).toFixed(7)}%`
 }
 
 function fmtDate(value) {
@@ -158,7 +156,7 @@ onMounted(() => {
                             <td class="vc-table__strong">
                                 {{ t('credit.report.lateFeeConcept', { description: fee.description, days: fee.daysLate }) }}
                             </td>
-                            <td>{{ t('credit.report.lateFeeRate') }}: {{ percent(fee.rate) }}</td>
+                            <td>{{ t('credit.report.lateFeeRate') }}: {{ formatRate(fee.rate) }}</td>
                             <td class="vc-table__num">—</td>
                             <td class="vc-table__num">{{ t('credit.report.lateFeeBase') }}: {{ formatCurrency(fee.overdueAmount) }}</td>
                             <td class="vc-table__num">{{ formatCurrency(fee.amount) }}</td>

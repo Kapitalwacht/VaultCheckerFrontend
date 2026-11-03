@@ -7,6 +7,7 @@ import { storeToRefs } from 'pinia'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import { setLocale } from '@/i18n.js'
 import useIamStore from '@/iam/application/iam.store.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -18,15 +19,15 @@ const mobileMenuOpen = ref(false)
 const isDark = ref(false)
 
 const allNavItems = [
-    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: ['system-admin', 'store-admin', 'customer'] },
-    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: ['system-admin', 'store-admin'] },
-    { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers',     roles: ['store-admin'] },
-    { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog',       roles: ['store-admin'] },
-    { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit',        roles: ['store-admin'] },
-    { labelKey: 'nav.plan',      icon: 'pi-calculator',  to: '/credit/plan',   roles: ['store-admin'] },
-    { labelKey: 'nav.report',    icon: 'pi-file',        to: '/credit/report', roles: ['store-admin', 'customer'] },
-    { labelKey: 'nav.billing',   icon: 'pi-wallet',      to: '/billing',       roles: ['store-admin'] },
-    { labelKey: 'nav.audit',     icon: 'pi-history',     to: '/audit',         roles: ['system-admin', 'store-admin'] }
+    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: [Roles.SYSTEM_ADMIN, Roles.STORE_ADMIN, Roles.CUSTOMER] },
+    { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: [Roles.SYSTEM_ADMIN] },
+    { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers',     roles: [Roles.STORE_ADMIN] },
+    { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog',       roles: [Roles.STORE_ADMIN] },
+    { labelKey: 'nav.credit',    icon: 'pi-credit-card', to: '/credit',        roles: [Roles.STORE_ADMIN] },
+    { labelKey: 'nav.plan',      icon: 'pi-calculator',  to: '/credit/plan',   roles: [Roles.STORE_ADMIN] },
+    { labelKey: 'nav.report',    icon: 'pi-file',        to: '/credit/report', roles: [Roles.STORE_ADMIN, Roles.CUSTOMER] },
+    { labelKey: 'nav.billing',   icon: 'pi-wallet',      to: '/billing',       roles: [Roles.STORE_ADMIN] },
+    { labelKey: 'nav.audit',     icon: 'pi-history',     to: '/audit',         roles: [Roles.SYSTEM_ADMIN, Roles.STORE_ADMIN] }
 ]
 
 const navItems = computed(() =>

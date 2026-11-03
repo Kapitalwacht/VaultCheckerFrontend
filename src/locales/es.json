@@ -244,7 +244,7 @@
             "partial-payment": "No se aceptan pagos parciales: ingresa el saldo completo.",
             "credit-limit-exceeded": "El monto supera el crédito disponible del cliente."
         },
-        "lateFeeInfo": "Mora de {days} días a la tasa {rate}%: {amount}",
+        "lateFeeInfo": "Mora de {days} días a la tasa {rate}: {amount}",
         "totalDue": "Total a pagar"
     },
     "audit": {
@@ -296,7 +296,8 @@
             "emailInvalid": "Ingresa un correo válido.",
             "passwordRequired": "La contraseña es obligatoria.",
             "generic": "No se pudo iniciar sesión. Inténtalo de nuevo.",
-            "google-invalid": "No se pudo validar tu cuenta de Google. Inténtalo de nuevo."
+            "google-invalid": "No se pudo validar tu cuenta de Google. Inténtalo de nuevo.",
+            "store-inactive": "Esta tienda fue dada de baja. Comunícate con el administrador del sistema."
         }
     },
     "register": {

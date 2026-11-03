@@ -244,7 +244,7 @@
             "partial-payment": "Partial payments are not allowed: enter the full balance.",
             "credit-limit-exceeded": "The amount exceeds the customer's available credit."
         },
-        "lateFeeInfo": "{days} days late at {rate}%: {amount}",
+        "lateFeeInfo": "{days} days late at {rate}: {amount}",
         "totalDue": "Total due"
     },
     "audit": {
@@ -295,7 +295,8 @@
             "emailInvalid": "Enter a valid email address.",
             "passwordRequired": "Password is required.",
             "generic": "Could not sign in. Please try again.",
-            "google-invalid": "Your Google account could not be verified. Please try again."
+            "google-invalid": "Your Google account could not be verified. Please try again.",
+            "store-inactive": "This store was deactivated. Contact the system administrator."
         }
     },
     "register": {

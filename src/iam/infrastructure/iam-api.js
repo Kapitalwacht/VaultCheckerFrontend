@@ -19,14 +19,14 @@ export class IamApi extends BaseApi {
                 password: credentials.password
             })
             .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
-            .catch(failWith({ 400: 'invalid-credentials', 404: 'invalid-credentials' }))
+            .catch(failWith({ 400: 'invalid-credentials', 404: 'invalid-credentials', 409: 'store-inactive' }))
     }
 
     signInWithGoogle(accessToken) {
         return this.http
             .post(`${authenticationPath}/google-sign-in`, { accessToken })
             .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
-            .catch(failWith({ 400: 'google-invalid', 404: 'google-no-account' }))
+            .catch(failWith({ 400: 'google-invalid', 404: 'google-no-account', 409: 'store-inactive' }))
     }
 
     signUp(registration) {

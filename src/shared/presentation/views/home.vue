@@ -8,6 +8,8 @@ import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter
 import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
+import useIamStore from '@/iam/application/iam.store.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
@@ -44,12 +46,16 @@ onMounted(() => {
     customersStore.fetchCustomers()
 })
 
-const shortcuts = [
-    { key: 'stores',    icon: 'pi-building',    to: '/stores' },
-    { key: 'customers', icon: 'pi-users',       to: '/customers' },
-    { key: 'catalog',   icon: 'pi-box',         to: '/catalog' },
-    { key: 'credit',    icon: 'pi-credit-card', to: '/credit' }
+const iamStore = useIamStore()
+
+const allShortcuts = [
+    { key: 'stores',    icon: 'pi-building',    to: '/stores',    roles: [Roles.SYSTEM_ADMIN] },
+    { key: 'customers', icon: 'pi-users',       to: '/customers', roles: [Roles.STORE_ADMIN] },
+    { key: 'catalog',   icon: 'pi-box',         to: '/catalog',   roles: [Roles.STORE_ADMIN] },
+    { key: 'credit',    icon: 'pi-credit-card', to: '/credit',    roles: [Roles.STORE_ADMIN] }
 ]
+
+const shortcuts = computed(() => allShortcuts.filter(s => s.roles.includes(iamStore.role)))
 
 function go(to) { router.push(to) }
 
@@ -70,7 +76,7 @@ function go(to) { router.push(to) }
             </article>
         </section>
 
-        <h2 class="section-title">{{ t('home.quickStart') }}</h2>
+        <h2 v-if="shortcuts.length" class="section-title">{{ t('home.quickStart') }}</h2>
         <section class="shortcuts">
             <button
                 v-for="s in shortcuts"

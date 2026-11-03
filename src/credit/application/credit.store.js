@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { CreditApi } from '@/credit/infrastructure/credit-api.js'
 import { CreditAccountAssembler } from '@/credit/infrastructure/credit-account.assembler.js'
+import { CreditStatementAssembler } from '@/credit/infrastructure/credit-statement.assembler.js'
 import { PurchaseAssembler } from '@/credit/infrastructure/purchase.assembler.js'
 import { InstallmentPaymentAssembler } from '@/credit/infrastructure/installment-payment.assembler.js'
 import { roundMoney } from '@/credit/domain/services/finance.js'
@@ -109,7 +110,7 @@ const useCreditStore = defineStore('credit', () => {
 
     function fetchStatement(customerId, asOfDate) {
         return creditApi.getStatement(customerId, asOfDate)
-            .then(response => response.data)
+            .then(response => CreditStatementAssembler.toEntityFromResource(response.data))
             .catch(err => {
                 if (err.response?.status === 404) return null
                 throw err
@@ -141,11 +142,7 @@ const useCreditStore = defineStore('credit', () => {
             purchaseId: purchase.purchaseId || `PUR-${Date.now()}`
         })
         return creditApi.createPurchase(resource)
-            .catch(error => {
-                if (/payment mode/i.test(error.response?.data?.details || '')) throw new Error('payment-mode')
-                throw error
-            })
-            .catch(failWith({ 422: 'credit-limit-exceeded' }))
+            .catch(failWith({ 409: 'payment-mode', 422: 'credit-limit-exceeded' }))
             .then(response => {
                 const created = PurchaseAssembler.toEntityFromResource(response.data)
                 purchases.value.push(created)

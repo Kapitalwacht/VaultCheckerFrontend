@@ -80,6 +80,9 @@ router.beforeEach(to => {
     if ((to.name === 'login' || to.name === 'register') && iam.isAuthenticated) {
         return { name: 'home' }
     }
+    if (to.meta?.roles && !to.meta.roles.includes(iam.role)) {
+        return { name: 'home' }
+    }
     return true
 })
 

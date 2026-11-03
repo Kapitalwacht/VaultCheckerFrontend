@@ -1,3 +1,5 @@
+import { Roles } from '@/iam/domain/model/roles.js'
+
 export class AuthenticatedUser {
     constructor({
         id = null,
@@ -5,7 +7,7 @@ export class AuthenticatedUser {
         email = '',
         name = '',
         phone = '',
-        role = 'store-admin',
+        role = Roles.STORE_ADMIN,
         storeId = null,
         customerId = null,
         token = ''
@@ -26,14 +28,14 @@ export class AuthenticatedUser {
     }
 
     get isSystemAdmin() {
-        return this.role === 'system-admin'
+        return this.role === Roles.SYSTEM_ADMIN
     }
 
     get isStoreAdmin() {
-        return this.role === 'store-admin'
+        return this.role === Roles.STORE_ADMIN
     }
 
     get isCustomer() {
-        return this.role === 'customer'
+        return this.role === Roles.CUSTOMER
     }
 }

@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 import { isValidPhone, normalizePhone } from '@/iam/domain/model/phone-number.js'
 import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
@@ -13,8 +14,8 @@ const { t } = useI18n()
 const router = useRouter()
 const iamStore = useIamStore()
 
-const accountType = ref('business')
-const isCustomer = computed(() => accountType.value === 'customer')
+const accountRole = ref(Roles.STORE_ADMIN)
+const isCustomer = computed(() => accountRole.value === Roles.CUSTOMER)
 const businessName = ref('')
 const ruc = ref('')
 const category = ref('')
@@ -93,7 +94,7 @@ function submit() {
     if (!validate()) return
     submitting.value = true
     iamStore.registerAccount({
-        accountType: accountType.value,
+        role: accountRole.value,
         businessName: businessName.value,
         ruc: ruc.value,
         category: category.value,
@@ -157,7 +158,7 @@ function submit() {
                     :class="{ 'login__type--active': !isCustomer }"
                     :aria-checked="!isCustomer"
                     role="radio"
-                    @click="accountType = 'business'"
+                    @click="accountRole = Roles.STORE_ADMIN"
                 >
                     <i class="pi pi-shop" /> {{ t('register.typeBusiness') }}
                 </button>
@@ -167,7 +168,7 @@ function submit() {
                     :class="{ 'login__type--active': isCustomer }"
                     :aria-checked="isCustomer"
                     role="radio"
-                    @click="accountType = 'customer'"
+                    @click="accountRole = Roles.CUSTOMER"
                 >
                     <i class="pi pi-user" /> {{ t('register.typeCustomer') }}
                 </button>

@@ -4,6 +4,7 @@ import { AuditApi } from '@/audit/infrastructure/audit-api.js'
 import { AuditLogAssembler } from '@/audit/infrastructure/audit-log.assembler.js'
 import { toIsoDate } from '@/shared/domain/local-date.js'
 import useIamStore from '@/iam/application/iam.store.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 
 const auditApi = new AuditApi()
 
@@ -33,7 +34,7 @@ const useAuditStore = defineStore('audit', () => {
         const now = new Date()
         const resource = {
             auditId: `AU-${now.getTime()}`,
-            userRole: iam.role ?? 'store-admin',
+            userRole: iam.role ?? Roles.STORE_ADMIN,
             action,
             date: toIsoDate(now),
             time: now.toTimeString().slice(0, 5),

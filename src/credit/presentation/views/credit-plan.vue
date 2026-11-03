@@ -8,6 +8,7 @@ import useCustomersStore from '@/customers/application/customers.store.js'
 import useCatalogStore from '@/catalog/application/catalog.store.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import { buildPaymentPlan, settleInstallment } from '@/credit/domain/services/payment-plan.js'
+import { formatRate } from '@/credit/domain/services/finance.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
@@ -47,25 +48,22 @@ const blankForm = () => ({
 })
 const form = reactive(blankForm())
 
+const MIN_INSTALLMENT_MONTHS = 2
+
 const selectedProduct = computed(() => products.value.find(p => sameId(p.id, form.productId)) || null)
 
 const monthsRange = computed(() => {
     const max = Number(selectedCustomer.value?.maxMonths) || 1
-    const mode = selectedProduct.value?.paymentMode
-    if (mode === 'single') return { min: 1, max: 1 }
-    if (mode === 'installments') return { min: Math.min(2, max), max }
+    const product = selectedProduct.value
+    if (product && !product.allowsInstallments) return { min: 1, max: 1 }
+    if (product && !product.allowsSinglePayment) return { min: Math.min(MIN_INSTALLMENT_MONTHS, max), max }
     return { min: 1, max }
 })
 
 function allowsMonths(months) {
-    const mode = selectedProduct.value?.paymentMode
-    if (mode === 'single') return months <= 1
-    if (mode === 'installments') return months > 1
-    return true
-}
-
-function ratePercent(rate) {
-    return `${(Number(rate) * 100).toFixed(7)}%`
+    const product = selectedProduct.value
+    if (!product) return true
+    return months < MIN_INSTALLMENT_MONTHS ? product.allowsSinglePayment : product.allowsInstallments
 }
 
 const selectedCustomer = computed(() =>
@@ -324,11 +322,11 @@ onMounted(() => {
                 </p>
                 <p class="plan-item__rates">
                     <template v-if="plan.mode === 'installments'">
-                        {{ t('credit.plan.graceRate', { days: plan.graceDays }) }}: {{ ratePercent(plan.grace.graceRate) }}
-                        · {{ t('credit.plan.monthlyRate') }}: {{ ratePercent(plan.monthlyRate) }}
+                        {{ t('credit.plan.graceRate', { days: plan.graceDays }) }}: {{ formatRate(plan.grace.graceRate) }}
+                        · {{ t('credit.plan.monthlyRate') }}: {{ formatRate(plan.monthlyRate) }}
                     </template>
                     <template v-else>
-                        {{ t('credit.plan.periodRate', { days: plan.graceDays }) }}: {{ ratePercent(plan.compensatory.rate) }}
+                        {{ t('credit.plan.periodRate', { days: plan.graceDays }) }}: {{ formatRate(plan.compensatory.rate) }}
                     </template>
                 </p>
 
@@ -465,7 +463,7 @@ onMounted(() => {
                 <p v-if="settlement.overdueDays > 0" class="pay-detail__late">
                     <i class="pi pi-exclamation-triangle" />
                     {{ t('credit.plan.overdueInfo', { days: settlement.overdueDays }) }}
-                    · {{ t('credit.plan.lateRate') }}: {{ ratePercent(settlement.lateRate) }}
+                    · {{ t('credit.plan.lateRate') }}: {{ formatRate(settlement.lateRate) }}
                 </p>
 
                 <ul class="pay-detail__breakdown">

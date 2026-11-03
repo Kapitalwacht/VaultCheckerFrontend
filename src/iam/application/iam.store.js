@@ -5,6 +5,7 @@ import { AuthenticatedUser } from '@/iam/domain/model/authenticated-user-entity.
 import { StoresApi } from '@/stores/infrastructure/stores-api.js'
 import { StoreAssembler } from '@/stores/infrastructure/store.assembler.js'
 import { Store } from '@/stores/domain/model/store-entity.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 import useAuditStore from '@/audit/application/audit.store.js'
 
 const STORAGE_KEY = 'vaultchecker-auth'
@@ -45,9 +46,9 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
-    function registerAccount({ accountType, businessName, category, ruc, ownerName, email, phone, password }) {
-        if (accountType === 'customer') {
-            return iamApi.signUp({ email, password, name: ownerName, phone, role: 'customer', storeId: null })
+    function registerAccount({ role, businessName, category, ruc, ownerName, email, phone, password }) {
+        if (role === Roles.CUSTOMER) {
+            return iamApi.signUp({ email, password, name: ownerName, phone, role, storeId: null })
                 .then(() => signIn({ email, password }))
                 .then(() => {
                     useAuditStore().recordAction('REGISTER_ACCOUNT', `Customer account ${email} created`)
@@ -68,7 +69,7 @@ const useIamStore = defineStore('iam', () => {
             password,
             name: ownerName,
             phone,
-            role: 'store-admin',
+            role,
             storeId: storeCode
         })
             .then(() => signIn({ email, password }))

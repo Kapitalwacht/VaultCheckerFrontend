@@ -1,12 +1,18 @@
 export const DAYS_PER_YEAR = 360
 export const DAYS_PER_MONTH = 30
+export const RATE_DECIMALS = 7
 
 export function roundMoney(x) {
     return Math.round((Number(x) + Number.EPSILON) * 100) / 100
 }
 
 export function roundRate(x) {
-    return Math.round((Number(x) + Number.EPSILON) * 1e7) / 1e7
+    const factor = 10 ** RATE_DECIMALS
+    return Math.round((Number(x) + Number.EPSILON) * factor) / factor
+}
+
+export function formatRate(rate) {
+    return `${(Number(rate) * 100).toFixed(RATE_DECIMALS)}%`
 }
 
 export function daysBetween(from, to) {
