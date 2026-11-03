@@ -109,38 +109,6 @@ export function buildPaymentPlan(purchase, terms) {
     }
 }
 
-export function buildStatement(entries, referenceDate, moratoriumRate, isPaid) {
-    const items = []
-    for (const { purchase, plan } of entries) {
-        for (const row of plan.rows) {
-            if (isPaid(purchase.id, row.period)) continue
-            const overdue = daysBetween(parseLocalDate(row.date), parseLocalDate(referenceDate)) > 0
-            const lateFee = overdue
-                ? settleInstallment(row, referenceDate, moratoriumRate).lateFee
-                : 0
-            items.push({
-                purchaseId: purchase.id,
-                description: purchase.description,
-                period: row.period,
-                dueDate: row.date,
-                interest: row.interest,
-                principal: row.principal,
-                installment: row.installment,
-                lateFee,
-                overdue
-            })
-        }
-    }
-    items.sort((a, b) => (a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0))
-    return {
-        items,
-        totalInterest: roundMoney(items.reduce((sum, i) => sum + i.interest, 0)),
-        totalLateFee: roundMoney(items.reduce((sum, i) => sum + i.lateFee, 0)),
-        totalPrincipal: roundMoney(items.reduce((sum, i) => sum + i.principal, 0)),
-        total: roundMoney(items.reduce((sum, i) => sum + i.installment + i.lateFee, 0))
-    }
-}
-
 export function settleInstallment(row, paidDate, moratoriumRate) {
     const scheduledDate = parseLocalDate(row.date)
     const actualDate = parseLocalDate(paidDate)
@@ -158,6 +126,7 @@ export function settleInstallment(row, paidDate, moratoriumRate) {
         paidDate: toIsoDate(actualDate),
         overdueDays,
         lateFee: late.interest,
+        lateRate: late.rate,
         interest: row.interest,
         principal: row.principal,
         installment: row.installment,

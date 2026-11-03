@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
@@ -13,6 +13,8 @@ const { t } = useI18n()
 const router = useRouter()
 const iamStore = useIamStore()
 
+const accountType = ref('business')
+const isCustomer = computed(() => accountType.value === 'customer')
 const businessName = ref('')
 const ruc = ref('')
 const category = ref('')
@@ -57,11 +59,13 @@ function checkField(field) {
     }
 }
 
-const FIELDS = ['businessName', 'ownerName', 'email', 'phone', 'password', 'confirmPassword']
+const BUSINESS_FIELDS = ['businessName', 'ownerName', 'email', 'phone', 'password', 'confirmPassword']
+const CUSTOMER_FIELDS = ['ownerName', 'email', 'phone', 'password', 'confirmPassword']
 
 function validate() {
     const errors = {}
-    FIELDS.forEach(field => {
+    const fields = isCustomer.value ? CUSTOMER_FIELDS : BUSINESS_FIELDS
+    fields.forEach(field => {
         const key = checkField(field)
         if (key) errors[field] = key
     })
@@ -89,6 +93,7 @@ function submit() {
     if (!validate()) return
     submitting.value = true
     iamStore.registerAccount({
+        accountType: accountType.value,
         businessName: businessName.value,
         ruc: ruc.value,
         category: category.value,
@@ -99,7 +104,7 @@ function submit() {
     })
         .then(result => {
             if (result.signedIn) {
-                router.push('/home')
+                router.push(isCustomer.value ? '/credit/report' : '/home')
                 return
             }
             emailSent.value = result.emailSent
@@ -143,10 +148,33 @@ function submit() {
 
             <template v-else>
             <h1 class="login__title">{{ t('register.title') }}</h1>
-            <p class="login__subtitle">{{ t('register.subtitle') }}</p>
+            <p class="login__subtitle">{{ isCustomer ? t('register.customerSubtitle') : t('register.subtitle') }}</p>
+
+            <div class="login__types" role="radiogroup">
+                <button
+                    type="button"
+                    class="login__type"
+                    :class="{ 'login__type--active': !isCustomer }"
+                    :aria-checked="!isCustomer"
+                    role="radio"
+                    @click="accountType = 'business'"
+                >
+                    <i class="pi pi-shop" /> {{ t('register.typeBusiness') }}
+                </button>
+                <button
+                    type="button"
+                    class="login__type"
+                    :class="{ 'login__type--active': isCustomer }"
+                    :aria-checked="isCustomer"
+                    role="radio"
+                    @click="accountType = 'customer'"
+                >
+                    <i class="pi pi-user" /> {{ t('register.typeCustomer') }}
+                </button>
+            </div>
 
             <form class="login__form" novalidate @submit.prevent="submit">
-                <label class="field">
+                <label v-if="!isCustomer" class="field">
                     <span class="field__label">{{ t('register.businessName') }}</span>
                     <span class="field__control" :class="{ 'field__control--error': fieldErrors.businessName }">
                         <i class="pi pi-shop field__icon" />
@@ -155,7 +183,7 @@ function submit() {
                     <span v-if="fieldErrors.businessName" class="field__error">{{ t(`register.error.${fieldErrors.businessName}`) }}</span>
                 </label>
 
-                <div class="login__row">
+                <div v-if="!isCustomer" class="login__row">
                     <label class="field">
                         <span class="field__label">{{ t('register.ruc') }}</span>
                         <span class="field__control">
@@ -196,6 +224,7 @@ function submit() {
                         <PhoneInput v-model="phone" :boxed="false" @input="revalidate('phone')" />
                     </span>
                     <span v-if="fieldErrors.phone" class="field__error">{{ t(`register.error.${fieldErrors.phone}`) }}</span>
+                    <span v-if="isCustomer" class="field__hint">{{ t('register.customerPhoneHint') }}</span>
                 </div>
 
                 <label class="field">
@@ -302,6 +331,14 @@ function submit() {
 
 .login__form { display: flex; flex-direction: column; gap: 1rem; }
 .login__row { display: flex; gap: 1rem; }
+.login__types { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+.login__type {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+    padding: 0.6rem 0.75rem; border: 1px solid var(--vc-border); border-radius: 10px;
+    background: var(--vc-surface); color: var(--vc-text); font: inherit; font-weight: 600; cursor: pointer;
+}
+.login__type--active { border-color: var(--vc-brand-500); background: rgba(22, 163, 74, 0.1); color: var(--vc-brand-600); }
+.field__hint { font-size: 0.78rem; color: var(--vc-text-muted); }
 .login__row .field { flex: 1; min-width: 0; }
 .field { display: flex; flex-direction: column; gap: 0.35rem; }
 .field__label { font-size: 0.85rem; font-weight: 600; color: var(--vc-text); }

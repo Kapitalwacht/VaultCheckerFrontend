@@ -45,7 +45,15 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
-    function registerAccount({ businessName, category, ruc, ownerName, email, phone, password }) {
+    function registerAccount({ accountType, businessName, category, ruc, ownerName, email, phone, password }) {
+        if (accountType === 'customer') {
+            return iamApi.signUp({ email, password, name: ownerName, phone, role: 'customer', storeId: null })
+                .then(() => signIn({ email, password }))
+                .then(() => {
+                    useAuditStore().recordAction('REGISTER_ACCOUNT', `Customer account ${email} created`)
+                    return { signedIn: true }
+                })
+        }
         const storeCode = `ST-${Date.now().toString(36).toUpperCase()}`
         const storeResource = StoreAssembler.toResourceFromEntity(new Store({
             storeId: storeCode,
@@ -77,24 +85,6 @@ const useIamStore = defineStore('iam', () => {
 
     function signInWithGoogle(profile) {
         return iamApi.signInWithGoogle(profile.accessToken).then(user => {
-            persist(user)
-            return user
-        })
-    }
-
-    let issuedPhoneCode = null
-
-    function requestLoginCode(phone) {
-        return iamApi.requestPhoneCode(phone).then(code => {
-            issuedPhoneCode = code
-            return { smsSent: true }
-        })
-    }
-
-    function signInWithPhone(phone, code) {
-        if (!/^\d{6}$/.test(code.trim())) return Promise.reject(new Error('invalid-code'))
-        return iamApi.signInWithPhone(phone, issuedPhoneCode ?? code.trim()).then(user => {
-            issuedPhoneCode = null
             persist(user)
             return user
         })
@@ -160,7 +150,7 @@ const useIamStore = defineStore('iam', () => {
 
     return {
         currentUser, isAuthenticated, role, storeId, customerId, token, isSystemAdmin,
-        signIn, signInWithGoogle, requestLoginCode, signInWithPhone, registerAccount, verifyEmail,
+        signIn, signInWithGoogle, registerAccount, verifyEmail,
         requestRecovery, verifyRecoveryCode, resetPassword, updateProfile, changeEmail, changePassword, logout
     }
 })

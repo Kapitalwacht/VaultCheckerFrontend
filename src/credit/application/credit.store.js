@@ -107,6 +107,15 @@ const useCreditStore = defineStore('credit', () => {
             })
     }
 
+    function fetchStatement(customerId, asOfDate) {
+        return creditApi.getStatement(customerId, asOfDate)
+            .then(response => response.data)
+            .catch(err => {
+                if (err.response?.status === 404) return null
+                throw err
+            })
+    }
+
     function openAccount(account) {
         return creditApi.createCreditAccount(CreditAccountAssembler.toResourceFromEntity(account))
             .catch(failWith({ 400: 'balance-over-limit', 409: 'account-exists' }))
@@ -132,6 +141,10 @@ const useCreditStore = defineStore('credit', () => {
             purchaseId: purchase.purchaseId || `PUR-${Date.now()}`
         })
         return creditApi.createPurchase(resource)
+            .catch(error => {
+                if (/payment mode/i.test(error.response?.data?.details || '')) throw new Error('payment-mode')
+                throw error
+            })
             .catch(failWith({ 422: 'credit-limit-exceeded' }))
             .then(response => {
                 const created = PurchaseAssembler.toEntityFromResource(response.data)
@@ -183,6 +196,7 @@ const useCreditStore = defineStore('credit', () => {
         loading,
         error,
         overdueAccounts,
+        fetchStatement,
         totalOutstanding,
         outstandingByCustomer,
         accountFor,

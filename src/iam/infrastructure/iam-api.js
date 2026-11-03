@@ -68,20 +68,6 @@ export class IamApi extends BaseApi {
             .catch(failWith({ 400: 'invalid-code', 422: 'code-expired' }))
     }
 
-    requestPhoneCode(phone) {
-        return this.http
-            .post(`${authenticationPath}/phone-code`, { phone })
-            .then(response => response.data.code)
-            .catch(failWith({ 404: 'phone-not-found' }))
-    }
-
-    signInWithPhone(phone, code) {
-        return this.http
-            .post(`${authenticationPath}/phone-sign-in`, { phone, code })
-            .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
-            .catch(failWith({ 400: 'invalid-code', 404: 'phone-not-found', 422: 'code-expired' }))
-    }
-
     updateProfile({ name, phone }) {
         return this.http
             .put(currentUserPath, { name, phone })

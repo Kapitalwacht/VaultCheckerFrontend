@@ -125,7 +125,8 @@
             "cashPrice": "Cash price",
             "listPrice": "List price (credit)",
             "paymentMode": "Payment mode",
-            "imageUrl": "Image URL"
+            "imageUrl": "Image URL",
+            "supplier": "Supplier"
         },
         "paymentMode": {
             "both": "Cash or installments",
@@ -208,30 +209,43 @@
                 "credit-limit-exceeded": "The amount exceeds the customer's available credit.",
                 "max-months-exceeded": "The months exceed the customer's agreed maximum.",
                 "installment-already-paid": "This installment is already paid.",
-                "previous-installment-pending": "You must pay the previous installment first."
-            }
+                "previous-installment-pending": "You must pay the previous installment first.",
+                "payment-mode": "This product is not sold over that many months (check its payment mode)."
+            },
+            "graceRate": "Grace rate ({days} days)",
+            "monthlyRate": "Monthly effective rate",
+            "periodRate": "Period rate ({days} days)",
+            "lateRate": "Late rate for the period"
         },
         "report": {
-            "subtitle": "Statement the customer must pay on their payment date.",
+            "subtitle": "What the customer must pay on their payment date, generated on the cutoff date.",
             "cutoffDate": "Cutoff date",
             "pickTitle": "Select a customer",
             "pickText": "Choose a customer to generate their payment report.",
             "emptyTitle": "No pending debt",
-            "emptyText": "This customer has no installments due on the given date.",
+            "emptyText": "This customer owes nothing on this cutoff's payment date.",
             "docTitle": "Payment report",
             "dueDate": "Due date",
             "concept": "Concept",
-            "lateFee": "Late fee",
             "lineTotal": "Total",
-            "overdue": "Overdue",
-            "total": "Total to pay"
+            "total": "Total to pay",
+            "paymentDate": "Payment date",
+            "installmentOf": "{description} · Installment {period} of {months}",
+            "singlePayment": "{description} · End-of-month payment",
+            "lateFeeTitle": "Late interest",
+            "lateFeeConcept": "Late interest on {description} ({days} days)",
+            "lateFeeRate": "Rate",
+            "lateFeeBase": "On",
+            "lateFeeTotal": "Total late interest"
         },
         "error": {
             "balance-over-limit": "The balance cannot exceed the credit limit.",
             "account-exists": "This customer already has a credit account.",
             "partial-payment": "Partial payments are not allowed: enter the full balance.",
             "credit-limit-exceeded": "The amount exceeds the customer's available credit."
-        }
+        },
+        "lateFeeInfo": "{days} days late at {rate}%: {amount}",
+        "totalDue": "Total due"
     },
     "audit": {
         "subtitle": "Log of actions performed on the platform.",
@@ -273,31 +287,13 @@
         "recoveredOk": "Password updated. You can sign in now.",
         "noAccount": "Don't have an account?",
         "createAccount": "Create one free",
-        "phone": {
-            "label": "Phone",
-            "code": "Code",
-            "codePlaceholder": "6 digits",
-            "send": "Send code",
-            "enter": "Sign in",
-            "usePhone": "Sign in with phone",
-            "useEmail": "Sign in with email",
-            "sentSms": "We sent a code by SMS to {phone}."
-        },
         "error": {
             "invalid-credentials": "Wrong email or password.",
             "google-no-account": "There is no account with that Google email.",
             "email-not-verified": "Verify your email with the link we sent before signing in.",
-            "phone-not-found": "There is no account with that phone.",
-            "invalid-code": "The code is incorrect.",
-            "code-expired": "The code expired, request a new one.",
-            "sms-unavailable": "Could not send the SMS. Check the number or try again later.",
             "emailRequired": "Email is required.",
             "emailInvalid": "Enter a valid email address.",
             "passwordRequired": "Password is required.",
-            "phoneRequired": "Phone number is required.",
-            "phoneInvalid": "Choose the country and enter the full number (8 to 15 digits in total).",
-            "codeRequired": "Enter the code we sent you.",
-            "codeInvalid": "The code must have 6 digits.",
             "generic": "Could not sign in. Please try again.",
             "google-invalid": "Your Google account could not be verified. Please try again."
         }
@@ -339,7 +335,11 @@
             "confirmRequired": "Please confirm your password.",
             "generic": "Could not create the account. Please try again."
         },
-        "back": "Back"
+        "back": "Back",
+        "typeBusiness": "I'm a business",
+        "typeCustomer": "I'm a customer",
+        "customerSubtitle": "Create your account to check what you owe your store.",
+        "customerPhoneHint": "Use the same phone the store registered for you, so we can find your debts."
     },
     "verify": {
         "pendingTitle": "Verifying your account",
@@ -597,6 +597,10 @@
             "state": {
                 "tip": "An inactive product is hidden when registering purchases.",
                 "hint": "Active or inactive."
+            },
+            "supplier": {
+                "tip": "Company or person you buy this product from. Optional.",
+                "hint": "E.g. Alicorp"
             }
         },
         "plan": {
@@ -671,8 +675,8 @@
                 "hint": "Pick a customer from your store."
             },
             "cutoffDate": {
-                "tip": "Statement cutoff date: shows pending purchases, interest and late fees as of that date.",
-                "hint": "Late fees are calculated up to this date."
+                "tip": "Cycle cutoff date. The report lists what the customer must pay on the payment date after this cutoff; late interest on overdue items runs until that payment date.",
+                "hint": "Shows what is due on the next payment date."
             }
         },
         "store": {

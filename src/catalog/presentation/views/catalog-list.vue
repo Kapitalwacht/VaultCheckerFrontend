@@ -29,6 +29,7 @@ const blankForm = () => ({
     name: '',
     category: '',
     brand: '',
+    supplier: '',
     unit: 'unit',
     cashPrice: 0,
     listPrice: 0,
@@ -60,6 +61,7 @@ function openEdit(product) {
         name: product.name,
         category: product.category,
         brand: product.brand ?? '',
+        supplier: product.supplier ?? '',
         unit: product.unit,
         cashPrice: fromBaseCurrency(product.cashPrice),
         listPrice: fromBaseCurrency(product.listPrice),
@@ -204,6 +206,13 @@ onMounted(() => catalogStore.fetchProducts())
                     </span>
                     <input v-model="form.brand" class="vc-input" />
                     <small class="vc-field__hint">{{ t('help.product.brand.hint') }}</small>
+                </label>
+                <label class="vc-field">
+                    <span class="vc-field__label">{{ t('catalog.field.supplier') }}
+                        <FieldHelp :tip="t('help.product.supplier.tip')" />
+                    </span>
+                    <input v-model="form.supplier" class="vc-input" />
+                    <small class="vc-field__hint">{{ t('help.product.supplier.hint') }}</small>
                 </label>
                 <label class="vc-field">
                     <span class="vc-field__label">{{ t('catalog.field.unit') }}

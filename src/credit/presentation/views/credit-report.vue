@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useCreditStore from '@/credit/application/credit.store.js'
@@ -8,7 +8,6 @@ import useCustomersStore from '@/customers/application/customers.store.js'
 import useIamStore from '@/iam/application/iam.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
-import { buildPaymentPlan, buildStatement } from '@/credit/domain/services/payment-plan.js'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
@@ -27,34 +26,38 @@ const scopedCustomers = computed(() => scope(customers.value))
 
 const selectedCustomerId = ref('')
 const referenceDate = ref(todayIsoDate())
+const statement = ref(null)
+const loading = ref(false)
 
-const selectedCustomer = computed(() => {
-    const id = isCustomerView.value ? customerId.value : selectedCustomerId.value
-    return customers.value.find(c => sameId(c.id, id)) || null
+const reportCustomerId = computed(() => (isCustomerView.value ? customerId.value : selectedCustomerId.value) || null)
+
+const customerName = computed(() => {
+    const customer = customers.value.find(c => sameId(c.id, reportCustomerId.value))
+    return customer ? customer.fullName : iamStore.currentUser?.name
 })
 
-const statement = computed(() => {
-    const customer = selectedCustomer.value
-    if (!customer) return null
-    const terms = {
-        rate: customer.compensatoryRate,
-        cutoffDay: customer.cutoffDay,
-        paymentDay: customer.paymentDay
+async function loadStatement() {
+    statement.value = null
+    if (!reportCustomerId.value || !referenceDate.value) return
+    loading.value = true
+    try {
+        statement.value = await creditStore.fetchStatement(reportCustomerId.value, referenceDate.value)
+    } finally {
+        loading.value = false
     }
-    const entries = creditStore.purchasesByCustomer(customer.id).map(purchase => ({
-        purchase,
-        plan: buildPaymentPlan(
-            { amount: purchase.amount, purchaseDate: purchase.purchaseDate, months: purchase.months },
-            terms
-        )
-    }))
-    return buildStatement(
-        entries,
-        referenceDate.value,
-        customer.moratoriumRate,
-        (purchaseId, period) => creditStore.isPeriodPaid(purchaseId, period)
-    )
-})
+}
+
+watch([reportCustomerId, referenceDate], loadStatement)
+
+function concept(line) {
+    return line.months > 1
+        ? t('credit.report.installmentOf', { description: line.description, period: line.period, months: line.months })
+        : t('credit.report.singlePayment', { description: line.description })
+}
+
+function percent(rate) {
+    return `${(Number(rate) * 100).toFixed(7)}%`
+}
 
 function fmtDate(value) {
     if (!value) return '—'
@@ -64,9 +67,8 @@ function fmtDate(value) {
 }
 
 onMounted(() => {
-    customersStore.fetchCustomers()
-    creditStore.fetchPurchases()
-    creditStore.fetchInstallmentPayments()
+    if (!isCustomerView.value) customersStore.fetchCustomers()
+    loadStatement()
 })
 
 </script>
@@ -100,13 +102,17 @@ onMounted(() => {
             </label>
         </div>
 
-        <div v-if="!selectedCustomer" class="vc-card vc-state">
+        <div v-if="!reportCustomerId" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-file" /></div>
             <p class="vc-state__title">{{ t('credit.report.pickTitle') }}</p>
             <p class="vc-state__text">{{ t('credit.report.pickText') }}</p>
         </div>
 
-        <div v-else-if="!statement.items.length" class="vc-card vc-state">
+        <div v-else-if="loading" class="vc-card vc-state">
+            <i class="pi pi-spin pi-spinner" />
+        </div>
+
+        <div v-else-if="!statement || !statement.lines.length" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-check-circle" /></div>
             <p class="vc-state__title">{{ t('credit.report.emptyTitle') }}</p>
             <p class="vc-state__text">{{ t('credit.report.emptyText') }}</p>
@@ -114,48 +120,60 @@ onMounted(() => {
 
         <article v-else class="vc-card report-doc">
             <header class="report-doc__head">
-                <div>
-                    <h2 class="report-doc__title">{{ t('credit.report.docTitle') }}</h2>
-                    <p class="report-doc__meta">
-                        {{ selectedCustomer.fullName }} · {{ t('customers.field.paymentDay') }}:
-                        {{ selectedCustomer.paymentDay }} · {{ t('credit.report.cutoffDate') }}:
-                        {{ fmtDate(referenceDate) }}
-                    </p>
-                </div>
+                <h2 class="report-doc__title">{{ t('credit.report.docTitle') }}</h2>
+                <p class="report-doc__meta">
+                    {{ customerName }} · {{ t('credit.report.cutoffDate') }}: {{ fmtDate(statement.cutoffDate) }}
+                    · {{ t('credit.report.paymentDate') }}: {{ fmtDate(statement.paymentDate) }}
+                </p>
             </header>
 
             <div class="vc-table-wrap">
                 <table class="vc-table">
                     <thead>
                         <tr>
-                            <th>{{ t('credit.report.dueDate') }}</th>
+                            <th>{{ t('credit.plan.purchaseDate') }}</th>
                             <th>{{ t('credit.report.concept') }}</th>
+                            <th>{{ t('credit.report.dueDate') }}</th>
                             <th class="vc-table__num">{{ t('credit.plan.interest') }}</th>
                             <th class="vc-table__num">{{ t('credit.plan.principalCol') }}</th>
-                            <th class="vc-table__num">{{ t('credit.report.lateFee') }}</th>
                             <th class="vc-table__num">{{ t('credit.report.lineTotal') }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in statement.items" :key="`${item.purchaseId}-${item.period}`">
-                            <td>{{ fmtDate(item.dueDate) }}</td>
+                        <tr v-for="line in statement.lines" :key="`${line.purchaseId}-${line.period}`">
+                            <td>{{ fmtDate(line.purchaseDate) }}</td>
+                            <td class="vc-table__strong">{{ concept(line) }}</td>
+                            <td>{{ fmtDate(line.dueDate) }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(line.interest) }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(line.principal) }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(line.total) }}</td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="statement.lateFees.length">
+                        <tr class="report-doc__section">
+                            <td colspan="6">{{ t('credit.report.lateFeeTitle') }}</td>
+                        </tr>
+                        <tr v-for="fee in statement.lateFees" :key="`fee-${fee.purchaseId}-${fee.period}`">
+                            <td>{{ fmtDate(fee.dueDate) }}</td>
                             <td class="vc-table__strong">
-                                {{ item.description }} · {{ t('credit.plan.installment') }} #{{ item.period }}
-                                <span v-if="item.overdue" class="report-doc__overdue">{{ t('credit.report.overdue') }}</span>
+                                {{ t('credit.report.lateFeeConcept', { description: fee.description, days: fee.daysLate }) }}
                             </td>
-                            <td class="vc-table__num">{{ formatCurrency(item.interest) }}</td>
-                            <td class="vc-table__num">{{ formatCurrency(item.principal) }}</td>
-                            <td class="vc-table__num">{{ formatCurrency(item.lateFee) }}</td>
-                            <td class="vc-table__num">{{ formatCurrency(item.installment + item.lateFee) }}</td>
+                            <td>{{ t('credit.report.lateFeeRate') }}: {{ percent(fee.rate) }}</td>
+                            <td class="vc-table__num">—</td>
+                            <td class="vc-table__num">{{ t('credit.report.lateFeeBase') }}: {{ formatCurrency(fee.overdueAmount) }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(fee.amount) }}</td>
                         </tr>
                     </tbody>
                     <tfoot>
+                        <tr v-if="statement.lateFees.length">
+                            <td colspan="5">{{ t('credit.report.lateFeeTotal') }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(statement.totalLateFee) }}</td>
+                        </tr>
                         <tr class="report-doc__totals">
-                            <td colspan="2">{{ t('credit.report.total') }}</td>
+                            <td colspan="3">{{ t('credit.report.total') }}</td>
                             <td class="vc-table__num">{{ formatCurrency(statement.totalInterest) }}</td>
                             <td class="vc-table__num">{{ formatCurrency(statement.totalPrincipal) }}</td>
-                            <td class="vc-table__num">{{ formatCurrency(statement.totalLateFee) }}</td>
-                            <td class="vc-table__num">{{ formatCurrency(statement.total) }}</td>
+                            <td class="vc-table__num">{{ formatCurrency(statement.totalToPay) }}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -180,6 +198,11 @@ onMounted(() => {
     color: #fff;
     font-size: 0.72rem;
     font-weight: 600;
+}
+.report-doc__section td {
+    padding-top: 1rem;
+    font-weight: 700;
+    color: var(--vc-danger-500);
 }
 .report-doc__totals td {
     border-top: 2px solid var(--vc-border, rgba(0, 0, 0, 0.12));

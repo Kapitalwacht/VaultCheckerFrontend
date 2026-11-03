@@ -1,14 +1,12 @@
 <script setup>
 
-import { ref, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
-import { isValidPhone, normalizePhone } from '@/iam/domain/model/phone-number.js'
 import { signInWithGoogle as googleSignIn, isGoogleConfigured } from '@/iam/infrastructure/google-identity.js'
-import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -24,13 +22,6 @@ const recovered = ref(route.query.recovered === '1')
 const googleMessage = ref('')
 const googleLoading = ref(false)
 
-const mode = ref('email')
-const phone = ref('')
-const phoneStep = ref('request')
-const phoneCode = ref('')
-const phoneSentTo = ref('')
-const phoneLoading = ref(false)
-
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const fieldErrors = ref({})
 const submitted = ref(false)
@@ -42,12 +33,6 @@ function checkField(field) {
             return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
         case 'password':
             return password.value ? '' : 'passwordRequired'
-        case 'phone':
-            if (!phone.value.trim()) return 'phoneRequired'
-            return isValidPhone(phone.value) ? '' : 'phoneInvalid'
-        case 'code':
-            if (!phoneCode.value.trim()) return 'codeRequired'
-            return /^\d{6}$/.test(phoneCode.value.trim()) ? '' : 'codeInvalid'
         default:
             return ''
     }
@@ -75,85 +60,6 @@ function revalidate(field) {
 function redirectAfterLogin(user) {
     const fallback = user.isCustomer ? '/credit/report' : '/home'
     router.push(route.query.redirect || fallback)
-}
-
-function phoneErrorKey(message) {
-    if (/Firebase|auth\//.test(message)) return 'sms-unavailable'
-    return message
-}
-
-function resetPhoneFlow() {
-    errorMessage.value = ''
-    phoneSentTo.value = ''
-    phoneStep.value = 'request'
-    phoneCode.value = ''
-    fieldErrors.value = {}
-    submitted.value = false
-}
-
-function applyRouteState(query) {
-    const nextMode = query.mode === 'phone' ? 'phone' : 'email'
-    if (nextMode !== mode.value) {
-        mode.value = nextMode
-        resetPhoneFlow()
-    }
-    if (nextMode === 'phone') {
-        const wantsCode = query.step === 'code' && phoneSentTo.value
-        if (!wantsCode && phoneStep.value === 'code') {
-            phoneStep.value = 'request'
-            phoneCode.value = ''
-            phoneSentTo.value = ''
-            errorMessage.value = ''
-            fieldErrors.value = {}
-            submitted.value = false
-        }
-    }
-}
-
-function switchMode(next) {
-    const query = { ...route.query, mode: next === 'phone' ? 'phone' : undefined, step: undefined }
-    router.push({ query })
-}
-
-watch(() => route.query, applyRouteState)
-applyRouteState(route.query)
-
-function requestPhoneCode() {
-    submitted.value = true
-    if (!validateFields(['phone'])) return
-    phoneLoading.value = true
-    errorMessage.value = ''
-    phoneSentTo.value = ''
-    phone.value = normalizePhone(phone.value)
-    iamStore.requestLoginCode(phone.value)
-        .then(() => {
-            phoneStep.value = 'code'
-            submitted.value = false
-            fieldErrors.value = {}
-            phoneSentTo.value = phone.value
-            router.push({ query: { ...route.query, mode: 'phone', step: 'code' } })
-        })
-        .catch(e => {
-            errorMessage.value = t(`login.error.${phoneErrorKey(e.message)}`, t('login.error.generic'))
-        })
-        .finally(() => {
-            phoneLoading.value = false
-        })
-}
-
-function submitPhoneCode() {
-    submitted.value = true
-    if (!validateFields(['code'])) return
-    phoneLoading.value = true
-    errorMessage.value = ''
-    iamStore.signInWithPhone(phone.value, phoneCode.value)
-        .then(redirectAfterLogin)
-        .catch(e => {
-            errorMessage.value = t(`login.error.${phoneErrorKey(e.message)}`, t('login.error.generic'))
-        })
-        .finally(() => {
-            phoneLoading.value = false
-        })
 }
 
 function submit() {
@@ -204,7 +110,7 @@ async function handleGoogle() {
                 <i class="pi pi-check-circle" /> {{ t('login.recoveredOk') }}
             </p>
 
-            <form v-if="mode === 'email'" class="login__form" novalidate @submit.prevent="submit">
+            <form class="login__form" novalidate @submit.prevent="submit">
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
                     <span class="field__control" :class="{ 'field__control--error': fieldErrors.email }">
@@ -257,48 +163,6 @@ async function handleGoogle() {
                 </button>
             </form>
 
-            <form v-else class="login__form" novalidate @submit.prevent="phoneStep === 'request' ? requestPhoneCode() : submitPhoneCode()">
-                <div class="field">
-                    <span class="field__label">{{ t('login.phone.label') }}</span>
-                    <span class="field__control field__control--phone" :class="{ 'field__control--error': fieldErrors.phone }">
-                        <PhoneInput v-model="phone" :boxed="false" :disabled="phoneStep === 'code'" @input="revalidate('phone')" />
-                    </span>
-                    <span v-if="fieldErrors.phone" class="field__error">{{ t(`login.error.${fieldErrors.phone}`) }}</span>
-                </div>
-
-                <label v-if="phoneStep === 'code'" class="field">
-                    <span class="field__label">{{ t('login.phone.code') }}</span>
-                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.code }">
-                        <i class="pi pi-key field__icon" />
-                        <input
-                            v-model="phoneCode"
-                            type="text"
-                            inputmode="numeric"
-                            maxlength="6"
-                            autocomplete="one-time-code"
-                            class="field__input"
-                            :placeholder="t('login.phone.codePlaceholder')"
-                            @input="revalidate('code')"
-                        />
-                    </span>
-                    <span v-if="fieldErrors.code" class="field__error">{{ t(`login.error.${fieldErrors.code}`) }}</span>
-                </label>
-
-                <p v-if="phoneSentTo" class="login__phone-note">
-                    <i class="pi pi-info-circle" />
-                    <span>{{ t('login.phone.sentSms', { phone: phoneSentTo }) }}</span>
-                </p>
-
-                <p v-if="errorMessage" class="login__error">
-                    <i class="pi pi-exclamation-triangle" /> {{ errorMessage }}
-                </p>
-
-                <button class="login__submit" type="submit" :disabled="phoneLoading">
-                    <i v-if="phoneLoading" class="pi pi-spin pi-spinner" />
-                    <span>{{ phoneStep === 'request' ? t('login.phone.send') : t('login.phone.enter') }}</span>
-                </button>
-            </form>
-
             <div class="login__divider"><span>{{ t('login.or') }}</span></div>
 
             <button type="button" class="login__google-btn" :disabled="googleLoading" @click="handleGoogle">
@@ -312,20 +176,12 @@ async function handleGoogle() {
             </button>
             <p v-if="googleMessage" class="login__google-note">{{ googleMessage }}</p>
 
-            <button v-if="mode === 'email'" type="button" class="login__alt-btn" @click="switchMode('phone')">
-                <i class="pi pi-mobile" /> <span>{{ t('login.phone.usePhone') }}</span>
-            </button>
-            <button v-else type="button" class="login__alt-btn" @click="switchMode('email')">
-                <i class="pi pi-envelope" /> <span>{{ t('login.phone.useEmail') }}</span>
-            </button>
-
             <p class="login__signup">
                 {{ t('login.noAccount') }}
                 <RouterLink class="login__link" :to="{ name: 'register' }">{{ t('login.createAccount') }}</RouterLink>
             </p>
 
             <p class="login__hint">{{ t('login.hint') }}</p>
-            <div id="recaptcha-container"></div>
         </div>
     </div>
 </template>
@@ -365,7 +221,6 @@ async function handleGoogle() {
     padding: 0 0.75rem;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.field__control--phone { padding: 0 0.6rem 0 0.35rem; }
 .field__control:focus-within {
     border-color: var(--vc-brand-500);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
@@ -449,20 +304,4 @@ async function handleGoogle() {
 .login__google-btn:disabled { opacity: 0.7; cursor: default; }
 .login__google-icon { width: 18px; height: 18px; flex: none; }
 .login__google-note { text-align: center; color: var(--vc-text-muted); font-size: 0.78rem; margin: 0.6rem 0 0; }
-.login__alt-btn {
-    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-    width: 100%; margin-top: 0.75rem; padding: 0.7rem 1rem;
-    border: 1px solid var(--vc-border); border-radius: 10px;
-    background: var(--vc-surface); color: var(--vc-text);
-    font: inherit; font-weight: 600; font-size: 0.92rem; cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
-}
-.login__alt-btn:hover { background: var(--vc-surface-2); border-color: var(--vc-text-muted); }
-.login__phone-note {
-    display: flex; align-items: flex-start; gap: 0.5rem;
-    margin: 0; padding: 0.6rem 0.8rem; border-radius: 10px;
-    background: rgba(22, 163, 74, 0.1); color: var(--vc-text); font-size: 0.85rem;
-}
-.login__phone-note .pi { flex-shrink: 0; margin-top: 0.15rem; }
-.login__phone-note span { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
 </style>

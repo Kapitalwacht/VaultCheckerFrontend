@@ -6,6 +6,7 @@ export class Product {
         name = '',
         category = '',
         brand = '',
+        supplier = '',
         unit = 'unit',
         cashPrice = 0,
         listPrice = 0,
@@ -19,6 +20,7 @@ export class Product {
         this.name = name
         this.category = category
         this.brand = brand
+        this.supplier = supplier
         this.unit = unit
         this.cashPrice = cashPrice
         this.listPrice = listPrice

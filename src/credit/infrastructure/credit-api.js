@@ -28,6 +28,10 @@ export class CreditApi extends BaseApi {
 
     updateCreditAccount(id, account) { return this.#creditAccountsEndpoint.update(id, account) }
 
+    getStatement(customerId, asOfDate) {
+        return this.http.get(`${creditAccountsPath}/statement`, { params: { customerId, asOfDate } })
+    }
+
     registerPayment(payment) { return this.#paymentsEndpoint.create(payment) }
 
     getAllPurchases() { return this.#purchasesEndpoint.getAll() }

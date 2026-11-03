@@ -47,6 +47,27 @@ const blankForm = () => ({
 })
 const form = reactive(blankForm())
 
+const selectedProduct = computed(() => products.value.find(p => sameId(p.id, form.productId)) || null)
+
+const monthsRange = computed(() => {
+    const max = Number(selectedCustomer.value?.maxMonths) || 1
+    const mode = selectedProduct.value?.paymentMode
+    if (mode === 'single') return { min: 1, max: 1 }
+    if (mode === 'installments') return { min: Math.min(2, max), max }
+    return { min: 1, max }
+})
+
+function allowsMonths(months) {
+    const mode = selectedProduct.value?.paymentMode
+    if (mode === 'single') return months <= 1
+    if (mode === 'installments') return months > 1
+    return true
+}
+
+function ratePercent(rate) {
+    return `${(Number(rate) * 100).toFixed(7)}%`
+}
+
 const selectedCustomer = computed(() =>
     customers.value.find(c => sameId(c.id, selectedCustomerId.value)) || null)
 
@@ -84,6 +105,7 @@ function onProductChange() {
     if (product) {
         form.description = product.name
         form.unitPrice = fromBaseCurrency(product.listPrice)
+        form.months = Math.min(Math.max(Number(form.months) || 1, monthsRange.value.min), monthsRange.value.max)
     }
 }
 
@@ -112,8 +134,12 @@ function closeModal() {
 
 async function submit() {
     if (!selectedCustomer.value) return
-    saving.value = true
     error.value = null
+    if (!allowsMonths(Number(form.months) || 1)) {
+        error.value = t('credit.plan.error.payment-mode')
+        return
+    }
+    saving.value = true
     try {
         await creditStore.registerPurchase({
             storeId: selectedCustomer.value.storeId,
@@ -296,6 +322,15 @@ onMounted(() => {
                         · {{ t('credit.plan.installment') }}: {{ formatCurrency(plan.installment) }}
                     </template>
                 </p>
+                <p class="plan-item__rates">
+                    <template v-if="plan.mode === 'installments'">
+                        {{ t('credit.plan.graceRate', { days: plan.graceDays }) }}: {{ ratePercent(plan.grace.graceRate) }}
+                        · {{ t('credit.plan.monthlyRate') }}: {{ ratePercent(plan.monthlyRate) }}
+                    </template>
+                    <template v-else>
+                        {{ t('credit.plan.periodRate', { days: plan.graceDays }) }}: {{ ratePercent(plan.compensatory.rate) }}
+                    </template>
+                </p>
 
                 <div class="vc-table-wrap">
                     <table class="vc-table">
@@ -388,8 +423,8 @@ onMounted(() => {
                     <input
                         v-model="form.months"
                         type="number"
-                        min="1"
-                        :max="selectedCustomer?.maxMonths || 1"
+                        :min="monthsRange.min"
+                        :max="monthsRange.max"
                         step="1"
                         class="vc-input"
                     />
@@ -430,6 +465,7 @@ onMounted(() => {
                 <p v-if="settlement.overdueDays > 0" class="pay-detail__late">
                     <i class="pi pi-exclamation-triangle" />
                     {{ t('credit.plan.overdueInfo', { days: settlement.overdueDays }) }}
+                    · {{ t('credit.plan.lateRate') }}: {{ ratePercent(settlement.lateRate) }}
                 </p>
 
                 <ul class="pay-detail__breakdown">
@@ -491,6 +527,7 @@ onMounted(() => {
 .plan-item__total { text-align: right; }
 .plan-item__total-label { display: block; font-size: 0.75rem; color: var(--vc-text-muted); }
 .plan-item__total-value { font-size: 1.2rem; font-weight: 700; color: var(--vc-brand-600, var(--vc-text)); }
+.plan-item__rates { margin: 0 0 0.75rem; font-size: 0.8rem; color: var(--vc-text-muted); }
 .plan-item__grace {
     margin: 0 0 0.9rem;
     padding: 0.6rem 0.8rem;

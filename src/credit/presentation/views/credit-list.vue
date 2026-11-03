@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useCreditStore from '@/credit/application/credit.store.js'
@@ -11,7 +11,8 @@ import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
-import { todayIsoDate } from '@/shared/domain/local-date.js'
+import { todayIsoDate, fromIsoDate } from '@/shared/domain/local-date.js'
+import { daysBetween, moratoriumInterest, roundMoney } from '@/credit/domain/services/finance.js'
 
 const { t } = useI18n()
 const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
@@ -66,11 +67,33 @@ function openAccountModal() {
 
 function openPaymentModal(account) {
     activeAccount.value = account
-    paymentForm.amount = fromBaseCurrency(account.balance)
     paymentForm.date = todayIsoDate()
+    paymentForm.amount = fromBaseCurrency(account.balance)
     formError.value = ''
     paymentModalOpen.value = true
 }
+
+const paymentCustomer = computed(() => {
+    const account = activeAccount.value
+    if (!account) return null
+    return customers.value.find(c => sameId(c.id, account.customerId) || sameId(c.customerId, account.customerId)) || null
+})
+
+const paymentLateFee = computed(() => {
+    const account = activeAccount.value
+    const none = { overdueDays: 0, rate: 0, interest: 0 }
+    if (!account || !paymentCustomer.value || !account.dueDate || !paymentForm.date) return none
+    if (Number(account.balance) <= 0) return none
+    const days = daysBetween(account.dueDate, fromIsoDate(paymentForm.date))
+    return days > 0 ? moratoriumInterest(Number(account.balance), paymentCustomer.value.moratoriumRate, days) : none
+})
+
+const paymentTotalDue = computed(() =>
+    activeAccount.value ? roundMoney(Number(activeAccount.value.balance) + paymentLateFee.value.interest) : 0)
+
+watch(paymentTotalDue, total => {
+    if (paymentModalOpen.value) paymentForm.amount = fromBaseCurrency(total)
+})
 
 function errorText(e) {
     return t(`credit.error.${e.message}`, t('common.error'))
@@ -268,6 +291,14 @@ onMounted(() => {
                     <input v-model="paymentForm.date" type="date" class="vc-input" required />
                     <small class="vc-field__hint">{{ t('help.accountPayment.date.hint') }}</small>
                 </label>
+                <p v-if="paymentLateFee.overdueDays > 0" class="credit-payment__late vc-field--full">
+                    {{ t('credit.lateFeeInfo', {
+                        days: paymentLateFee.overdueDays,
+                        rate: (paymentLateFee.rate * 100).toFixed(7),
+                        amount: formatCurrency(paymentLateFee.interest)
+                    }) }}
+                    · {{ t('credit.totalDue') }}: <strong>{{ formatCurrency(paymentTotalDue) }}</strong>
+                </p>
                 <p v-if="formError" class="credit-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>
             <template #footer>
@@ -292,6 +323,15 @@ onMounted(() => {
 .credit-kpi__label { font-size: 0.82rem; color: var(--vc-text-muted); }
 .credit-kpi__value { font-size: 1.5rem; font-weight: 700; color: var(--vc-text); }
 .credit-kpi__value--danger { color: var(--vc-danger-500); }
+.credit-payment__late {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--vc-text);
+    font-size: 0.88rem;
+}
 .credit-form__error {
     grid-column: 1 / -1;
     margin: 0;
