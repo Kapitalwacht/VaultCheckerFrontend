@@ -23,11 +23,8 @@ export function daysBetween(from, to) {
 
 export function effectiveRateForDays(rate, days) {
     const { type, value, periodDays = DAYS_PER_YEAR, capitalizationDays = DAYS_PER_MONTH } = rate
-    if (type === 'nominal') {
-        const periodic = value * (capitalizationDays / periodDays)
-        return Math.pow(1 + periodic, days / capitalizationDays) - 1
-    }
-    return Math.pow(1 + value, days / periodDays) - 1
+    const annual = type === 'nominal' ? roundRate(nominalToEffectiveAnnual(value * (DAYS_PER_YEAR / periodDays), capitalizationDays)) : value
+    return Math.pow(1 + annual, days / DAYS_PER_YEAR) - 1
 }
 
 export function effectiveMonthlyRate(rate) {
@@ -60,33 +57,34 @@ export function frenchInstallment(principal, monthlyRate, months) {
 }
 
 export function frenchSchedule(principal, monthlyRate, months) {
-    const installment = frenchInstallment(principal, monthlyRate, months)
-    let balance = principal
+    const installment = roundMoney(frenchInstallment(principal, monthlyRate, months))
+    let balance = roundMoney(principal)
     const rows = []
     for (let period = 1; period <= months; period++) {
-        const interest = balance * monthlyRate
-        const principalPaid = installment - interest
-        balance = balance - principalPaid
+        const interest = roundMoney(balance * monthlyRate)
+        const isLast = period === months
+        const principalPaid = isLast ? balance : roundMoney(installment - interest)
+        balance = roundMoney(balance - principalPaid)
         rows.push({
             period,
-            installment: roundMoney(installment),
-            interest: roundMoney(interest),
-            principal: roundMoney(principalPaid),
-            balance: roundMoney(Math.max(balance, 0))
+            installment: isLast ? roundMoney(principalPaid + interest) : installment,
+            interest,
+            principal: principalPaid,
+            balance: Math.max(balance, 0)
         })
     }
-    return { installment: roundMoney(installment), monthlyRate: roundRate(monthlyRate), rows }
+    return { installment, monthlyRate: roundRate(monthlyRate), rows }
 }
 
 export function compensatoryInterest(principal, rate, days) {
-    const i = effectiveRateForDays(rate, days)
-    return { days, rate: roundRate(i), interest: roundMoney(principal * i) }
+    const i = roundRate(effectiveRateForDays(rate, days))
+    return { days, rate: i, interest: roundMoney(principal * i) }
 }
 
 export function moratoriumInterest(overdueAmount, moratoriumRate, overdueDays) {
     if (overdueDays <= 0) return { overdueDays: 0, rate: 0, interest: 0 }
-    const i = effectiveRateForDays(moratoriumRate, overdueDays)
-    return { overdueDays, rate: roundRate(i), interest: roundMoney(overdueAmount * i) }
+    const i = roundRate(effectiveRateForDays(moratoriumRate, overdueDays))
+    return { overdueDays, rate: i, interest: roundMoney(overdueAmount * i) }
 }
 
 export function allocatePayment(amount, { lateFee = 0, interest = 0, principal = 0 }) {

@@ -4,6 +4,7 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useCustomersStore from '@/customers/application/customers.store.js'
+import useCreditStore from '@/credit/application/credit.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
@@ -15,6 +16,7 @@ const { t } = useI18n()
 const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const customersStore = useCustomersStore()
+const creditStore = useCreditStore()
 const { customers, loading, error } = storeToRefs(customersStore)
 
 const CURRENCIES = ['PEN', 'USD']
@@ -138,11 +140,18 @@ async function submit() {
 }
 
 async function remove(customer) {
+    if (Number(creditStore.accountFor(customer)?.balance) > 0) {
+        window.alert(t('customers.hasDebt', { name: customer.fullName }))
+        return
+    }
     if (!window.confirm(t('customers.confirmDelete', { name: customer.fullName }))) return
     await customersStore.deleteCustomer(customer.id)
 }
 
-onMounted(() => customersStore.fetchCustomers())
+onMounted(() => {
+    customersStore.fetchCustomers()
+    creditStore.fetchAccounts()
+})
 
 </script>
 

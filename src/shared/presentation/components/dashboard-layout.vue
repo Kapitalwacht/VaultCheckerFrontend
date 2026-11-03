@@ -19,7 +19,7 @@ const mobileMenuOpen = ref(false)
 const isDark = ref(false)
 
 const allNavItems = [
-    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: [Roles.SYSTEM_ADMIN, Roles.STORE_ADMIN, Roles.CUSTOMER] },
+    { labelKey: 'nav.home',      icon: 'pi-th-large',   to: '/home',          roles: [Roles.SYSTEM_ADMIN, Roles.STORE_ADMIN] },
     { labelKey: 'nav.stores',    icon: 'pi-building',    to: '/stores',        roles: [Roles.SYSTEM_ADMIN] },
     { labelKey: 'nav.customers', icon: 'pi-users',       to: '/customers',     roles: [Roles.STORE_ADMIN] },
     { labelKey: 'nav.catalog',   icon: 'pi-box',         to: '/catalog',       roles: [Roles.STORE_ADMIN] },

@@ -102,8 +102,8 @@ onMounted(() => {
 
         <div v-if="!reportCustomerId" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-file" /></div>
-            <p class="vc-state__title">{{ t('credit.report.pickTitle') }}</p>
-            <p class="vc-state__text">{{ t('credit.report.pickText') }}</p>
+            <p class="vc-state__title">{{ isCustomerView ? t('credit.report.unlinkedTitle') : t('credit.report.pickTitle') }}</p>
+            <p class="vc-state__text">{{ isCustomerView ? t('credit.report.unlinkedText') : t('credit.report.pickText') }}</p>
         </div>
 
         <div v-else-if="loading" class="vc-card vc-state">

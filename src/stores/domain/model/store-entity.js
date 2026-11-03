@@ -1,4 +1,8 @@
 export class Store {
+    static generateCode() {
+        return `ST-${Date.now().toString(36).toUpperCase()}`
+    }
+
     constructor({
         id = null,
         storeId = null,

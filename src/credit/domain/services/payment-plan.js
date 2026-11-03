@@ -6,7 +6,8 @@ import {
     effectiveMonthlyRate,
     frenchSchedule,
     moratoriumInterest,
-    roundMoney
+    roundMoney,
+    roundRate
 } from '@/credit/domain/services/finance.js'
 
 function lastDayOfMonth(year, monthIndex) {
@@ -40,15 +41,10 @@ function parseLocalDate(value) {
 
 export function resolveFirstPaymentDate(purchaseDate, cutoffDay, paymentDay) {
     const purchase = parseLocalDate(purchaseDate)
-    const year = purchase.getFullYear()
-    const month = purchase.getMonth()
-    const cutoffDate = dateAtDay(year, month, cutoffDay)
-    const baseMonth = purchase <= cutoffDate ? month : month + 1
-    let paymentDate = dateAtDay(year, baseMonth, paymentDay)
-    if (paymentDate <= purchase) {
-        paymentDate = addMonths(paymentDate, 1, paymentDay)
-    }
-    return paymentDate
+    let cutoff = dateAtDay(purchase.getFullYear(), purchase.getMonth(), cutoffDay)
+    if (purchase > cutoff) cutoff = addMonths(cutoff, 1, cutoffDay)
+    const payment = dateAtDay(cutoff.getFullYear(), cutoff.getMonth(), paymentDay)
+    return payment > cutoff ? payment : addMonths(cutoff, 1, paymentDay)
 }
 
 export function buildPaymentPlan(purchase, terms) {
@@ -86,13 +82,13 @@ export function buildPaymentPlan(purchase, terms) {
     }
 
     const grace = capitalizeGracePeriod(principal, terms.rate, graceDays)
-    const monthlyRate = effectiveMonthlyRate(terms.rate)
+    const monthlyRate = roundRate(effectiveMonthlyRate(terms.rate))
     const schedule = frenchSchedule(grace.capitalizedDebt, monthlyRate, months)
     const rows = schedule.rows.map(row => ({
         ...row,
         date: toIsoDate(addMonths(firstPaymentDate, row.period, paymentDay))
     }))
-    const totalToPay = roundMoney(schedule.installment * months)
+    const totalToPay = roundMoney(schedule.rows.reduce((sum, row) => sum + row.installment, 0))
 
     return {
         mode: 'installments',

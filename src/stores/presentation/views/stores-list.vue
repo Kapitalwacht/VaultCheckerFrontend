@@ -4,6 +4,8 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import useStoresStore from '@/stores/application/stores.store.js'
+import useIamStore from '@/iam/application/iam.store.js'
+import { Store } from '@/stores/domain/model/store-entity.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
@@ -27,9 +29,14 @@ const blankForm = () => ({
     phone: '',
     email: '',
     description: '',
-    state: 'active'
+    state: 'active',
+    adminName: '',
+    adminEmail: '',
+    adminPassword: ''
 })
 const form = reactive(blankForm())
+const iamStore = useIamStore()
+const formError = ref('')
 
 const filtered = computed(() => {
     const q = search.value.trim().toLowerCase()
@@ -41,12 +48,14 @@ const filtered = computed(() => {
 
 function openCreate() {
     editingId.value = null
+    formError.value = ''
     Object.assign(form, blankForm())
     modalOpen.value = true
 }
 
 function openEdit(store) {
     editingId.value = store.id
+    formError.value = ''
     Object.assign(form, {
         storeId: store.storeId ?? '',
         ruc: store.ruc,
@@ -68,12 +77,24 @@ function closeModal() {
 
 async function submit() {
     saving.value = true
+    formError.value = ''
     try {
-        if (editingId.value) await storesStore.updateStore(editingId.value, { ...form })
-        else await storesStore.createStore({ ...form })
+        if (editingId.value) {
+            await storesStore.updateStore(editingId.value, { ...form })
+        } else {
+            const storeId = Store.generateCode()
+            await iamStore.createStoreAdmin({
+                name: form.adminName,
+                email: form.adminEmail,
+                phone: form.phone,
+                password: form.adminPassword,
+                storeId
+            })
+            await storesStore.createStore({ ...form, storeId })
+        }
         modalOpen.value = false
     } catch (e) {
-        error.value = e.message
+        formError.value = t(`register.error.${e.message}`, t('common.error'))
     } finally {
         saving.value = false
     }
@@ -220,6 +241,30 @@ onMounted(() => storesStore.fetchStores())
                     <textarea v-model="form.description" class="vc-textarea" />
                     <small class="vc-field__hint">{{ t('help.store.description.hint') }}</small>
                 </label>
+                <template v-if="!editingId">
+                    <label class="vc-field vc-field--full">
+                        <span class="vc-field__label">{{ t('stores.field.adminName') }}
+                            <FieldHelp :tip="t('help.store.adminName.tip')" />
+                        </span>
+                        <input v-model="form.adminName" class="vc-input" required />
+                        <small class="vc-field__hint">{{ t('help.store.adminName.hint') }}</small>
+                    </label>
+                    <label class="vc-field">
+                        <span class="vc-field__label">{{ t('stores.field.adminEmail') }}
+                            <FieldHelp :tip="t('help.store.adminEmail.tip')" />
+                        </span>
+                        <input v-model="form.adminEmail" type="email" class="vc-input" required />
+                        <small class="vc-field__hint">{{ t('help.store.adminEmail.hint') }}</small>
+                    </label>
+                    <label class="vc-field">
+                        <span class="vc-field__label">{{ t('stores.field.adminPassword') }}
+                            <FieldHelp :tip="t('help.store.adminPassword.tip')" />
+                        </span>
+                        <input v-model="form.adminPassword" type="password" minlength="8" class="vc-input" required />
+                        <small class="vc-field__hint">{{ t('help.store.adminPassword.hint') }}</small>
+                    </label>
+                </template>
+                <p v-if="formError" class="store-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>
 
             <template #footer>

@@ -55,7 +55,7 @@ const useIamStore = defineStore('iam', () => {
                     return { signedIn: true }
                 })
         }
-        const storeCode = `ST-${Date.now().toString(36).toUpperCase()}`
+        const storeCode = Store.generateCode()
         const storeResource = StoreAssembler.toResourceFromEntity(new Store({
             storeId: storeCode,
             ruc,
@@ -78,6 +78,10 @@ const useIamStore = defineStore('iam', () => {
                 useAuditStore().recordAction('REGISTER_ACCOUNT', `Account ${email} created for ${businessName}`)
                 return { signedIn: true }
             })
+    }
+
+    function createStoreAdmin({ name, email, phone, password, storeId }) {
+        return iamApi.signUp({ email, password, name, phone, role: Roles.STORE_ADMIN, storeId })
     }
 
     function verifyEmail(email, token) {
@@ -122,7 +126,10 @@ const useIamStore = defineStore('iam', () => {
     function updateProfile({ name, phone }) {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
-        return iamApi.updateProfile({ name, phone }).then(() => rebuildSession({ name, phone }))
+        return iamApi.updateProfile({ name, phone }).then(() => {
+            useAuditStore().recordAction('UPDATE_PROFILE', `Profile of ${currentUser.value.email} updated`)
+            return rebuildSession({ name, phone })
+        })
     }
 
     function changeEmail(newEmail) {
@@ -139,7 +146,10 @@ const useIamStore = defineStore('iam', () => {
     function changePassword(currentPassword, newPassword) {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
-        return iamApi.changePassword(currentPassword, newPassword).then(() => true)
+        return iamApi.changePassword(currentPassword, newPassword).then(() => {
+            useAuditStore().recordAction('CHANGE_PASSWORD', `Password of ${currentUser.value.email} changed`)
+            return true
+        })
     }
 
     function logout() {
@@ -151,7 +161,7 @@ const useIamStore = defineStore('iam', () => {
 
     return {
         currentUser, isAuthenticated, role, storeId, customerId, token, isSystemAdmin,
-        signIn, signInWithGoogle, registerAccount, verifyEmail,
+        signIn, signInWithGoogle, registerAccount, createStoreAdmin, verifyEmail,
         requestRecovery, verifyRecoveryCode, resetPassword, updateProfile, changeEmail, changePassword, logout
     }
 })

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import useIamStore from '@/iam/application/iam.store.js'
+import { Roles } from '@/iam/domain/model/roles.js'
 import storesRoutes from '@/stores/presentation/stores-routes.js'
 import customersRoutes from '@/customers/presentation/customers-routes.js'
 import catalogRoutes from '@/catalog/presentation/catalog-routes.js'
@@ -46,7 +47,7 @@ const routes = [
         component: DashboardLayout,
         children: [
             { path: '', redirect: { name: 'home' } },
-            { path: 'home', name: 'home', component: HomeView, meta: { title: 'nav.home' } },
+            { path: 'home', name: 'home', component: HomeView, meta: { title: 'nav.home', roles: [Roles.SYSTEM_ADMIN, Roles.STORE_ADMIN] } },
             { path: 'profile', name: 'profile', component: ProfileView, meta: { title: 'profile.title' } },
             ...storesRoutes,
             ...customersRoutes,
@@ -81,7 +82,7 @@ router.beforeEach(to => {
         return { name: 'home' }
     }
     if (to.meta?.roles && !to.meta.roles.includes(iam.role)) {
-        return { name: 'home' }
+        return { name: iam.currentUser?.isCustomer ? 'credit-report' : 'home' }
     }
     return true
 })

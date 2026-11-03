@@ -65,7 +65,10 @@
             "address": "Address",
             "phone": "Phone",
             "email": "Email",
-            "description": "Description"
+            "description": "Description",
+            "adminName": "Administrator name",
+            "adminEmail": "Sign-in email",
+            "adminPassword": "Sign-in password"
         }
     },
     "customers": {
@@ -108,7 +111,8 @@
             "maxMonths": "Max. months",
             "cutoffDay": "Cutoff day",
             "paymentDay": "Payment day"
-        }
+        },
+        "hasDebt": "{name} has pending debt and cannot be deleted."
     },
     "catalog": {
         "subtitle": "Manage the products and services you offer.",
@@ -236,13 +240,16 @@
             "lateFeeConcept": "Late interest on {description} ({days} days)",
             "lateFeeRate": "Rate",
             "lateFeeBase": "On",
-            "lateFeeTotal": "Total late interest"
+            "lateFeeTotal": "Total late interest",
+            "unlinkedTitle": "We can't find your record yet",
+            "unlinkedText": "Ask your store to register you with the same phone as your account."
         },
         "error": {
             "balance-over-limit": "The balance cannot exceed the credit limit.",
             "account-exists": "This customer already has a credit account.",
             "partial-payment": "Partial payments are not allowed: enter the full balance.",
-            "credit-limit-exceeded": "The amount exceeds the customer's available credit."
+            "credit-limit-exceeded": "The amount exceeds the customer's available credit.",
+            "pending-purchases": "This account has pending purchases: pay them one by one from the payment plan."
         },
         "lateFeeInfo": "{days} days late at {rate}: {amount}",
         "totalDue": "Total due"
@@ -708,6 +715,18 @@
             "description": {
                 "tip": "Additional information about the store.",
                 "hint": "Optional."
+            },
+            "adminName": {
+                "tip": "Person who will manage this store.",
+                "hint": "Owner or manager."
+            },
+            "adminEmail": {
+                "tip": "Username the administrator will sign in with.",
+                "hint": "This is their username."
+            },
+            "adminPassword": {
+                "tip": "Initial password; they can change it in their profile.",
+                "hint": "At least 8 characters."
             }
         }
     }

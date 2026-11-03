@@ -165,7 +165,7 @@ const useCreditStore = defineStore('credit', () => {
         }
         return creditApi.createInstallmentPayment(
             InstallmentPaymentAssembler.toResourceFromEntity({ ...payment, purchaseId: purchaseCode(payment.purchaseId) })
-        ).catch(failWith({ 409: 'installment-already-paid' })).then(response => {
+        ).catch(failWith({ 400: 'previous-installment-pending', 409: 'installment-already-paid' })).then(response => {
             const created = InstallmentPaymentAssembler.toEntityFromResource(response.data)
             fetchInstallmentPayments()
             fetchAccounts()
@@ -179,7 +179,7 @@ const useCreditStore = defineStore('credit', () => {
 
     function registerPayment(payment) {
         return creditApi.registerPayment(payment)
-            .catch(failWith({ 422: 'partial-payment' }))
+            .catch(failWith({ 409: 'pending-purchases', 422: 'partial-payment' }))
             .then(response => {
                 fetchAccounts()
                 return response.data

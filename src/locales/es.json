@@ -65,7 +65,10 @@
             "address": "Dirección",
             "phone": "Teléfono",
             "email": "Correo",
-            "description": "Descripción"
+            "description": "Descripción",
+            "adminName": "Nombre del administrador",
+            "adminEmail": "Correo de acceso",
+            "adminPassword": "Contraseña de acceso"
         }
     },
     "customers": {
@@ -108,7 +111,8 @@
             "maxMonths": "Máx. meses",
             "cutoffDay": "Día de corte",
             "paymentDay": "Día de pago"
-        }
+        },
+        "hasDebt": "{name} tiene deuda pendiente y no se puede eliminar."
     },
     "catalog": {
         "subtitle": "Administra los productos y servicios que ofreces.",
@@ -236,13 +240,16 @@
             "lateFeeConcept": "Mora de {description} ({days} días)",
             "lateFeeRate": "Tasa",
             "lateFeeBase": "Sobre",
-            "lateFeeTotal": "Total de intereses por mora"
+            "lateFeeTotal": "Total de intereses por mora",
+            "unlinkedTitle": "Aún no encontramos tu ficha",
+            "unlinkedText": "Pide a tu tienda que te registre con el mismo teléfono de tu cuenta."
         },
         "error": {
             "balance-over-limit": "El saldo no puede superar el límite de crédito.",
             "account-exists": "Este cliente ya tiene una cuenta de crédito.",
             "partial-payment": "No se aceptan pagos parciales: ingresa el saldo completo.",
-            "credit-limit-exceeded": "El monto supera el crédito disponible del cliente."
+            "credit-limit-exceeded": "El monto supera el crédito disponible del cliente.",
+            "pending-purchases": "Esta cuenta tiene compras pendientes: págalas una por una desde Plan de pagos."
         },
         "lateFeeInfo": "Mora de {days} días a la tasa {rate}: {amount}",
         "totalDue": "Total a pagar"
@@ -709,6 +716,18 @@
             "description": {
                 "tip": "Información adicional sobre la tienda.",
                 "hint": "Opcional."
+            },
+            "adminName": {
+                "tip": "Persona que administrará esta tienda.",
+                "hint": "Dueño o encargado."
+            },
+            "adminEmail": {
+                "tip": "Usuario con el que el administrador entrará a la app.",
+                "hint": "Será su usuario."
+            },
+            "adminPassword": {
+                "tip": "Clave inicial del administrador; podrá cambiarla en su perfil.",
+                "hint": "Mínimo 8 caracteres."
             }
         }
     }
