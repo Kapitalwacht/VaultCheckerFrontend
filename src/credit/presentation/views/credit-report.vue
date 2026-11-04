@@ -8,14 +8,13 @@ import useCustomersStore from '@/customers/application/customers.store.js'
 import useIamStore from '@/iam/application/iam.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import { Roles } from '@/iam/domain/model/roles.js'
-import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { formatIn } from '@/shared/infrastructure/currency-formatter.js'
 import { formatRate } from '@/credit/domain/services/finance.js'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
-const { format: formatCurrency } = useCurrencyFormatter()
 const { scope } = useStoreScope()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
@@ -50,6 +49,10 @@ async function loadStatement() {
 }
 
 watch([reportCustomerId, referenceDate], loadStatement)
+
+function formatCurrency(value) {
+    return formatIn(value, statement.value?.currency)
+}
 
 function concept(line) {
     return line.months > 1

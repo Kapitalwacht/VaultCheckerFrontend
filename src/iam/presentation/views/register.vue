@@ -2,7 +2,6 @@
 
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import BrandLogo from '@/shared/presentation/components/brand-logo.vue'
 import LocaleToggle from '@/shared/presentation/components/locale-toggle.vue'
 import useIamStore from '@/iam/application/iam.store.js'
@@ -11,7 +10,6 @@ import { isValidPhone, normalizePhone } from '@/iam/domain/model/phone-number.js
 import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
-const router = useRouter()
 const iamStore = useIamStore()
 
 const accountRole = ref(Roles.STORE_ADMIN)
@@ -104,10 +102,6 @@ function submit() {
         password: password.value
     })
         .then(result => {
-            if (result.signedIn) {
-                router.push(isCustomer.value ? '/credit/report' : '/home')
-                return
-            }
             emailSent.value = result.emailSent
             verificationLink.value = result.link || ''
             done.value = true

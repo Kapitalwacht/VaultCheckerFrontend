@@ -6,20 +6,18 @@ import { storeToRefs } from 'pinia'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import useCreditStore from '@/credit/application/credit.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
-import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { SUPPORTED_CURRENCIES, formatIn } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import PhoneInput from '@/shared/presentation/components/phone-input.vue'
 
 const { t } = useI18n()
-const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const customersStore = useCustomersStore()
 const creditStore = useCreditStore()
 const { customers, loading, error } = storeToRefs(customersStore)
 
-const CURRENCIES = ['PEN', 'USD']
 const RATE_TYPES = ['effective', 'nominal']
 const CAPITALIZATIONS = [
     { days: 1, label: 'daily' },
@@ -85,7 +83,7 @@ function openEdit(customer) {
         dni: customer.dni,
         phone: customer.phone,
         address: customer.address,
-        creditLimit: fromBaseCurrency(customer.creditLimit),
+        creditLimit: customer.creditLimit,
         currency: customer.currency ?? 'PEN',
         rateType: customer.rateType ?? 'effective',
         ratePercent: (Number(customer.rateValue) || 0) * 100,
@@ -117,7 +115,7 @@ async function submit() {
             phone: form.phone,
             address: form.address,
             state: form.state,
-            creditLimit: toBaseCurrency(form.creditLimit),
+            creditLimit: Number(form.creditLimit) || 0,
             currency: form.currency,
             rateType: form.rateType,
             rateValue: (Number(form.ratePercent) || 0) / 100,
@@ -138,6 +136,11 @@ async function submit() {
         saving.value = false
     }
 }
+
+const currencyLocked = computed(() => {
+    const customer = customers.value.find(item => item.id === editingId.value)
+    return Boolean(customer) && Number(creditStore.accountFor(customer)?.balance) > 0
+})
 
 async function remove(customer) {
     if (Number(creditStore.accountFor(customer)?.balance) > 0) {
@@ -211,7 +214,7 @@ onMounted(() => {
                     <tr v-for="customer in filtered" :key="customer.id">
                         <td class="vc-table__strong">{{ customer.fullName }}</td>
                         <td>{{ customer.dni }}</td>
-                        <td class="vc-table__num">{{ formatCurrency(customer.creditLimit) }}</td>
+                        <td class="vc-table__num">{{ formatIn(customer.creditLimit, customer.currency) }}</td>
                         <td>{{ formatRate(customer) }}</td>
                         <td>
                             <StatusBadge
@@ -282,8 +285,8 @@ onMounted(() => {
                     <span class="vc-field__label">{{ t('customers.field.currency') }}
                         <FieldHelp :tip="t('help.customer.currency.tip')" />
                     </span>
-                    <select v-model="form.currency" class="vc-select">
-                        <option v-for="c in CURRENCIES" :key="c" :value="c">{{ c }}</option>
+                    <select v-model="form.currency" class="vc-select" :disabled="currencyLocked">
+                        <option v-for="c in SUPPORTED_CURRENCIES" :key="c" :value="c">{{ c }}</option>
                     </select>
                     <small class="vc-field__hint">{{ t('help.customer.currency.hint') }}</small>
                 </label>

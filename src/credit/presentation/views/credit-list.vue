@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'
 import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
-import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { formatIn, symbolOf, toPen, useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
 import FieldHelp from '@/shared/presentation/components/field-help.vue'
@@ -15,7 +15,7 @@ import { todayIsoDate, fromIsoDate } from '@/shared/domain/local-date.js'
 import { daysBetween, formatRate, moratoriumInterest, roundMoney } from '@/credit/domain/services/finance.js'
 
 const { t } = useI18n()
-const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
+const { format } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
@@ -24,7 +24,7 @@ const { customers } = storeToRefs(customersStore)
 
 const scopedAccounts = computed(() => scope(accounts.value))
 const totalOutstanding = computed(() =>
-    scopedAccounts.value.reduce((sum, account) => sum + Number(account.balance || 0), 0))
+    scopedAccounts.value.reduce((sum, account) => sum + toPen(account.balance, currencyOf(account)), 0))
 const overdueAccounts = computed(() => scopedAccounts.value.filter(account => account.isOverdue))
 const scopedCustomers = computed(() => scope(customers.value))
 const customersWithoutAccount = computed(() =>
@@ -45,6 +45,11 @@ const blankAccount = () => ({
 })
 const accountForm = reactive(blankAccount())
 const paymentForm = reactive({ amount: 0, date: todayIsoDate() })
+
+function currencyOf(account) {
+    const customer = customers.value.find(item => sameId(item.id, account.customerId) || sameId(item.customerId, account.customerId))
+    return customer?.currency
+}
 
 function customerName(id) {
     const c = customers.value.find(item => sameId(item.id, id) || sameId(item.customerId, id))
@@ -68,7 +73,7 @@ function openAccountModal() {
 function openPaymentModal(account) {
     activeAccount.value = account
     paymentForm.date = todayIsoDate()
-    paymentForm.amount = fromBaseCurrency(account.balance)
+    paymentForm.amount = account.balance
     formError.value = ''
     paymentModalOpen.value = true
 }
@@ -92,7 +97,7 @@ const paymentTotalDue = computed(() =>
     activeAccount.value ? roundMoney(Number(activeAccount.value.balance) + paymentLateFee.value.interest) : 0)
 
 watch(paymentTotalDue, total => {
-    if (paymentModalOpen.value) paymentForm.amount = fromBaseCurrency(total)
+    if (paymentModalOpen.value) paymentForm.amount = total
 })
 
 function errorText(e) {
@@ -107,8 +112,8 @@ async function submitAccount() {
             ...accountForm,
             creditId: `CRD-${Date.now()}`,
             storeId: accountForm.storeId || scopeStoreId.value || null,
-            balance: toBaseCurrency(accountForm.balance),
-            creditLimit: toBaseCurrency(accountForm.creditLimit),
+            balance: Number(accountForm.balance) || 0,
+            creditLimit: Number(accountForm.creditLimit) || 0,
             dueDate: accountForm.dueDate || null
         })
         accountModalOpen.value = false
@@ -126,7 +131,7 @@ async function submitPayment() {
         await creditStore.registerPayment({
             creditAccountId: activeAccount.value.id,
             storeId: activeAccount.value.storeId,
-            amount: toBaseCurrency(paymentForm.amount),
+            amount: Number(paymentForm.amount) || 0,
             date: paymentForm.date
         })
         paymentModalOpen.value = false
@@ -159,7 +164,7 @@ onMounted(() => {
         <section class="credit-kpis">
             <article class="vc-card credit-kpi">
                 <span class="credit-kpi__label">{{ t('credit.totalOutstanding') }}</span>
-                <span class="credit-kpi__value">{{ formatCurrency(totalOutstanding) }}</span>
+                <span class="credit-kpi__value">{{ format(totalOutstanding) }}</span>
             </article>
             <article class="vc-card credit-kpi">
                 <span class="credit-kpi__label">{{ t('credit.activeAccounts') }}</span>
@@ -207,8 +212,8 @@ onMounted(() => {
                 <tbody>
                     <tr v-for="account in scopedAccounts" :key="account.id">
                         <td class="vc-table__strong">{{ customerName(account.customerId) }}</td>
-                        <td class="vc-table__num">{{ formatCurrency(account.balance) }}</td>
-                        <td class="vc-table__num">{{ formatCurrency(account.availableCredit) }}</td>
+                        <td class="vc-table__num">{{ formatIn(account.balance, currencyOf(account)) }}</td>
+                        <td class="vc-table__num">{{ formatIn(account.availableCredit, currencyOf(account)) }}</td>
                         <td>{{ fmtDate(account.dueDate) }}</td>
                         <td>
                             <StatusBadge
@@ -274,14 +279,14 @@ onMounted(() => {
         <VcModal :open="paymentModalOpen" :title="t('credit.registerPayment')" @close="!saving && (paymentModalOpen = false)">
             <p v-if="activeAccount" class="credit-payment__ctx">
                 {{ customerName(activeAccount.customerId) }} · {{ t('credit.field.balance') }}:
-                <strong>{{ formatCurrency(activeAccount.balance) }}</strong>
+                <strong>{{ formatIn(activeAccount.balance, currencyOf(activeAccount)) }}</strong>
             </p>
             <form id="payment-form" class="vc-form-grid" @submit.prevent="submitPayment">
                 <label class="vc-field">
                     <span class="vc-field__label">{{ t('credit.field.amount') }}
                         <FieldHelp :tip="t('help.accountPayment.amount.tip')" />
                     </span>
-                    <input v-model="paymentForm.amount" type="number" min="0" step="0.01" class="vc-input" required />
+                    <input v-model="paymentForm.amount" type="number" min="0" step="0.01" class="vc-input" :placeholder="activeAccount && symbolOf(currencyOf(activeAccount))" required />
                     <small class="vc-field__hint">{{ t('help.accountPayment.amount.hint') }}</small>
                 </label>
                 <label class="vc-field">
@@ -295,9 +300,9 @@ onMounted(() => {
                     {{ t('credit.lateFeeInfo', {
                         days: paymentLateFee.overdueDays,
                         rate: formatRate(paymentLateFee.rate),
-                        amount: formatCurrency(paymentLateFee.interest)
+                        amount: formatIn(paymentLateFee.interest, currencyOf(activeAccount))
                     }) }}
-                    · {{ t('credit.totalDue') }}: <strong>{{ formatCurrency(paymentTotalDue) }}</strong>
+                    · {{ t('credit.totalDue') }}: <strong>{{ formatIn(paymentTotalDue, currencyOf(activeAccount)) }}</strong>
                 </p>
                 <p v-if="formError" class="credit-form__error vc-field--full"><i class="pi pi-exclamation-triangle" /> {{ formError }}</p>
             </form>

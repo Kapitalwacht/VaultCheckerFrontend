@@ -21,6 +21,8 @@ const errorMessage = ref('')
 const recovered = ref(route.query.recovered === '1')
 const googleMessage = ref('')
 const googleLoading = ref(false)
+const unverified = ref(false)
+const resent = ref(false)
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const fieldErrors = ref({})
@@ -70,11 +72,16 @@ function submit() {
     iamStore.signIn({ email: email.value, password: password.value })
         .then(redirectAfterLogin)
         .catch(e => {
+            unverified.value = e.message === 'email-not-verified'
             errorMessage.value = t(`login.error.${e.message}`, t('login.error.generic'))
         })
         .finally(() => {
             submitting.value = false
         })
+}
+
+function resendVerification() {
+    iamStore.resendVerification(email.value).then(() => { resent.value = true })
 }
 
 async function handleGoogle() {
@@ -156,6 +163,12 @@ async function handleGoogle() {
                 <p v-if="errorMessage" class="login__error">
                     <i class="pi pi-exclamation-triangle" /> {{ errorMessage }}
                 </p>
+                <button v-if="unverified && !resent" type="button" class="login__link login__resend" @click="resendVerification">
+                    {{ t('login.resendVerification') }}
+                </button>
+                <p v-if="resent" class="login__success">
+                    <i class="pi pi-check-circle" /> {{ t('login.verificationResent') }}
+                </p>
 
                 <button class="login__submit" type="submit" :disabled="submitting">
                     <i v-if="submitting" class="pi pi-spin pi-spinner" />
@@ -187,6 +200,7 @@ async function handleGoogle() {
 </template>
 
 <style scoped>
+.login__resend { border: none; background: none; cursor: pointer; font: inherit; }
 .login {
     min-height: 100vh;
     display: grid;

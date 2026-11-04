@@ -14,7 +14,8 @@ export class PurchaseAssembler {
             amount: resource.amount,
             purchaseDate: resource.purchaseDate ? String(resource.purchaseDate).slice(0, 10) : null,
             months: resource.months,
-            state: resource.state
+            state: resource.state,
+            terms: resource.terms
         })
     }
 

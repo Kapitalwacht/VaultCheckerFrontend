@@ -2,8 +2,6 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { IamApi } from '@/iam/infrastructure/iam-api.js'
 import { AuthenticatedUser } from '@/iam/domain/model/authenticated-user-entity.js'
-import { StoresApi } from '@/stores/infrastructure/stores-api.js'
-import { StoreAssembler } from '@/stores/infrastructure/store.assembler.js'
 import { Store } from '@/stores/domain/model/store-entity.js'
 import { Roles } from '@/iam/domain/model/roles.js'
 import useAuditStore from '@/audit/application/audit.store.js'
@@ -11,7 +9,6 @@ import useAuditStore from '@/audit/application/audit.store.js'
 const STORAGE_KEY = 'vaultchecker-auth'
 
 const iamApi = new IamApi()
-const storesApi = new StoresApi()
 
 function restoreSession() {
     try {
@@ -47,37 +44,22 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function registerAccount({ role, businessName, category, ruc, ownerName, email, phone, password }) {
-        if (role === Roles.CUSTOMER) {
-            return iamApi.signUp({ email, password, name: ownerName, phone, role, storeId: null })
-                .then(() => signIn({ email, password }))
-                .then(() => {
-                    useAuditStore().recordAction('REGISTER_ACCOUNT', `Customer account ${email} created`)
-                    return { signedIn: true }
-                })
-        }
-        const storeCode = Store.generateCode()
-        const storeResource = StoreAssembler.toResourceFromEntity(new Store({
-            storeId: storeCode,
-            ruc,
-            businessName,
-            category,
-            phone,
-            email
-        }))
+        const isCustomer = role === Roles.CUSTOMER
         return iamApi.signUp({
             email,
             password,
             name: ownerName,
             phone,
             role,
-            storeId: storeCode
-        })
-            .then(() => signIn({ email, password }))
-            .then(() => storesApi.createStore(storeResource))
-            .then(() => {
-                useAuditStore().recordAction('REGISTER_ACCOUNT', `Account ${email} created for ${businessName}`)
-                return { signedIn: true }
-            })
+            storeId: isCustomer ? null : Store.generateCode(),
+            businessName: isCustomer ? null : businessName,
+            ruc: isCustomer ? null : ruc,
+            category: isCustomer ? null : category
+        }).then(() => ({ signedIn: false, emailSent: true, link: '' }))
+    }
+
+    function resendVerification(email) {
+        return iamApi.resendVerification(email)
     }
 
     function createStoreAdmin({ name, email, phone, password, storeId }) {
@@ -165,7 +147,7 @@ const useIamStore = defineStore('iam', () => {
 
     return {
         currentUser, isAuthenticated, role, storeId, customerId, token, isSystemAdmin,
-        signIn, signInWithGoogle, registerAccount, createStoreAdmin, verifyEmail,
+        signIn, signInWithGoogle, registerAccount, resendVerification, createStoreAdmin, verifyEmail,
         requestRecovery, verifyRecoveryCode, resetPassword, updateProfile, changeEmail, changePassword, logout
     }
 })

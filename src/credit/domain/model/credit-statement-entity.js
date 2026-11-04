@@ -2,6 +2,7 @@ export class CreditStatement {
     constructor({
         customerId = null,
         storeId = null,
+        currency = null,
         cutoffDate = null,
         paymentDate = null,
         lines = [],
@@ -13,6 +14,7 @@ export class CreditStatement {
     } = {}) {
         this.customerId = customerId
         this.storeId = storeId
+        this.currency = currency
         this.cutoffDate = cutoffDate
         this.paymentDate = paymentDate
         this.lines = lines

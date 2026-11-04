@@ -6,9 +6,9 @@ import { storeToRefs } from 'pinia'
 import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import useCatalogStore from '@/catalog/application/catalog.store.js'
-import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { formatIn, fromPen } from '@/shared/infrastructure/currency-formatter.js'
 import { buildPaymentPlan, settleInstallment } from '@/credit/domain/services/payment-plan.js'
-import { formatRate } from '@/credit/domain/services/finance.js'
+import { formatRate, roundMoney } from '@/credit/domain/services/finance.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import VcModal from '@/shared/presentation/components/vc-modal.vue'
 import StatusBadge from '@/shared/presentation/components/status-badge.vue'
@@ -17,7 +17,6 @@ import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
-const { format: formatCurrency, fromBaseCurrency, toBaseCurrency } = useCurrencyFormatter()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
 const catalogStore = useCatalogStore()
@@ -50,6 +49,10 @@ const form = reactive(blankForm())
 
 const MIN_INSTALLMENT_MONTHS = 2
 
+function formatCurrency(value) {
+    return formatIn(value, selectedCustomer.value?.currency)
+}
+
 const selectedProduct = computed(() => products.value.find(p => sameId(p.id, form.productId)) || null)
 
 const monthsRange = computed(() => {
@@ -76,24 +79,18 @@ const creditLimit = computed(() => {
     return creditStore.accountFor(selectedCustomer.value)?.creditLimit ?? selectedCustomer.value.creditLimit
 })
 
-const amount = computed(() =>
-    toBaseCurrency((Number(form.quantity) || 0) * (Number(form.unitPrice) || 0)))
+const amount = computed(() => roundMoney((Number(form.quantity) || 0) * (Number(form.unitPrice) || 0)))
 
 const activeProducts = computed(() => scope(products.value).filter(p => p.isActive))
 
 const plans = computed(() => {
     const customer = selectedCustomer.value
     if (!customer) return []
-    const terms = {
-        rate: customer.compensatoryRate,
-        cutoffDay: customer.cutoffDay,
-        paymentDay: customer.paymentDay
-    }
     return creditStore.purchasesByCustomer(customer.id).map(purchase => ({
         purchase,
         plan: buildPaymentPlan(
             { amount: purchase.amount, purchaseDate: purchase.purchaseDate, months: purchase.months },
-            terms
+            purchase.termsFor(customer)
         )
     }))
 })
@@ -102,7 +99,7 @@ function onProductChange() {
     const product = products.value.find(p => sameId(p.id, form.productId))
     if (product) {
         form.description = product.name
-        form.unitPrice = fromBaseCurrency(product.listPrice)
+        form.unitPrice = fromPen(product.listPrice, selectedCustomer.value?.currency)
         form.months = Math.min(Math.max(Number(form.months) || 1, monthsRange.value.min), monthsRange.value.max)
     }
 }
@@ -169,7 +166,7 @@ function nextPayablePeriod(purchaseId, plan) {
 
 const settlement = computed(() => {
     if (!payRow.value || !selectedCustomer.value) return null
-    return settleInstallment(payRow.value, payDate.value, selectedCustomer.value.moratoriumRate)
+    return settleInstallment(payRow.value, payDate.value, payPurchase.value.termsFor(selectedCustomer.value).moratoriumRate)
 })
 
 function openPay(row, purchase) {

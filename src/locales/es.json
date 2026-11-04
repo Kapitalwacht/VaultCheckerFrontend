@@ -305,7 +305,9 @@
             "generic": "No se pudo iniciar sesión. Inténtalo de nuevo.",
             "google-invalid": "No se pudo validar tu cuenta de Google. Inténtalo de nuevo.",
             "store-inactive": "Esta tienda fue dada de baja. Comunícate con el administrador del sistema."
-        }
+        },
+        "resendVerification": "Reenviar correo de verificación",
+        "verificationResent": "Te enviamos un nuevo link de verificación."
     },
     "register": {
         "title": "Crea tu cuenta",
@@ -342,7 +344,8 @@
             "passwordRequired": "La contraseña es obligatoria.",
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
-            "generic": "No se pudo crear la cuenta. Inténtalo de nuevo."
+            "generic": "No se pudo crear la cuenta. Inténtalo de nuevo.",
+            "store-taken": "Ya existe una tienda con ese RUC."
         },
         "back": "Volver",
         "typeBusiness": "Soy negocio",

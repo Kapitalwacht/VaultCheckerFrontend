@@ -4,12 +4,13 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
+import { toPen, useCurrencyFormatter } from '@/shared/infrastructure/currency-formatter.js'
 import useCreditStore from '@/credit/application/credit.store.js'
 import useCustomersStore from '@/customers/application/customers.store.js'
 import { useStoreScope } from '@/iam/application/use-store-scope.js'
 import useIamStore from '@/iam/application/iam.store.js'
 import { Roles } from '@/iam/domain/model/roles.js'
+import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
 const { t } = useI18n()
@@ -19,16 +20,21 @@ const { scope } = useStoreScope()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
 const { accounts, installmentPayments } = storeToRefs(creditStore)
-const { activeCustomers } = storeToRefs(customersStore)
+const { customers, activeCustomers } = storeToRefs(customersStore)
 
 const today = todayIsoDate()
 
+function balanceInPen(account) {
+    const customer = customers.value.find(item => sameId(item.id, account.customerId) || sameId(item.customerId, account.customerId))
+    return toPen(account.balance, customer?.currency)
+}
+
 const scopedAccounts = computed(() => scope(accounts.value))
 const outstanding = computed(() =>
-    scopedAccounts.value.reduce((sum, account) => sum + Number(account.balance || 0), 0))
+    scopedAccounts.value.reduce((sum, account) => sum + balanceInPen(account), 0))
 const overdue = computed(() => scopedAccounts.value
     .filter(account => account.isOverdue)
-    .reduce((sum, account) => sum + Number(account.balance || 0), 0))
+    .reduce((sum, account) => sum + balanceInPen(account), 0))
 const upcomingInstallments = computed(() => scope(installmentPayments.value)
     .filter(payment => payment.state === 'pending' && String(payment.scheduledDate || '') >= today)
     .length)

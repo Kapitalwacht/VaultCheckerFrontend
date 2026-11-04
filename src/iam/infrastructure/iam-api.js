@@ -5,6 +5,8 @@ const usersPath = '/users'
 const currentUserPath = `${usersPath}/me`
 const authenticationPath = import.meta.env.VITE_AUTH_ENDPOINT_PATH ?? '/authentication'
 
+const STORE_CONFLICT = 'STORE_CONFLICT'
+
 function failWith(errorsByStatus) {
     return error => {
         throw new Error(errorsByStatus[error.response?.status] ?? 'generic')
@@ -19,7 +21,7 @@ export class IamApi extends BaseApi {
                 password: credentials.password
             })
             .then(response => AuthenticatedUserAssembler.toEntityFromResource(response.data))
-            .catch(failWith({ 400: 'invalid-credentials', 404: 'invalid-credentials', 409: 'store-inactive' }))
+            .catch(failWith({ 400: 'invalid-credentials', 403: 'email-not-verified', 404: 'invalid-credentials', 409: 'store-inactive' }))
     }
 
     signInWithGoogle(accessToken) {
@@ -33,6 +35,10 @@ export class IamApi extends BaseApi {
         return this.http.post(`${authenticationPath}/sign-out`, { refreshToken })
     }
 
+    resendVerification(email) {
+        return this.http.post(`${authenticationPath}/resend-verification`, { email })
+    }
+
     signUp(registration) {
         return this.http
             .post(`${authenticationPath}/sign-up`, {
@@ -41,10 +47,16 @@ export class IamApi extends BaseApi {
                 role: registration.role,
                 name: registration.name,
                 phone: registration.phone,
-                storeId: registration.storeId
+                storeId: registration.storeId,
+                businessName: registration.businessName,
+                ruc: registration.ruc,
+                category: registration.category
             })
             .then(response => response.data)
-            .catch(failWith({ 409: 'email-taken' }))
+            .catch(error => {
+                if (error.response?.data?.code === STORE_CONFLICT) throw new Error('store-taken')
+                throw new Error(error.response?.status === 409 ? 'email-taken' : 'generic')
+            })
     }
 
     verifyEmail(email, token) {

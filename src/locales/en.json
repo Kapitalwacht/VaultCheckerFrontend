@@ -304,7 +304,9 @@
             "generic": "Could not sign in. Please try again.",
             "google-invalid": "Your Google account could not be verified. Please try again.",
             "store-inactive": "This store was deactivated. Contact the system administrator."
-        }
+        },
+        "resendVerification": "Resend verification email",
+        "verificationResent": "We sent you a new verification link."
     },
     "register": {
         "title": "Create your account",
@@ -341,7 +343,8 @@
             "passwordRequired": "Password is required.",
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
-            "generic": "Could not create the account. Please try again."
+            "generic": "Could not create the account. Please try again.",
+            "store-taken": "A store with that RUC already exists."
         },
         "back": "Back",
         "typeBusiness": "I'm a business",

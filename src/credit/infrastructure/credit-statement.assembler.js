@@ -5,6 +5,7 @@ export class CreditStatementAssembler {
         return new CreditStatement({
             customerId: resource.customerId,
             storeId: resource.storeId,
+            currency: resource.currency,
             cutoffDate: resource.cutoffDate,
             paymentDate: resource.paymentDate,
             lines: resource.lines,

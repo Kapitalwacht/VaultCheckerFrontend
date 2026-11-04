@@ -10,7 +10,8 @@ export class Purchase {
         amount = 0,
         purchaseDate = null,
         months = 1,
-        state = 'active'
+        state = 'active',
+        terms = null
     } = {}) {
         this.id = id
         this.purchaseId = purchaseId
@@ -23,6 +24,32 @@ export class Purchase {
         this.purchaseDate = purchaseDate
         this.months = months
         this.state = state
+        this.terms = terms
+    }
+
+    termsFor(customer) {
+        const agreed = this.terms
+        if (!agreed) {
+            return {
+                rate: customer.compensatoryRate,
+                moratoriumRate: customer.moratoriumRate,
+                cutoffDay: customer.cutoffDay,
+                paymentDay: customer.paymentDay
+            }
+        }
+        const periodDays = agreed.ratePeriodDays ?? undefined
+        const capitalizationDays = agreed.rateCapitalizationDays ?? undefined
+        return {
+            rate: { type: agreed.rateType, value: Number(agreed.rateValue), periodDays, capitalizationDays },
+            moratoriumRate: {
+                type: agreed.moratoriumRateType,
+                value: Number(agreed.moratoriumRateValue),
+                periodDays,
+                capitalizationDays
+            },
+            cutoffDay: agreed.cutoffDay,
+            paymentDay: agreed.paymentDay
+        }
     }
 
     get isSinglePayment() {
