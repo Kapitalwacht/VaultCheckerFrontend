@@ -11,7 +11,8 @@ export class AuthenticatedUserAssembler {
             role: resource.role,
             storeId: resource.storeId,
             customerId: resource.customerId,
-            token: resource.token
+            token: resource.token,
+            refreshToken: resource.refreshToken
         })
     }
 }

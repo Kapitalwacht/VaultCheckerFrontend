@@ -10,7 +10,8 @@ export class AuthenticatedUser {
         role = Roles.STORE_ADMIN,
         storeId = null,
         customerId = null,
-        token = ''
+        token = '',
+        refreshToken = ''
     } = {}) {
         this.id = id
         this.userId = userId
@@ -21,6 +22,7 @@ export class AuthenticatedUser {
         this.storeId = storeId
         this.customerId = customerId
         this.token = token
+        this.refreshToken = refreshToken
     }
 
     get isAuthenticated() {

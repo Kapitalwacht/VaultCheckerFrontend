@@ -108,6 +108,7 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function rebuildSession(changes) {
+        const session = restoreSession() ?? currentUser.value
         const updated = new AuthenticatedUser({
             id: currentUser.value.id,
             userId: currentUser.value.userId,
@@ -117,7 +118,8 @@ const useIamStore = defineStore('iam', () => {
             role: currentUser.value.role,
             storeId: currentUser.value.storeId,
             customerId: currentUser.value.customerId,
-            token: currentUser.value.token
+            token: session.token,
+            refreshToken: session.refreshToken
         })
         persist(updated)
         return updated
@@ -153,6 +155,8 @@ const useIamStore = defineStore('iam', () => {
     }
 
     function logout() {
+        const refreshToken = restoreSession()?.refreshToken
+        if (refreshToken) iamApi.signOut(refreshToken).catch(() => {})
         currentUser.value = null
         try {
             localStorage.removeItem(STORAGE_KEY)

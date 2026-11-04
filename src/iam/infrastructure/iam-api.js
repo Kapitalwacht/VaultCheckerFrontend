@@ -29,6 +29,10 @@ export class IamApi extends BaseApi {
             .catch(failWith({ 400: 'google-invalid', 404: 'google-no-account', 409: 'store-inactive' }))
     }
 
+    signOut(refreshToken) {
+        return this.http.post(`${authenticationPath}/sign-out`, { refreshToken })
+    }
+
     signUp(registration) {
         return this.http
             .post(`${authenticationPath}/sign-up`, {
