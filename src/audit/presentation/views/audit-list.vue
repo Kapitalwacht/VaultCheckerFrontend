@@ -54,7 +54,7 @@ onMounted(() => auditStore.fetchLogs())
         <div v-else-if="error" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-exclamation-triangle" /></div>
             <p class="vc-state__title">{{ t('common.error') }}</p>
-            <p class="vc-state__text">{{ error }}</p>
+            <p class="vc-state__text">{{ t('common.loadError') }}</p>
             <button class="vc-btn vc-btn--ghost" @click="auditStore.fetchLogs()">{{ t('common.retry') }}</button>
         </div>
 
@@ -80,7 +80,7 @@ onMounted(() => auditStore.fetchLogs())
                         <td>{{ log.date }}</td>
                         <td>{{ log.time }}</td>
                         <td>{{ log.userRole }}</td>
-                        <td><StatusBadge :tone="toneFor(log.action)" :label="log.action" /></td>
+                        <td><StatusBadge :tone="toneFor(log.action)" :label="t(`audit.action.${log.action}`, log.action)" /></td>
                         <td>{{ log.details }}</td>
                     </tr>
                 </tbody>

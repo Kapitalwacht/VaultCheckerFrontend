@@ -20,6 +20,7 @@ const category = ref('')
 const ownerName = ref('')
 const email = ref('')
 const phone = ref('')
+const dni = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
@@ -31,6 +32,7 @@ const verificationLink = ref('')
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 8
+const DNI_PATTERN = /^\d{8}$/
 
 const fieldErrors = ref({})
 const submitted = ref(false)
@@ -45,8 +47,11 @@ function checkField(field) {
             if (!email.value.trim()) return 'emailRequired'
             return EMAIL_PATTERN.test(email.value.trim()) ? '' : 'emailInvalid'
         case 'phone':
-            if (!phone.value.trim()) return 'phoneRequired'
+            if (!phone.value.trim()) return ''
             return isValidPhone(phone.value) ? '' : 'phoneInvalid'
+        case 'dni':
+            if (!dni.value.trim()) return 'dniRequired'
+            return DNI_PATTERN.test(dni.value.trim()) ? '' : 'dniInvalid'
         case 'password':
             if (!password.value) return 'passwordRequired'
             return password.value.length < MIN_PASSWORD_LENGTH ? 'passwordShort' : ''
@@ -59,7 +64,7 @@ function checkField(field) {
 }
 
 const BUSINESS_FIELDS = ['businessName', 'ownerName', 'email', 'phone', 'password', 'confirmPassword']
-const CUSTOMER_FIELDS = ['ownerName', 'email', 'phone', 'password', 'confirmPassword']
+const CUSTOMER_FIELDS = ['ownerName', 'dni', 'email', 'phone', 'password', 'confirmPassword']
 
 function validate() {
     const errors = {}
@@ -98,7 +103,8 @@ function submit() {
         category: category.value,
         ownerName: ownerName.value,
         email: email.value,
-        phone: normalizePhone(phone.value),
+        phone: normalizePhone(phone.value) || null,
+        dni: dni.value.trim(),
         password: password.value
     })
         .then(result => {
@@ -204,6 +210,16 @@ function submit() {
                     <span v-if="fieldErrors.ownerName" class="field__error">{{ t(`register.error.${fieldErrors.ownerName}`) }}</span>
                 </label>
 
+                <label v-if="isCustomer" class="field">
+                    <span class="field__label">{{ t('register.dni') }}</span>
+                    <span class="field__control" :class="{ 'field__control--error': fieldErrors.dni }">
+                        <i class="pi pi-id-card field__icon" />
+                        <input v-model="dni" type="text" inputmode="numeric" maxlength="8" class="field__input" :placeholder="t('register.dniPlaceholder')" @input="revalidate('dni')" />
+                    </span>
+                    <span v-if="fieldErrors.dni" class="field__error">{{ t(`register.error.${fieldErrors.dni}`) }}</span>
+                    <span class="field__hint">{{ t('register.customerDniHint') }}</span>
+                </label>
+
                 <label class="field">
                     <span class="field__label">{{ t('login.email') }}</span>
                     <span class="field__control" :class="{ 'field__control--error': fieldErrors.email }">
@@ -219,7 +235,6 @@ function submit() {
                         <PhoneInput v-model="phone" :boxed="false" @input="revalidate('phone')" />
                     </span>
                     <span v-if="fieldErrors.phone" class="field__error">{{ t(`register.error.${fieldErrors.phone}`) }}</span>
-                    <span v-if="isCustomer" class="field__hint">{{ t('register.customerPhoneHint') }}</span>
                 </div>
 
                 <label class="field">

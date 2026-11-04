@@ -1,6 +1,7 @@
 <script setup>
 
 import { watch, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
     open: { type: Boolean, default: false },
@@ -8,6 +9,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+const { t } = useI18n()
 
 function onKey(e) {
     if (e.key === 'Escape') emit('close')
@@ -40,7 +42,7 @@ onBeforeUnmount(() => {
                 <div class="vc-modal__card vc-card" role="dialog" aria-modal="true">
                     <header class="vc-modal__head">
                         <h2 class="vc-modal__title">{{ title }}</h2>
-                        <button class="vc-modal__close" type="button" aria-label="Close" @click="emit('close')">
+                        <button class="vc-modal__close" type="button" :aria-label="t('common.close')" @click="emit('close')">
                             <i class="pi pi-times" />
                         </button>
                     </header>

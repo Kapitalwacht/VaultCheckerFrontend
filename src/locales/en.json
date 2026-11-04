@@ -49,7 +49,9 @@
         "retry": "Retry",
         "toggleLanguage": "Switch language",
         "help": "Help",
-        "country": "Country"
+        "country": "Country",
+        "close": "Close",
+        "loadError": "The action could not be completed. Please try again."
     },
     "stores": {
         "subtitle": "Manage the stores registered on the platform.",
@@ -242,7 +244,7 @@
             "lateFeeBase": "On",
             "lateFeeTotal": "Total late interest",
             "unlinkedTitle": "We can't find your record yet",
-            "unlinkedText": "Ask your store to register you with the same phone as your account."
+            "unlinkedText": "Ask your store to register you with the same DNI as your account."
         },
         "error": {
             "balance-over-limit": "The balance cannot exceed the credit limit.",
@@ -266,6 +268,28 @@
             "role": "Role",
             "action": "Action",
             "details": "Details"
+        },
+        "action": {
+            "USER_SIGNED_UP": "User signed up",
+            "USER_SIGNED_IN": "Signed in",
+            "USER_SIGNED_OUT": "Signed out",
+            "PASSWORD_RESET": "Password reset",
+            "UPDATE_PROFILE": "Profile updated",
+            "CHANGE_PASSWORD": "Password changed",
+            "CHANGE_EMAIL": "Email changed",
+            "CHANGE_PLAN": "Plan changed",
+            "CREATE_STORE": "Store created",
+            "UPDATE_STORE": "Store updated",
+            "CREATE_CUSTOMER": "Customer created",
+            "UPDATE_CUSTOMER": "Customer updated",
+            "DELETE_CUSTOMER": "Customer deleted",
+            "CREATE_PRODUCT": "Product created",
+            "UPDATE_PRODUCT": "Product updated",
+            "DELETE_PRODUCT": "Product deleted",
+            "OPEN_CREDIT_ACCOUNT": "Credit account opened",
+            "REGISTER_PAYMENT": "Account payment",
+            "REGISTER_PURCHASE": "Purchase registered",
+            "REGISTER_INSTALLMENT_PAYMENT": "Installment payment"
         }
     },
     "comingSoon": {
@@ -319,7 +343,7 @@
         "categoryPlaceholder": "e.g. Grocery",
         "ownerName": "Your name",
         "ownerNamePlaceholder": "e.g. John Doe",
-        "phone": "Phone",
+        "phone": "Phone (optional)",
         "phonePlaceholder": "+51 987654321",
         "confirmPassword": "Confirm password",
         "confirmPasswordPlaceholder": "Repeat the password",
@@ -338,19 +362,23 @@
             "ownerNameRequired": "Your name is required.",
             "emailRequired": "Email is required.",
             "emailInvalid": "Enter a valid email address.",
-            "phoneRequired": "Phone number is required.",
             "phoneInvalid": "Choose the country and enter the full number (8 to 15 digits in total).",
             "passwordRequired": "Password is required.",
             "passwordShort": "Password must be at least 8 characters.",
             "confirmRequired": "Please confirm your password.",
             "generic": "Could not create the account. Please try again.",
-            "store-taken": "A store with that RUC already exists."
+            "store-taken": "A store with that RUC already exists.",
+            "dniRequired": "The DNI is required.",
+            "dniInvalid": "Enter an 8-digit DNI.",
+            "dni-taken": "An account with that DNI already exists."
         },
         "back": "Back",
         "typeBusiness": "I'm a business",
         "typeCustomer": "I'm a customer",
         "customerSubtitle": "Create your account to check what you owe your store.",
-        "customerPhoneHint": "Use the same phone the store registered for you, so we can find your debts."
+        "dni": "ID number (DNI)",
+        "dniPlaceholder": "12345678",
+        "customerDniHint": "Use the DNI the store registered for you, so we can find your debts."
     },
     "verify": {
         "pendingTitle": "Verifying your account",
@@ -517,7 +545,7 @@
             },
             "dni": {
                 "tip": "Customer's national ID number (8 digits).",
-                "hint": "Numbers only, 8 digits."
+                "hint": "The customer will use this DNI to create their account."
             },
             "phone": {
                 "tip": "Choose the country by its flag and enter the phone or WhatsApp used for payment reminders.",

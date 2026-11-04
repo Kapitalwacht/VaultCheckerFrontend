@@ -6,6 +6,7 @@ const currentUserPath = `${usersPath}/me`
 const authenticationPath = import.meta.env.VITE_AUTH_ENDPOINT_PATH ?? '/authentication'
 
 const STORE_CONFLICT = 'STORE_CONFLICT'
+const DNI_CONFLICT = 'USERDNI_CONFLICT'
 
 function failWith(errorsByStatus) {
     return error => {
@@ -48,6 +49,7 @@ export class IamApi extends BaseApi {
                 name: registration.name,
                 phone: registration.phone,
                 storeId: registration.storeId,
+                dni: registration.dni,
                 businessName: registration.businessName,
                 ruc: registration.ruc,
                 category: registration.category
@@ -55,6 +57,7 @@ export class IamApi extends BaseApi {
             .then(response => response.data)
             .catch(error => {
                 if (error.response?.data?.code === STORE_CONFLICT) throw new Error('store-taken')
+                if (error.response?.data?.code === DNI_CONFLICT) throw new Error('dni-taken')
                 throw new Error(error.response?.status === 409 ? 'email-taken' : 'generic')
             })
     }

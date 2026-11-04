@@ -16,7 +16,7 @@ import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
 const catalogStore = useCatalogStore()
@@ -113,7 +113,7 @@ function fmtDate(value) {
         const [y, m, day] = String(value).slice(0, 10).split('-').map(Number)
         d = new Date(y, (m || 1) - 1, day || 1)
     }
-    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString()
+    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString(locale.value)
 }
 
 function openCreate() {
@@ -149,7 +149,7 @@ async function submit() {
         }, selectedCustomer.value)
         modalOpen.value = false
     } catch (e) {
-        error.value = t(`credit.plan.error.${e.message}`, e.message)
+        error.value = t(`credit.plan.error.${e.message}`, t('common.error'))
     } finally {
         saving.value = false
     }
@@ -204,7 +204,7 @@ async function submitPay() {
         })
         payModalOpen.value = false
     } catch (e) {
-        error.value = t(`credit.plan.error.${e.message}`, e.message)
+        error.value = t(`credit.plan.error.${e.message}`, t('common.error'))
     } finally {
         paying.value = false
     }

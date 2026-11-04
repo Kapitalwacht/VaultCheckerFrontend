@@ -132,7 +132,7 @@ onMounted(() => catalogStore.fetchProducts())
         <div v-else-if="error" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-exclamation-triangle" /></div>
             <p class="vc-state__title">{{ t('common.error') }}</p>
-            <p class="vc-state__text">{{ error }}</p>
+            <p class="vc-state__text">{{ t('common.loadError') }}</p>
             <button class="vc-btn vc-btn--ghost" @click="catalogStore.fetchProducts()">{{ t('common.retry') }}</button>
         </div>
 

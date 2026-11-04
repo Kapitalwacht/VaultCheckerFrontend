@@ -14,7 +14,7 @@ import FieldHelp from '@/shared/presentation/components/field-help.vue'
 import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate } from '@/shared/domain/local-date.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { scope } = useStoreScope()
 const creditStore = useCreditStore()
 const customersStore = useCustomersStore()
@@ -64,7 +64,7 @@ function fmtDate(value) {
     if (!value) return '—'
     const [y, m, d] = String(value).slice(0, 10).split('-').map(Number)
     const date = new Date(y, (m || 1) - 1, d || 1)
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString()
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(locale.value)
 }
 
 onMounted(() => {

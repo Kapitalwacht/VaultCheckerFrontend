@@ -1,4 +1,5 @@
 import axios from 'axios'
+import i18n from '@/i18n.js'
 
 const AUTH_STORAGE_KEY = 'vaultchecker-auth'
 const DEFAULT_BASE_URL = 'http://localhost:3000/api/v1'
@@ -60,6 +61,11 @@ function retryAfterRefresh(client) {
     }
 }
 
+function attachLanguageHeader(config) {
+    config.headers['Accept-Language'] = i18n.global.locale.value
+    return config
+}
+
 function attachAuthHeader(config) {
     const goesToAuth = (config.url ?? '').includes(`${authSegment}/`)
     const token = currentToken()
@@ -81,6 +87,7 @@ export class BaseApi {
             }
         })
 
+        this.#client.interceptors.request.use(attachLanguageHeader)
         this.#client.interceptors.request.use(attachAuthHeader)
         this.#client.interceptors.response.use(response => response, retryAfterRefresh(this.#client))
     }

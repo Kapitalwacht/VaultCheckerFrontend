@@ -43,7 +43,7 @@ const useIamStore = defineStore('iam', () => {
         })
     }
 
-    function registerAccount({ role, businessName, category, ruc, ownerName, email, phone, password }) {
+    function registerAccount({ role, businessName, category, ruc, ownerName, email, phone, dni, password }) {
         const isCustomer = role === Roles.CUSTOMER
         return iamApi.signUp({
             email,
@@ -52,6 +52,7 @@ const useIamStore = defineStore('iam', () => {
             phone,
             role,
             storeId: isCustomer ? null : Store.generateCode(),
+            dni: isCustomer ? dni : null,
             businessName: isCustomer ? null : businessName,
             ruc: isCustomer ? null : ruc,
             category: isCustomer ? null : category

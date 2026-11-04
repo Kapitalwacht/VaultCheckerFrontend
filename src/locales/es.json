@@ -49,7 +49,9 @@
         "retry": "Reintentar",
         "toggleLanguage": "Cambiar idioma",
         "help": "Ayuda",
-        "country": "País"
+        "country": "País",
+        "close": "Cerrar",
+        "loadError": "No se pudo completar la acción. Inténtalo de nuevo."
     },
     "stores": {
         "subtitle": "Gestiona las tiendas registradas en la plataforma.",
@@ -242,7 +244,7 @@
             "lateFeeBase": "Sobre",
             "lateFeeTotal": "Total de intereses por mora",
             "unlinkedTitle": "Aún no encontramos tu ficha",
-            "unlinkedText": "Pide a tu tienda que te registre con el mismo teléfono de tu cuenta."
+            "unlinkedText": "Pide a tu tienda que te registre con el mismo DNI de tu cuenta."
         },
         "error": {
             "balance-over-limit": "El saldo no puede superar el límite de crédito.",
@@ -266,6 +268,28 @@
             "role": "Rol",
             "action": "Acción",
             "details": "Detalle"
+        },
+        "action": {
+            "USER_SIGNED_UP": "Registro de usuario",
+            "USER_SIGNED_IN": "Inicio de sesión",
+            "USER_SIGNED_OUT": "Cierre de sesión",
+            "PASSWORD_RESET": "Contraseña restablecida",
+            "UPDATE_PROFILE": "Perfil actualizado",
+            "CHANGE_PASSWORD": "Contraseña cambiada",
+            "CHANGE_EMAIL": "Correo cambiado",
+            "CHANGE_PLAN": "Plan cambiado",
+            "CREATE_STORE": "Tienda creada",
+            "UPDATE_STORE": "Tienda actualizada",
+            "CREATE_CUSTOMER": "Cliente creado",
+            "UPDATE_CUSTOMER": "Cliente actualizado",
+            "DELETE_CUSTOMER": "Cliente eliminado",
+            "CREATE_PRODUCT": "Producto creado",
+            "UPDATE_PRODUCT": "Producto actualizado",
+            "DELETE_PRODUCT": "Producto eliminado",
+            "OPEN_CREDIT_ACCOUNT": "Cuenta de crédito abierta",
+            "REGISTER_PAYMENT": "Pago de cuenta",
+            "REGISTER_PURCHASE": "Compra registrada",
+            "REGISTER_INSTALLMENT_PAYMENT": "Pago de cuota"
         }
     },
     "comingSoon": {
@@ -286,7 +310,6 @@
         "passwordPlaceholder": "Tu contraseña",
         "togglePassword": "Mostrar u ocultar contraseña",
         "submit": "Iniciar sesión",
-        "togglePasswordAria": "Mostrar contraseña",
         "hint": "Protege la información de tu negocio y tus clientes.",
         "forgot": "¿Olvidaste tu contraseña?",
         "or": "o",
@@ -320,7 +343,7 @@
         "categoryPlaceholder": "Ej. Bodega",
         "ownerName": "Tu nombre",
         "ownerNamePlaceholder": "Nombre del dueño",
-        "phone": "Teléfono",
+        "phone": "Teléfono (opcional)",
         "phonePlaceholder": "+51 987654321",
         "confirmPassword": "Confirmar contraseña",
         "confirmPasswordPlaceholder": "Repite la contraseña",
@@ -339,19 +362,23 @@
             "ownerNameRequired": "Tu nombre es obligatorio.",
             "emailRequired": "El correo es obligatorio.",
             "emailInvalid": "Ingresa un correo válido.",
-            "phoneRequired": "El número de teléfono es obligatorio.",
             "phoneInvalid": "Elige el país e ingresa el número completo (8 a 15 dígitos en total).",
             "passwordRequired": "La contraseña es obligatoria.",
             "passwordShort": "La contraseña debe tener al menos 8 caracteres.",
             "confirmRequired": "Confirma tu contraseña.",
             "generic": "No se pudo crear la cuenta. Inténtalo de nuevo.",
-            "store-taken": "Ya existe una tienda con ese RUC."
+            "store-taken": "Ya existe una tienda con ese RUC.",
+            "dniRequired": "El DNI es obligatorio.",
+            "dniInvalid": "Ingresa un DNI de 8 dígitos.",
+            "dni-taken": "Ya existe una cuenta con ese DNI."
         },
         "back": "Volver",
         "typeBusiness": "Soy negocio",
         "typeCustomer": "Soy cliente",
         "customerSubtitle": "Crea tu cuenta para consultar lo que debes a tu tienda.",
-        "customerPhoneHint": "Usa el mismo teléfono con el que te registró la tienda; así vemos tus deudas."
+        "dni": "DNI",
+        "dniPlaceholder": "12345678",
+        "customerDniHint": "Usa el DNI con el que te registró la tienda; así vemos tus deudas."
     },
     "verify": {
         "pendingTitle": "Verificando tu cuenta",
@@ -518,7 +545,7 @@
             },
             "dni": {
                 "tip": "Documento de identidad del cliente (8 dígitos).",
-                "hint": "Solo números, 8 dígitos."
+                "hint": "Con este DNI el cliente podrá crear su cuenta."
             },
             "phone": {
                 "tip": "Elige el país con su bandera e ingresa el teléfono o WhatsApp para coordinar cobros y avisos de vencimiento.",

@@ -14,7 +14,7 @@ import { sameId } from '@/shared/domain/same-id.js'
 import { todayIsoDate, fromIsoDate } from '@/shared/domain/local-date.js'
 import { daysBetween, formatRate, moratoriumInterest, roundMoney } from '@/credit/domain/services/finance.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { format } = useCurrencyFormatter()
 const { scope, scopeStoreId } = useStoreScope()
 const creditStore = useCreditStore()
@@ -61,7 +61,7 @@ const stateTone = { current: 'info', overdue: 'danger', paid: 'neutral' }
 function fmtDate(value) {
     if (!value) return '—'
     const d = value instanceof Date ? value : new Date(value)
-    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString()
+    return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString(locale.value)
 }
 
 function openAccountModal() {
@@ -184,7 +184,7 @@ onMounted(() => {
         <div v-else-if="error" class="vc-card vc-state">
             <div class="vc-state__icon"><i class="pi pi-exclamation-triangle" /></div>
             <p class="vc-state__title">{{ t('common.error') }}</p>
-            <p class="vc-state__text">{{ error }}</p>
+            <p class="vc-state__text">{{ t('common.loadError') }}</p>
             <button class="vc-btn vc-btn--ghost" @click="creditStore.fetchAccounts()">{{ t('common.retry') }}</button>
         </div>
 
