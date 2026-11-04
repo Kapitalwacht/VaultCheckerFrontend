@@ -53,6 +53,8 @@ function formatCurrency(value) {
     return formatIn(value, selectedCustomer.value?.currency)
 }
 
+const canPurchase = computed(() => selectedCustomer.value?.isActive ?? false)
+
 const selectedProduct = computed(() => products.value.find(p => sameId(p.id, form.productId)) || null)
 
 const monthsRange = computed(() => {
@@ -231,7 +233,7 @@ onMounted(() => {
                 <h1 class="vc-page__title">{{ t('nav.plan') }}</h1>
                 <p class="vc-page__subtitle">{{ t('credit.plan.subtitle') }}</p>
             </div>
-            <button class="vc-btn vc-btn--primary" :disabled="!selectedCustomer" @click="openCreate">
+            <button class="vc-btn vc-btn--primary" :disabled="!canPurchase" @click="openCreate">
                 <i class="pi pi-plus" /> {{ t('credit.plan.newPurchase') }}
             </button>
         </div>
@@ -248,6 +250,10 @@ onMounted(() => {
                 <small class="vc-field__hint">{{ t('help.plan.customer.hint') }}</small>
             </label>
         </div>
+
+        <p v-if="selectedCustomer && !canPurchase" class="plan-form__error">
+            <i class="pi pi-exclamation-triangle" /> {{ t('credit.plan.inactiveCustomer') }}
+        </p>
 
         <div v-if="selectedCustomer" class="plan-kpis">
             <article class="vc-card plan-kpi">
@@ -284,7 +290,7 @@ onMounted(() => {
             <div class="vc-state__icon"><i class="pi pi-calculator" /></div>
             <p class="vc-state__title">{{ t('credit.plan.emptyTitle') }}</p>
             <p class="vc-state__text">{{ t('credit.plan.emptyText') }}</p>
-            <button class="vc-btn vc-btn--primary" @click="openCreate">
+            <button class="vc-btn vc-btn--primary" :disabled="!canPurchase" @click="openCreate">
                 <i class="pi pi-plus" /> {{ t('credit.plan.newPurchase') }}
             </button>
         </div>

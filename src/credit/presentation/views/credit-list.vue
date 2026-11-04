@@ -28,7 +28,7 @@ const totalOutstanding = computed(() =>
 const overdueAccounts = computed(() => scopedAccounts.value.filter(account => account.isOverdue))
 const scopedCustomers = computed(() => scope(customers.value))
 const customersWithoutAccount = computed(() =>
-    scopedCustomers.value.filter(customer => !creditStore.accountFor(customer)))
+    scopedCustomers.value.filter(customer => customer.isActive && !creditStore.accountFor(customer)))
 
 const accountModalOpen = ref(false)
 const paymentModalOpen = ref(false)

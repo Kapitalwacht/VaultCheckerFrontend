@@ -221,7 +221,8 @@
             "graceRate": "Tasa de gracia ({days} días)",
             "monthlyRate": "TEM",
             "periodRate": "Tasa del período ({days} días)",
-            "lateRate": "Tasa moratoria del período"
+            "lateRate": "Tasa moratoria del período",
+            "inactiveCustomer": "Este cliente está inactivo: no puede hacer compras nuevas, pero sí pagar lo pendiente."
         },
         "report": {
             "subtitle": "Listado que el cliente debe pagar en su fecha de pago, generado en la fecha de corte.",

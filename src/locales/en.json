@@ -221,7 +221,8 @@
             "graceRate": "Grace rate ({days} days)",
             "monthlyRate": "Monthly effective rate",
             "periodRate": "Period rate ({days} days)",
-            "lateRate": "Late rate for the period"
+            "lateRate": "Late rate for the period",
+            "inactiveCustomer": "This customer is inactive: they cannot make new purchases, but can pay what is pending."
         },
         "report": {
             "subtitle": "What the customer must pay on their payment date, generated on the cutoff date.",
