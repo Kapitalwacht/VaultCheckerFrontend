@@ -142,7 +142,7 @@ onMounted(async () => {
                 </div>
                 <div v-if="subscription" class="billing-current__meta">
                     <span class="billing-badge" :class="`billing-badge--${subscription.status}`">{{ statusLabel }}</span>
-                    <p v-if="subscription.currentPeriodEnd" class="billing-current__renew">
+                    <p v-if="subscription.currentPeriodEnd && !currentPlan?.isFree" class="billing-current__renew">
                         {{ t('billing.renewsOn', { date: subscription.currentPeriodEnd }) }}
                     </p>
                 </div>
