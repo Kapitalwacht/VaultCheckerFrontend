@@ -399,9 +399,9 @@
         "free": "Gratis",
         "perMonth": "/mes",
         "planNames": {
-            "barrio": "Barrio",
-            "negocio": "Negocio",
-            "cadena": "Cadena"
+            "corner": "Barrio",
+            "business": "Negocio",
+            "chain": "Cadena"
         },
         "features": {
             "store1": "1 tienda",
