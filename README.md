@@ -142,7 +142,7 @@ npm run dev
 - App: `http://localhost:5173`
 
 To use the mock API instead, keep the default URL and run `npm run server` in another terminal. It
-serves `server/db.json` on port 3000.
+serves `server/db.json` on port 3000. The file ships with empty collections, so start by signing up.
 
 ### Build
 
