@@ -4,7 +4,6 @@ import { SubscriptionsApi } from '@/subscriptions/infrastructure/subscriptions-a
 import { PlanAssembler } from '@/subscriptions/infrastructure/plan.assembler.js'
 import { SubscriptionAssembler } from '@/subscriptions/infrastructure/subscription.assembler.js'
 import { InvoiceAssembler } from '@/subscriptions/infrastructure/invoice.assembler.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 
 const subscriptionsApi = new SubscriptionsApi()
 
@@ -55,7 +54,6 @@ const useSubscriptionsStore = defineStore('subscriptions', () => {
     function subscribe(storeId, plan) {
         return subscriptionsApi.changePlan(storeId, plan.planId).then(response => {
             subscription.value = SubscriptionAssembler.toEntityFromResource(response.data)
-            useAuditStore().recordAction('CHANGE_PLAN', `Store ${storeId} switched to plan ${plan.name}`)
             return fetchInvoices(storeId)
         })
     }

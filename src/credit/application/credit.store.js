@@ -6,7 +6,6 @@ import { CreditStatementAssembler } from '@/credit/infrastructure/credit-stateme
 import { PurchaseAssembler } from '@/credit/infrastructure/purchase.assembler.js'
 import { InstallmentPaymentAssembler } from '@/credit/infrastructure/installment-payment.assembler.js'
 import { roundMoney } from '@/credit/domain/services/finance.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 import { sameId } from '@/shared/domain/same-id.js'
 
 const creditApi = new CreditApi()
@@ -148,10 +147,6 @@ const useCreditStore = defineStore('credit', () => {
                 purchases.value.push(created)
                 fetchAccounts()
                 fetchInstallmentPayments()
-                useAuditStore().recordAction(
-                    'REGISTER_PURCHASE',
-                    `Purchase of ${created.description || 'item'} for ${created.amount} (${created.months} months)`
-                )
                 return created
             })
     }
@@ -169,10 +164,6 @@ const useCreditStore = defineStore('credit', () => {
             const created = InstallmentPaymentAssembler.toEntityFromResource(response.data)
             fetchInstallmentPayments()
             fetchAccounts()
-            useAuditStore().recordAction(
-                'REGISTER_INSTALLMENT_PAYMENT',
-                `Installment #${created.period} paid ${created.total} (late fee ${created.lateFee})`
-            )
             return created
         })
     }

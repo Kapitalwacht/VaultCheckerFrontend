@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { CustomersApi } from '@/customers/infrastructure/customers-api.js'
 import { CustomerAssembler } from '@/customers/infrastructure/customer.assembler.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 
 const customersApi = new CustomersApi()
 
@@ -32,7 +31,6 @@ const useCustomersStore = defineStore('customers', () => {
             .then(response => {
                 const created = CustomerAssembler.toEntityFromResource(response.data)
                 customers.value.push(created)
-                useAuditStore().recordAction('CREATE_CUSTOMER', `Customer ${created.fullName} created`)
                 return created
             })
     }
@@ -43,7 +41,6 @@ const useCustomersStore = defineStore('customers', () => {
                 const updated = CustomerAssembler.toEntityFromResource(response.data)
                 const index = customers.value.findIndex(item => item.id === id)
                 if (index !== -1) customers.value[index] = updated
-                useAuditStore().recordAction('UPDATE_CUSTOMER', `Customer ${updated.fullName} updated`)
                 return updated
             })
     }
@@ -51,7 +48,6 @@ const useCustomersStore = defineStore('customers', () => {
     function deleteCustomer(id) {
         return customersApi.deleteCustomer(id).then(() => {
             customers.value = customers.value.filter(item => item.id !== id)
-            useAuditStore().recordAction('DELETE_CUSTOMER', `Customer ${id} deleted`)
         })
     }
 

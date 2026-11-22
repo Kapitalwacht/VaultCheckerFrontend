@@ -17,5 +17,4 @@ export class AuditApi extends BaseApi {
 
     getLogsByDate(date) { return this.http.get(`${auditPath}?date=${date}`) }
 
-    createLog(log) { return this.#auditEndpoint.create(log) }
 }

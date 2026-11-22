@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { CatalogApi } from '@/catalog/infrastructure/catalog-api.js'
 import { ProductAssembler } from '@/catalog/infrastructure/product.assembler.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 
 const catalogApi = new CatalogApi()
 
@@ -32,7 +31,6 @@ const useCatalogStore = defineStore('catalog', () => {
             .then(response => {
                 const created = ProductAssembler.toEntityFromResource(response.data)
                 products.value.push(created)
-                useAuditStore().recordAction('CREATE_PRODUCT', `Product ${created.name} created`)
                 return created
             })
     }
@@ -43,7 +41,6 @@ const useCatalogStore = defineStore('catalog', () => {
                 const updated = ProductAssembler.toEntityFromResource(response.data)
                 const index = products.value.findIndex(item => item.id === id)
                 if (index !== -1) products.value[index] = updated
-                useAuditStore().recordAction('UPDATE_PRODUCT', `Product ${updated.name} updated`)
                 return updated
             })
     }
@@ -51,7 +48,6 @@ const useCatalogStore = defineStore('catalog', () => {
     function deleteProduct(id) {
         return catalogApi.deleteProduct(id).then(() => {
             products.value = products.value.filter(item => item.id !== id)
-            useAuditStore().recordAction('DELETE_PRODUCT', `Product ${id} deleted`)
         })
     }
 

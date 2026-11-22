@@ -2,9 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { AuditApi } from '@/audit/infrastructure/audit-api.js'
 import { AuditLogAssembler } from '@/audit/infrastructure/audit-log.assembler.js'
-import { toIsoDate } from '@/shared/domain/local-date.js'
-import useIamStore from '@/iam/application/iam.store.js'
-import { Roles } from '@/iam/domain/model/roles.js'
 
 const auditApi = new AuditApi()
 
@@ -29,25 +26,7 @@ const useAuditStore = defineStore('audit', () => {
             })
     }
 
-    function recordAction(action, details) {
-        const iam = useIamStore()
-        const now = new Date()
-        const resource = {
-            auditId: `AU-${now.getTime()}`,
-            userRole: iam.role ?? Roles.STORE_ADMIN,
-            action,
-            date: toIsoDate(now),
-            time: now.toTimeString().slice(0, 5),
-            details
-        }
-        return auditApi.createLog(resource)
-            .then(response => {
-                logs.value.unshift(AuditLogAssembler.toEntityFromResource(response.data))
-            })
-            .catch(() => {  })
-    }
-
-    return { logs, loading, error, fetchLogs, recordAction }
+    return { logs, loading, error, fetchLogs }
 })
 
 export default useAuditStore

@@ -4,7 +4,6 @@ import { IamApi } from '@/iam/infrastructure/iam-api.js'
 import { AuthenticatedUser } from '@/iam/domain/model/authenticated-user-entity.js'
 import { Store } from '@/stores/domain/model/store-entity.js'
 import { Roles } from '@/iam/domain/model/roles.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 
 const STORAGE_KEY = 'vaultchecker-auth'
 
@@ -112,7 +111,6 @@ const useIamStore = defineStore('iam', () => {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
         return iamApi.updateProfile({ name, phone }).then(() => {
-            useAuditStore().recordAction('UPDATE_PROFILE', `Profile of ${currentUser.value.email} updated`)
             return rebuildSession({ name, phone })
         })
     }
@@ -123,7 +121,6 @@ const useIamStore = defineStore('iam', () => {
         const email = newEmail.trim()
         return iamApi.changeEmail(email).then(user => {
             persist(user)
-            useAuditStore().recordAction('CHANGE_EMAIL', `Account email changed to ${email}`)
             return { emailSent: true, link: null }
         })
     }
@@ -132,7 +129,6 @@ const useIamStore = defineStore('iam', () => {
         const id = currentUser.value?.id
         if (!id) return Promise.reject(new Error('not-authenticated'))
         return iamApi.changePassword(currentPassword, newPassword).then(() => {
-            useAuditStore().recordAction('CHANGE_PASSWORD', `Password of ${currentUser.value.email} changed`)
             return true
         })
     }

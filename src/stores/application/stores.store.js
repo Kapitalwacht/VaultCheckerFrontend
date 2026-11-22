@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { StoresApi } from '@/stores/infrastructure/stores-api.js'
 import { StoreAssembler } from '@/stores/infrastructure/store.assembler.js'
-import useAuditStore from '@/audit/application/audit.store.js'
 
 const storesApi = new StoresApi()
 
@@ -32,7 +31,6 @@ const useStoresStore = defineStore('stores', () => {
             .then(response => {
                 const created = StoreAssembler.toEntityFromResource(response.data)
                 stores.value.push(created)
-                useAuditStore().recordAction('CREATE_STORE', `Store ${created.businessName} created`)
                 return created
             })
     }
@@ -43,7 +41,6 @@ const useStoresStore = defineStore('stores', () => {
                 const updated = StoreAssembler.toEntityFromResource(response.data)
                 const index = stores.value.findIndex(item => item.id === id)
                 if (index !== -1) stores.value[index] = updated
-                useAuditStore().recordAction('UPDATE_STORE', `Store ${updated.businessName} updated`)
                 return updated
             })
     }
