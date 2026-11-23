@@ -1,14 +1,12 @@
 # VaultChecker — Frontend
 
 Web application for **VaultChecker**, a multi-store platform that digitalises the neighbourhood
-_"cuaderno de fiado"_ (store credit ledger). Store owners manage customers, products and credit from
+paper store credit ledger. Store owners manage customers, products and credit from
 the browser, and neighbours consult their own debt and payment plan.
 
 Built with **Vue 3**, **Pinia** and **PrimeVue**, and organised with the same **bounded contexts** as
 the backend. All business data comes from the
 [VaultChecker Platform API](https://github.com/Kapitalwacht/VaultCheckerBackend).
-
----
 
 ## Tech stack
 
@@ -23,8 +21,6 @@ the backend. All business data comes from the
 | i18n             | vue-i18n (Spanish and English)                    |
 | Mock API         | json-server                                       |
 | Hosting          | Firebase Hosting                                  |
-
----
 
 ## Architecture
 
@@ -66,7 +62,7 @@ renews the session with the refresh token and retries the request once.
 | `customers`     | Customers and their agreed credit terms                           | `/customers` |
 | `credit`        | Credit accounts, payment plans and the cutoff report              | `/credit`, `/credit/plan`, `/credit/report` |
 | `subscriptions` | Store plans, Stripe checkout and invoices                         | `/billing` |
-| `audit`         | Operation history                                                 | `/audit` |
+| `audit`         | Operation history recorded by the backend (read only)             | `/audit` |
 | `shared`        | Layout, shared components, API base, currency and date helpers    | `/home` |
 
 ### Roles
@@ -88,14 +84,14 @@ links the account to their debts.
 **French method, 360-day year, 30-day commercial month, total grace capitalised, amounts rounded to
 2 decimals and rates shown with 7 decimals**. The backend remains the source of truth for amounts owed.
 
-Each credit shows the customer's currency. Totals convert dollars to soles with `VITE_USD_PEN_RATE`.
+Each credit shows the customer's currency. Totals convert dollars to Peruvian soles with `VITE_USD_PEN_RATE`.
 
 ### Internationalisation
 
 Interface texts live in `src/locales/es.json` and `src/locales/en.json`. To add or change a text,
-update **both** files; views read them through `t('...')`, never as literal text.
-
----
+update **both** files; views read them through `t('...')`, never as literal text. Plan names are
+translated from the plan id (`corner`, `business`, `chain`) under `billing.planNames`, and audit
+actions under `audit.action`.
 
 ## Configuration
 
@@ -116,8 +112,6 @@ Vite reads the env files from **`src/`** (`envDir` in `vite.config.js`), not fro
 | `VITE_USD_PEN_RATE`                  | Soles per dollar                              |
 
 Emails and payment links are configured in the backend, so the frontend needs no EmailJS or Stripe keys.
-
----
 
 ## Running locally
 
@@ -143,6 +137,7 @@ npm run dev
 
 To use the mock API instead, keep the default URL and run `npm run server` in another terminal. It
 serves `server/db.json` on port 3000. The file ships with empty collections, so start by signing up.
+The mock API does not record audit entries; only the backend does.
 
 ### Build
 
