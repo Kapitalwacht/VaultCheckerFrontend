@@ -1,10 +1,10 @@
-# VaultChecker — Frontend
+# VaultChecker Frontend
 
-Web application for **VaultChecker**, a multi-store platform that digitalises the neighbourhood
+Web application for VaultChecker, a multi-store platform that digitalises the neighbourhood
 paper store credit ledger. Store owners manage customers, products and credit from
 the browser, and neighbours consult their own debt and payment plan.
 
-Built with **Vue 3**, **Pinia** and **PrimeVue**, and organised with the same **bounded contexts** as
+Built with Vue 3, Pinia and PrimeVue, and organised with the same bounded contexts as
 the backend. All business data comes from the
 [VaultChecker Platform API](https://github.com/Kapitalwacht/VaultCheckerBackend).
 
@@ -24,12 +24,12 @@ the backend. All business data comes from the
 
 ## Architecture
 
-The code is split into **bounded contexts** (one folder per business capability). Every context is
+The code is split into bounded contexts (one folder per business capability). Every context is
 organised into the same four layers:
 
 ```
 src/<context>/
-├── domain/           # Business model — no framework code
+├── domain/           # Business model, no framework code
 │   ├── model/              # Entities (CreditAccount, Purchase, Roles, …)
 │   └── services/           # Pure domain services (the financial calculations)
 ├── application/      # Pinia stores that orchestrate the use cases
@@ -75,27 +75,27 @@ The router guard checks `meta.roles` on each route. The API enforces the same ru
 | `store-admin`  | Home, customers, products, credit, report, billing and audit   |
 | `customer`     | Their own cutoff report                                        |
 
-Everyone can open their profile. A customer signs up with the **DNI** registered by the store, which
+Everyone can open their profile. A customer signs up with the DNI registered by the store, which
 links the account to their debts.
 
 ### Financial calculations
 
 `src/credit/domain/services` previews payment plans with the same conventions as the backend:
-**French method, 360-day year, 30-day commercial month, total grace capitalised, amounts rounded to
-2 decimals and rates shown with 7 decimals**. The backend remains the source of truth for amounts owed.
+French method, 360-day year, 30-day commercial month, total grace capitalised, amounts rounded to
+2 decimals and rates shown with 7 decimals. The backend remains the source of truth for amounts owed.
 
 Each credit shows the customer's currency. Totals convert dollars to Peruvian soles with `VITE_USD_PEN_RATE`.
 
 ### Internationalisation
 
 Interface texts live in `src/locales/es.json` and `src/locales/en.json`. To add or change a text,
-update **both** files; views read them through `t('...')`, never as literal text. Plan names are
+update both files; views read them through `t('...')`, never as literal text. Plan names are
 translated from the plan id (`corner`, `business`, `chain`) under `billing.planNames`, and audit
 actions under `audit.action`.
 
 ## Configuration
 
-Vite reads the env files from **`src/`** (`envDir` in `vite.config.js`), not from the project root:
+Vite reads the env files from `src/` (`envDir` in `vite.config.js`), not from the project root:
 
 | File                   | Used by                           |
 |------------------------|-----------------------------------|
@@ -115,7 +115,7 @@ Emails and payment links are configured in the backend, so the frontend needs no
 
 ## Running locally
 
-Prerequisites: **Node.js** `^20.19.0` or `>=22.12.0`.
+Prerequisites: Node.js `^20.19.0` or `>=22.12.0`.
 
 ```bash
 npm install
@@ -148,10 +148,10 @@ npm run preview
 
 ## Deployment
 
-Every push to `main` builds the app and deploys `dist` to **Firebase Hosting** through GitHub Actions:
+Every push to `main` builds the app and deploys `dist` to Firebase Hosting through GitHub Actions:
 `https://vaultchecker-frontend.web.app`.
 
 ## Related repositories
 
-- [VaultCheckerBackend](https://github.com/Kapitalwacht/VaultCheckerBackend) — REST API
-- [vaultCheckerLandingPage](https://github.com/Kapitalwacht/vaultCheckerLandingPage) — landing page
+- [VaultCheckerBackend](https://github.com/Kapitalwacht/VaultCheckerBackend): REST API
+- [vaultCheckerLandingPage](https://github.com/Kapitalwacht/vaultCheckerLandingPage): landing page
